@@ -18,3 +18,5 @@ pnpm-debug.log*
 
 # Archivos del sistema y de editores
 .vscode/
+
+/app/generated/prisma
