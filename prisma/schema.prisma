@@ -12,7 +12,7 @@ datasource db {
     provider = "postgresql"
 }
 
-model Payment {
+model Pago {
     id              String      @id @default(cuid())
     clerkUserId     String
     formaDePago     String
@@ -23,7 +23,7 @@ model Payment {
     monto           Decimal     @db.Decimal(10, 2)
 }
 
-model Dispute {
+model Disputa {
     id                  String      @id @default(cuid())
     clerkUserId         String
     pedidoId            String
