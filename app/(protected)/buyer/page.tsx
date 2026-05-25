@@ -3,7 +3,7 @@
 import { CreditCard, MessageSquareWarning, Package } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { formatFecha, formatMonto } from '@/lib/formatters'
-import { SummaryCard } from '@/components/buyer/summary-card'
+import { SummaryCard } from '@/components/ui/summary-card'
 import { AlertBanner } from '@/components/buyer/alert-banner'
 
 
