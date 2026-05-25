@@ -1,9 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { X, CreditCard, Lock } from 'lucide-react'
-import { formatFecha, formatMonto } from '@/lib/formatters'
-import { Payment, PaymentStatus } from '@/types/payments'
+import { Payment } from '@/types/payments'
 import { PaymentRow } from '@/components/buyer/payment-row'
 import { PaymentModal } from '@/components/buyer/payment-modal'
 import { TabButton } from '@/components/ui/tab-button'
