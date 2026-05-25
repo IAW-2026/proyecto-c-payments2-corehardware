@@ -87,4 +87,5 @@ const disputas: Dispute[] = [
     { id: 1, pedidoId: 1012, fecha: '2025-05-15', descripcion: 'Recibi un producto dañado, la caja llegó golpeada y el item no funciona.', contacto: 'juan@email.com', estado: 'pendiente', monto: 184500 },
     { id: 2, pedidoId: 1008, fecha: '2025-04-30', descripcion: 'El producto recibido no coincide con el que pedí, es un modelo diferente.', contacto: '+54 9 11 1234-5678', estado: 'reembolsada', monto: 76200 },
     { id: 3, pedidoId: 1003, fecha: '2025-04-12', descripcion: 'El paquete nunca llegó a la dirección indicada.', contacto: 'juan@email.com', estado: 'rechazada', monto: 312000 },
+    { id: 4, pedidoId: 1009, fecha: '2025-04-20', descripcion: 'El producto llegó pero era una unidad de reposición diferente a la solicitada.', contacto: 'juan@email.com', estado: 'repuesta', monto: 95800 },
 ]

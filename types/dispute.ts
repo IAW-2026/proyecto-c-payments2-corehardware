@@ -1,4 +1,4 @@
-type DisputeStatus = 'pendiente' | 'reembolsada' | 'rechazada'
+type DisputeStatus = 'pendiente' | 'reembolsada' | 'repuesta' | 'rechazada'
  
 type Dispute = {
     id: number

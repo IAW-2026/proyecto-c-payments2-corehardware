@@ -5,6 +5,7 @@ const estadoVariant: Record<DisputeStatus, React.ComponentProps<typeof Badge>['v
     pendiente:   'warning',
     reembolsada: 'accent',
     rechazada:   'danger',
+    repuesta: 'accent',  
 }
 
 
@@ -12,6 +13,7 @@ const estadoLabel: Record<DisputeStatus, string> = {
     pendiente:   'Pendiente',
     reembolsada: 'Reembolsada',
     rechazada:   'Rechazada',
+    repuesta: 'Repuesta',
 }
 
 export function DisputeRow({ disputa }: { disputa: Dispute }) {
