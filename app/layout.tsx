@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { ClerkProvider, Show, SignInButton, SignUpButton, UserButton } from '@clerk/nextjs'
 import { Geist, Geist_Mono } from 'next/font/google'
 import './globals.css'
+import { ButtonPrimary, ButtonSecondary } from '@/components/ui/button'
 
 const geistSans = Geist({
     variable: '--font-geist-sans',
@@ -24,27 +25,31 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html
-            lang="en"
-            className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-        >
-            <body className="min-h-full flex flex-col">
-                <ClerkProvider
-                    signInUrl="/sign-in"
-                    signUpUrl="/sign-up"
-                >
-                    <header className="flex justify-end items-center p-4 gap-4 h-16">
-                        <Show when="signed-out">
-                            <SignInButton />
-                            <SignUpButton>
-                                <button className="bg-purple-700 text-white rounded-full font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 cursor-pointer">
-                                    Sign Up
-                                </button>
-                            </SignUpButton>
-                        </Show>
-                        <Show when="signed-in">
-                            <UserButton />
-                        </Show>
+        <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
+            <body className="min-h-full flex flex-col bg-neutral-50 text-neutral-900 dark:bg-neutral-950 dark:text-neutral-100 transition-colors duration-200">
+                <ClerkProvider signInUrl="/sign-in" signUpUrl="/sign-up">
+                    <header className="border-b border-neutral-200 dark:border-neutral-900 flex justify-between items-center p-4 gap-4 h-16">
+                        <div className="pl-4 flex items-baseline gap-0.5">
+                            <span className="text-2xl font-bold text-neutral-900 dark:text-neutral-100 tracking-tight">
+                                CoreHardware
+                            </span>
+                            <span className="text-base sm:text-lg font-normal text-green-600 dark:text-green-500">
+                                Payments
+                            </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <Show when="signed-out">
+                                <SignInButton>
+                                    <ButtonSecondary>Sign In</ButtonSecondary>
+                                </SignInButton>
+                                <SignUpButton>
+                                    <ButtonPrimary>Sign Up</ButtonPrimary>
+                                </SignUpButton>
+                            </Show>
+                            <Show when="signed-in">
+                                <UserButton />
+                            </Show>
+                        </div>
                     </header>
                     {children}
                 </ClerkProvider>

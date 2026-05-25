@@ -20,3 +20,5 @@ pnpm-debug.log*
 .vscode/
 
 /app/generated/prisma
+
+/app/theme-preview/
