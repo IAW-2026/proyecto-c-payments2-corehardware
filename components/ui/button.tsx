@@ -1,3 +1,4 @@
+import { X } from 'lucide-react'
 import { ButtonHTMLAttributes } from 'react'
  
 const base = 'px-4 py-2 font-medium text-sm rounded-lg transition-colors active:scale-[0.98] cursor-pointer'
@@ -33,4 +34,15 @@ export function ButtonMuted({ className = '', ...props }: ButtonHTMLAttributes<H
         />
     )
 }
- 
+
+
+export function ButtonClose({ className = '', ...props }: ButtonHTMLAttributes<HTMLButtonElement>) {
+    return (
+        <button
+            className={`p-1.5 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-500 transition-colors ${className}`}
+            {...props}
+        >
+            <X className="w-4 h-4" />
+        </button>
+    )
+}

@@ -1,8 +1,8 @@
 import { formatMonto } from "@/lib/formatters"
 import { Payment } from "@/types/payments"
-import { CreditCard, X, Lock } from 'lucide-react'
+import { CreditCard, Lock } from 'lucide-react'
 import { Input } from "@/components/ui/input"
-import { ButtonPrimary } from "@/components/ui/button"
+import { ButtonClose, ButtonPrimary } from "@/components/ui/button"
  
 export function PaymentModal({ payment, onClose }: { payment: Payment; onClose: () => void }) {
     return (
@@ -19,12 +19,7 @@ export function PaymentModal({ payment, onClose }: { payment: Payment; onClose: 
                             Total: {formatMonto(payment.monto)}
                         </p>
                     </div>
-                    <button
-                        onClick={onClose}
-                        className="p-1.5 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-500 transition-colors"
-                    >
-                        <X className="w-4 h-4" />
-                    </button>
+                    <ButtonClose onClick={onClose} />
                 </div>
  
                 {/* Form */}
