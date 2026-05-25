@@ -8,7 +8,6 @@ import { PaymentRow } from '@/components/buyer/payment-row'
 import { PaymentModal } from '@/components/buyer/payment-modal'
 import { TabButton } from '@/components/ui/tab-button'
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
 
 type Tab = 'pendientes' | 'realizados'
 
@@ -19,7 +18,7 @@ export default function PaymentsPage() {
     const lista = tab === 'pendientes' ? pagosPendientes : pagosRealizados
 
     return (
-        <div className="max-w-3xl mx-auto space-y-6">
+        <div className="max-w-6xl mx-auto space-y-6">
 
             {/* Encabezado */}
             <div>

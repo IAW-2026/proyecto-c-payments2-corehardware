@@ -19,7 +19,7 @@ export default function DisputesPage() {
     const lista = tab === 'activas' ? activas : resueltas
  
     return (
-        <div className="max-w-3xl mx-auto space-y-6">
+        <div className="max-w-6xl mx-auto space-y-6">
  
             {/* Encabezado */}
             <div className="flex items-start justify-between gap-4">
