@@ -12,7 +12,7 @@ export default function SideNav({ tabs }: { tabs: Tab[] }) {
                 border-neutral-200 dark:border-neutral-900 bg-neutral-100/50 dark:bg-neutral-900/30 px-4 md:px-4 md:py-6 gap-1 overflow-x-auto md:overflow-x-visible">
             {tabs.map(({ label, href }) => {
                 const Tab = pathname === href ? TabItemActive : TabItem
-                return <Tab key={href}>{label}</Tab>
+                return <Tab key={href} href={href}>{label}</Tab>
             })}
         </nav>
     )

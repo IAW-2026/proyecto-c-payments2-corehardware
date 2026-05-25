@@ -2,8 +2,8 @@ import SideNav from '@/components/ui/side-nav'
 
 const tabs = [
     { label: 'Home', href: '/seller' },
-    { label: 'Acreditaciones', href: '/seller/acreditaciones' },
-    { label: 'Disputas', href: '/seller/disputas' },
+    { label: 'Acreditaciones', href: '/seller/accreditations' },
+    { label: 'Disputas', href: '/seller/disputes' },
 ]
 
 export default function SellerLayout({ children }: { children: React.ReactNode }) {

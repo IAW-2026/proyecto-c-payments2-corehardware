@@ -1,7 +1,7 @@
 import SideNav from '@/components/ui/side-nav'
 
 const tabs = [
-    { label: 'Home', href: '/seller' },
+    { label: 'Home', href: '/admin' },
     { label: 'Dashboard', href: '/admin/dashboard' },
 ]
 

@@ -2,8 +2,8 @@ import SideNav from '@/components/ui/side-nav'
 
 const tabs = [
     { label: 'Home', href: '/buyer' },
-    { label: 'Pagos', href: '/buyer/pagos' },
-    { label: 'Disputas', href: '/buyer/disputas' },
+    { label: 'Pagos', href: '/buyer/payments' },
+    { label: 'Disputas', href: '/buyer/disputes' },
 ]
 
 export default function BuyerLayout({ children }: { children: React.ReactNode }) {
