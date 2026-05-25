@@ -14,7 +14,6 @@ export function ButtonPrimary({ className = '', ...props }: ButtonHTMLAttributes
         />
     )
 }
- 
 
 export function ButtonSecondary({ className = '', ...props }: ButtonHTMLAttributes<HTMLButtonElement>) {
     return (
@@ -25,7 +24,6 @@ export function ButtonSecondary({ className = '', ...props }: ButtonHTMLAttribut
     )
 }
  
-
 export function ButtonMuted({ className = '', ...props }: ButtonHTMLAttributes<HTMLButtonElement>) {
     return (
         <button
@@ -35,6 +33,14 @@ export function ButtonMuted({ className = '', ...props }: ButtonHTMLAttributes<H
     )
 }
 
+export function ButtonDanger({ className = '', ...props }: ButtonHTMLAttributes<HTMLButtonElement>) {
+    return (
+        <button
+            className={`${base} bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 dark:bg-red-500/10 dark:hover:bg-red-500/20 dark:text-red-400 dark:border-red-500/20 ${disabledClasses} ${className}`}
+            {...props}
+        />
+    )
+}
 
 export function ButtonClose({ className = '', ...props }: ButtonHTMLAttributes<HTMLButtonElement>) {
     return (
