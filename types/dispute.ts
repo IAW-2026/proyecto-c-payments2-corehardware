@@ -1,11 +1,8 @@
-type DisputeStatus = 'pendiente' | 'reembolsada' | 'repuesta' | 'rechazada'
- 
-type Dispute = {
-    id: number
-    pedidoId: number
-    fecha: string
-    descripcion: string
-    contacto: string
+import { Disputa } from '@prisma/client'
+
+export type DisputeStatus = 'pendiente' | 'reembolsada' | 'repuesta' | 'rechazada'
+
+export type Dispute = Omit<Disputa, 'estado'> & {
     estado: DisputeStatus
-    monto: number
+    contacto: string
 }

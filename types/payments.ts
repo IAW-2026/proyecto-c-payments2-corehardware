@@ -1,11 +1,7 @@
-export type PaymentStatus = 'pendiente' | 'acreditado' | 'rechazado' | 'en_proceso'
+import { Pago } from '@prisma/client'
+
+export type PaymentStatus = 'pendiente' | 'acreditado' | 'rechazado' | 'en_proceso' | 'cancelado' | 'reembolsado' | 'contracargo'
  
-export type Payment = {
-    id: number
-    pedidoId: number
-    fecha: string
-    descripcion: string
-    monto: number
-    formaPago: string
+export type Payment = Omit<Pago, 'estado'> & {
     estado: PaymentStatus
 }

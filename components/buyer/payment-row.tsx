@@ -4,17 +4,23 @@ import { Badge } from "@/components/ui/badge"
 import { ButtonPrimary } from "@/components/ui/button"
  
 const statusVariant: Record<PaymentStatus, React.ComponentProps<typeof Badge>['variant']> = {
-    pendiente:  'warning',
-    acreditado: 'accent',
-    rechazado:  'danger',
-    en_proceso: 'default',
+    pendiente:   'warning',
+    acreditado:  'accent',
+    rechazado:   'danger',
+    en_proceso:  'default',
+    cancelado:   'default',
+    reembolsado: 'default',
+    contracargo: 'danger',
 }
- 
+
 const statusLabel: Record<PaymentStatus, string> = {
-    pendiente:  'Pendiente',
-    acreditado: 'Acreditado',
-    rechazado:  'Rechazado',
-    en_proceso: 'En proceso',
+    pendiente:   'Pendiente',
+    acreditado:  'Acreditado',
+    rechazado:   'Rechazado',
+    en_proceso:  'En proceso',
+    cancelado:   'Cancelado',
+    reembolsado: 'Reembolsado',
+    contracargo: 'Contracargo',
 }
  
 export function PaymentRow({ payment, onPagar }: { payment: Payment; onPagar?: (p: Payment) => void }) {
@@ -31,7 +37,7 @@ export function PaymentRow({ payment, onPagar }: { payment: Payment; onPagar?: (
             </td>
             {/* Forma de pago — solo desktop */}
             <td className="hidden md:table-cell px-4 py-3.5 text-xs text-neutral-400 whitespace-nowrap">
-                {payment.formaPago || '—'}
+                {payment.formaDePago || '—'}
             </td>
             {/* Monto */}
             <td className="px-4 py-3.5 font-mono text-sm font-semibold text-neutral-900 dark:text-neutral-100 whitespace-nowrap">

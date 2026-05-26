@@ -3,12 +3,13 @@ import { useState } from "react"
 import { Input } from "../ui/input"
 import { ButtonClose, ButtonPrimary, ButtonSecondary } from "../ui/button"
 import { Payment } from "@/types/payments"
+import { Prisma } from "@prisma/client"
 
 
 // Pagos realizados y cobrados disponibles para disputar
 const pagosDisputables: Payment[] = [
-    { id: 1, pedidoId: 1012, fecha: '2025-05-10', descripcion: 'Pedido #1012', monto: 184500, formaPago: 'Tarjeta de crédito', estado: 'acreditado' },
-    { id: 2, pedidoId: 1008, fecha: '2025-04-28', descripcion: 'Pedido #1008', monto: 76200, formaPago: 'Tarjeta de débito', estado: 'acreditado' },
+    { id: '1', clerkUserId: '1', pedidoId: '1012', fecha: new Date('2025-05-10'), descripcion: 'Pedido #1012', monto: new Prisma.Decimal(184500), formaDePago: 'Tarjeta de crédito', estado: 'acreditado' },
+    { id: '2', clerkUserId: '1', pedidoId: '1008', fecha: new Date('2025-04-28'), descripcion: 'Pedido #1008', monto: new Prisma.Decimal(76200), formaDePago: 'Tarjeta de débito', estado: 'acreditado' },
 ]
 
 export function NewDisputeModal({ onClose }: { onClose: () => void }) {

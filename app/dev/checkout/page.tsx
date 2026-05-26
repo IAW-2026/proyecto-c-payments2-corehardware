@@ -3,7 +3,6 @@
 import { useState } from "react";
 
 export default function DevCheckoutPage() {
-    // Estado inicial (IDs como strings para cumplir con Zod)
     const [formData, setFormData] = useState({
         id: "1001",
         fecha: new Date().toISOString(),
@@ -81,7 +80,6 @@ export default function DevCheckoutPage() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* FORMULARIO DE PRUEBA (DARK STYLE) */}
                 <form onSubmit={handleTestCheckout} className="space-y-4 border border-gray-800 p-5 rounded-lg bg-gray-900 shadow-xl">
                     <h2 className="text-lg font-semibold border-b border-gray-800 pb-2 text-white">Datos del Pedido</h2>
                     
@@ -128,7 +126,6 @@ export default function DevCheckoutPage() {
                     </button>
                 </form>
 
-                {/* PANEL DE RESPUESTA (DARK STYLE) */}
                 <div className="flex flex-col space-y-4">
                     <h2 className="text-lg font-semibold border-b border-gray-800 pb-2 text-white">Respuesta de la API</h2>
                     
@@ -146,10 +143,6 @@ export default function DevCheckoutPage() {
                         )}
                     </div>
                 </div>
-            </div>
-            
-            <div className="bg-amber-950/20 border border-amber-900/60 p-4 rounded text-xs text-amber-300">
-                <strong>Nota sobre Autenticación:</strong> Si recibes un status <code className="bg-amber-950 px-1.5 py-0.5 rounded border border-amber-800 text-amber-400">401 (No autorizado)</code>, asegúrate de haber iniciado sesión en tu aplicación con Clerk en esta misma pestaña del navegador antes de lanzar el test.
             </div>
         </div>
     );
