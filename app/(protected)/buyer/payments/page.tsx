@@ -97,6 +97,6 @@ const pagosRealizados: Payment[] = [
 ]
 
 const pagosPendientes: Payment[] = [
-    { id: '4', clerkUserId: '1', pedidoId: '1015', fecha: new Date('2025-05-22'), descripcion: 'Pedido #1015', monto: new Prisma.Decimal(95800), formaDePago: '', estado: 'pendiente' },
+    { id: '4', clerkUserId: '1', pedidoId: '1015', fecha: new Date('2025-05-22'), descripcion: 'Pedido #1015', monto: new Prisma.Decimal(150), formaDePago: '', estado: 'pendiente' },
     { id: '5', clerkUserId: '1', pedidoId: '1014', fecha: new Date('2025-05-20'), descripcion: 'Pedido #1014', monto: new Prisma.Decimal(210000), formaDePago: '', estado: 'pendiente' },
 ]
