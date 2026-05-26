@@ -5,6 +5,7 @@ import { TabButton } from '@/components/ui/tab-button'
 import { ButtonPrimary } from '@/components/ui/button'
 import { DisputeRow } from '@/components/buyer/dispute-row'
 import { NewDisputeModal } from '@/components/buyer/dispute-modal'
+import { Dispute } from '@/types/dispute'
   
 
 type DisputeTab = 'activas' | 'resueltas'
@@ -84,8 +85,8 @@ export default function DisputesPage() {
 
 
 const disputas: Dispute[] = [
-    { id: 1, pedidoId: 1012, fecha: '2025-05-15', descripcion: 'Recibi un producto dañado, la caja llegó golpeada y el item no funciona.', contacto: 'juan@email.com', estado: 'pendiente', monto: 184500 },
-    { id: 2, pedidoId: 1008, fecha: '2025-04-30', descripcion: 'El producto recibido no coincide con el que pedí, es un modelo diferente.', contacto: '+54 9 11 1234-5678', estado: 'reembolsada', monto: 76200 },
-    { id: 3, pedidoId: 1003, fecha: '2025-04-12', descripcion: 'El paquete nunca llegó a la dirección indicada.', contacto: 'juan@email.com', estado: 'rechazada', monto: 312000 },
-    { id: 4, pedidoId: 1009, fecha: '2025-04-20', descripcion: 'El producto llegó pero era una unidad de reposición diferente a la solicitada.', contacto: 'juan@email.com', estado: 'repuesta', monto: 95800 },
+    { id: '1', clerkUserId: '1', pagoId: '1012', fechaDeInicio: new Date('2025-05-15'), fechaDeFinalizacion: null, descripcion: 'Recibi un producto dañado, la caja llegó golpeada y el item no funciona.', contacto: 'juan@email.com', estado: 'pendiente'},
+    { id: '2', clerkUserId: '1', pagoId: '1008', fechaDeInicio: new Date('2025-04-30'), fechaDeFinalizacion: null, descripcion: 'El producto recibido no coincide con el que pedí, es un modelo diferente.', contacto: '+54 9 11 1234-5678', estado: 'reembolsada'},
+    { id: '3', clerkUserId: '1', pagoId: '1003', fechaDeInicio: new Date('2025-04-12'), fechaDeFinalizacion: null, descripcion: 'El paquete nunca llegó a la dirección indicada.', contacto: 'juan@email.com', estado: 'rechazada'},
+    { id: '4', clerkUserId: '1', pagoId: '1009', fechaDeInicio: new Date('2025-04-20'), fechaDeFinalizacion: null, descripcion: 'El producto llegó pero era una unidad de reposición diferente a la solicitada.', contacto: 'juan@email.com', estado: 'repuesta'},
 ]

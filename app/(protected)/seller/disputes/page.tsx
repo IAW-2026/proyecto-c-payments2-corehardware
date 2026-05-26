@@ -4,6 +4,8 @@ import { useState } from 'react'
 import { TabButton } from '@/components/ui/tab-button'
 import { DisputeRow } from '@/components/seller/dispute-row'
 import { DisputeResolveModal } from '@/components/seller/dispute-resolve-modal'
+import { Dispute, DisputeStatus } from '@/types/dispute'
+import { Prisma } from '@prisma/client'
 
 type DisputeTab = 'pendientes' | 'resueltas'
 type ResolutionStatus = Exclude<DisputeStatus, 'pendiente'>
@@ -17,7 +19,7 @@ export default function SellerDisputasPage() {
     const resueltas  = lista.filter((d) => d.estado !== 'pendiente')
     const items = tab === 'pendientes' ? pendientes : resueltas
 
-    function handleResolver(id: number, estado: ResolutionStatus) {
+    function handleResolver(id: string, estado: ResolutionStatus) {
         setLista((prev) => prev.map((d) => d.id === id ? { ...d, estado } : d))
     }
 
@@ -91,8 +93,8 @@ export default function SellerDisputasPage() {
 // ─── Mock Data ────────────────────────────────────────────────────────────────
 
 const disputas: Dispute[] = [
-    { id: 1, pedidoId: 1015, fecha: '2025-05-22', descripcion: 'Recibi un producto dañado, la caja llegó golpeada y el item no funciona.',       contacto: 'juan@email.com',        estado: 'pendiente',   monto: 95800  },
-    { id: 2, pedidoId: 1014, fecha: '2025-05-20', descripcion: 'El producto recibido no coincide con el que pedí, es un modelo diferente.',       contacto: '+54 9 11 1234-5678',    estado: 'pendiente',   monto: 210000 },
-    { id: 3, pedidoId: 1012, fecha: '2025-05-10', descripcion: 'El paquete nunca llegó a la dirección indicada.',                                 contacto: 'carlos@email.com',      estado: 'rechazada',   monto: 184500 },
-    { id: 4, pedidoId: 1008, fecha: '2025-04-28', descripcion: 'El producto llegó pero era una unidad de reposición diferente a la solicitada.',  contacto: 'ana@email.com',         estado: 'repuesta',    monto: 76200  },
+    { id: '1', clerkUserId: '1', pagoId:'', fechaDeInicio: new Date('2025-05-22'), fechaDeFinalizacion: null, descripcion: 'Recibi un producto dañado, la caja llegó golpeada y el item no funciona.',       contacto: 'juan@email.com',        estado: 'pendiente'},
+    { id: '2', clerkUserId: '1', pagoId:'', fechaDeInicio: new Date('2025-05-20'), fechaDeFinalizacion: null, descripcion: 'El producto recibido no coincide con el que pedí, es un modelo diferente.',       contacto: '+54 9 11 1234-5678',    estado: 'pendiente'},
+    { id: '3', clerkUserId: '1', pagoId:'', fechaDeInicio: new Date('2025-05-10'), fechaDeFinalizacion: null, descripcion: 'El paquete nunca llegó a la dirección indicada.',                                 contacto: 'carlos@email.com',      estado: 'rechazada' },
+    { id: '4', clerkUserId: '1', pagoId:'', fechaDeInicio: new Date('2025-04-28'), fechaDeFinalizacion: null, descripcion: 'El producto llegó pero era una unidad de reposición diferente a la solicitada.',  contacto: 'ana@email.com',         estado: 'repuesta'},
 ]

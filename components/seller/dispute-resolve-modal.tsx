@@ -1,4 +1,5 @@
 import { ButtonClose, ButtonDanger, ButtonMuted, ButtonSecondary } from '@/components/ui/button'
+import { Dispute, DisputeStatus } from '@/types/dispute';
 
 type ResolutionStatus = Exclude<DisputeStatus, 'pendiente'>
 
@@ -11,7 +12,7 @@ const opciones: { estado: ResolutionStatus; label: string }[] = [
 export function DisputeResolveModal({ disputa, onClose, onResolver }: {
     disputa: Dispute
     onClose: () => void
-    onResolver: (id: number, estado: ResolutionStatus) => void
+    onResolver: (id: string, estado: ResolutionStatus) => void
 }) {
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neutral-950/60 backdrop-blur-sm">
@@ -21,7 +22,7 @@ export function DisputeResolveModal({ disputa, onClose, onResolver }: {
                 <div className="flex items-center justify-between px-5 py-4 border-b border-neutral-100 dark:border-neutral-800">
                     <div>
                         <h2 className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">Resolver disputa</h2>
-                        <p className="text-xs text-neutral-500 mt-0.5">Pedido #{disputa.pedidoId}</p>
+                        <p className="text-xs text-neutral-500 mt-0.5">Pago #{disputa.pagoId}</p>
                     </div>
                     <ButtonClose onClick={onClose} />
                 </div>
