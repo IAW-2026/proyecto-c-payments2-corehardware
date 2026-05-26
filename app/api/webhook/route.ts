@@ -17,7 +17,7 @@ function validateSignature(req: NextRequest): boolean {
     const xSignature  = req.headers.get("x-signature") ?? "";
     const xRequestId  = req.headers.get("x-request-id") ?? "";
     const dataId      = req.nextUrl.searchParams.get("data.id") ?? "";
-    const secret      = process.env.MERCADOPAGO_PUBLIC_KEY!;
+    const secret      = process.env.MERCADOPAGO_SECRET_KEY!;
 
     const parts: Record<string, string> = {};
     xSignature.split(",").forEach(part => {
