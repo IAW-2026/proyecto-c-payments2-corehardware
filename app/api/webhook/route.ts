@@ -3,7 +3,6 @@ import { prisma } from "@/lib/prisma";
 import crypto from "crypto";
 import { PaymentStatus } from "@/types/payments";
 
-// Mapeo de estados MP → estados locales
 const MP_STATUS_MAP: Record<string, PaymentStatus> = {
     pending:      "pendiente",
     in_process:   "en_proceso",
@@ -14,13 +13,12 @@ const MP_STATUS_MAP: Record<string, PaymentStatus> = {
     charged_back: "contracargo",
 };
 
-function validateSignature(req: NextRequest, rawBody: string): boolean {
+function validateSignature(req: NextRequest): boolean {
     const xSignature  = req.headers.get("x-signature") ?? "";
     const xRequestId  = req.headers.get("x-request-id") ?? "";
     const dataId      = req.nextUrl.searchParams.get("data.id") ?? "";
-    const secret      = process.env.MERCADOPAGO_WEBHOOK_SECRET!;
+    const secret      = process.env.MERCADOPAGO_PUBLIC_KEY!;
 
-    // Extraer ts y v1 del header x-signature
     const parts: Record<string, string> = {};
     xSignature.split(",").forEach(part => {
         const [k, v] = part.split("=");
@@ -31,7 +29,6 @@ function validateSignature(req: NextRequest, rawBody: string): boolean {
     const hash = parts["v1"];
     if (!ts || !hash) return false;
 
-    // Armar el mensaje según el template de MP
     const manifest = `id:${dataId};request-id:${xRequestId};ts:${ts};`;
 
     const expected = crypto
@@ -44,16 +41,12 @@ function validateSignature(req: NextRequest, rawBody: string): boolean {
 
 export async function POST(req: NextRequest) {
     try {
-        const rawBody = await req.text();
-        
-        // 1. Validar firma
-        if (!validateSignature(req, rawBody)) {
+        const body = await req.json();
+
+        if (!validateSignature(req)) {
             return NextResponse.json({ message: "Firma inválida" }, { status: 401 });
         }
 
-        const body = JSON.parse(rawBody);
-
-        // 2. Ignorar eventos que no sean pagos
         if (body.type !== "payment") {
             return NextResponse.json({ received: true }, { status: 200 });
         }
@@ -63,7 +56,6 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ message: "data.id ausente" }, { status: 400 });
         }
 
-        // 3. Obtener detalle del pago desde la API de MP
         const mpRes = await fetch(`https://api.mercadopago.com/v1/payments/${mpPaymentId}`, {
             headers: {
                 Authorization: `Bearer ${process.env.MERCADOPAGO_ACCESS_TOKEN}`,
@@ -82,13 +74,11 @@ export async function POST(req: NextRequest) {
         const paymentMethodId   = mpPayment.payment_method_id ?? "";
 
         if (!externalReference) {
-            // Pago sin external_reference, no nos corresponde
             return NextResponse.json({ received: true }, { status: 200 });
         }
 
-        const estadoLocal = MP_STATUS_MAP[mpStatus] ?? "PENDIENTE";
+        const estadoLocal = MP_STATUS_MAP[mpStatus] ?? "pendiente";
 
-        // 4. Actualizar el Pago local (upsert de estado)
         await prisma.pago.update({
             where: { id: externalReference },
             data: {
