@@ -5,9 +5,11 @@ import crypto from "crypto";
 console.log("DEBUG: El archivo webhook/route.ts ha sido invocado");
 
 export async function POST(req: NextRequest) {
+    console.log("LOG DE DIAGNÓSTICO: La función POST fue invocada");
     try {
         // 1. Leer el cuerpo como texto para validación de firma (y JSON para uso posterior)
         const rawBody = await req.text();
+        console.log("LOG DE DIAGNÓSTICO: Cuerpo recibido:", rawBody);
         const body = JSON.parse(rawBody);
         
         const xSignature = req.headers.get("x-signature") ?? "";
