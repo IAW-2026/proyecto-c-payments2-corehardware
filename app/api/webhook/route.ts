@@ -66,18 +66,29 @@ export async function POST(req: NextRequest) {
         const externalReference = mpData.external_reference;
 
         if (externalReference) {
+            // Extraer forma de pago de forma segura
+            const formaDePago = mpData.payment_method_id || mpData.payments?.[0]?.payment_method_id;
+
+            // Definir datos de actualización dinámicos
+            const dataToUpdate: any = {
+                estado: MP_STATUS_MAP[mpData.status] ?? "desconocido",
+            };
+
+            // Solo agregar formaDePago si está presente
+            if (formaDePago) {
+                dataToUpdate.formaDePago = formaDePago;
+            }
+
             await prisma.pago.update({
                 where: { id: externalReference },
-                data: {
-                    estado: MP_STATUS_MAP[mpData.status] ?? "desconocido",
-                    formaDePago: topic === 'payment' ? mpData.payment_method_id : null,
-                },
+                data: dataToUpdate,
             });
         }
 
         return NextResponse.json({ received: true }, { status: 200 });
 
     } catch (error) {
+        console.error("Error en Webhook:", error);
         return NextResponse.json({ message: "Error interno" }, { status: 500 });
     }
 }
