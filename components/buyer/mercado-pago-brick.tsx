@@ -4,18 +4,20 @@ import { initMercadoPago, CardPayment } from '@mercadopago/sdk-react';
 import { useState, useEffect } from 'react';
 import { getCustomVariables } from '@/lib/mp-style';
 
-// Inicializamos una sola vez
-initMercadoPago(process.env.NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY!);
-
 interface Props {
     amount: number;
+    publicKey: string;
     onSubmit: (formData: any) => Promise<any>;
     onSuccess: (orderId: string) => void;
     onError: (error: string) => void;
 }
 
-export default function MercadoPagoBrick({ amount, onSubmit, onSuccess, onError }: Props) {
+export default function MercadoPagoBrick({ amount, publicKey, onSubmit, onSuccess, onError }: Props) {
     const [isDark, setIsDark] = useState(false);
+
+    useEffect(() => {
+        initMercadoPago(publicKey);
+    }, []);
 
     useEffect(() => {
         const media = window.matchMedia('(prefers-color-scheme: dark)');
@@ -32,7 +34,7 @@ export default function MercadoPagoBrick({ amount, onSubmit, onSuccess, onError 
                     --secondary-color: ${isDark ? '#0a0a0a' : '#ffffff'} !important;
                 }
             `}</style>
-            
+
             <CardPayment
                 initialization={{ amount }}
                 onSubmit={async (formData) => {

@@ -34,7 +34,8 @@ export async function POST(req: NextRequest) {
 
         const pago = await prisma.pago.create({
             data: {
-                clerkUserId: userId,
+                sellerClerkUserId: userId,
+                buyerClerkUserId: '1',
                 formaDePago: "",
                 estado: "PENDIENTE",
                 pedidoId: String(body.id),

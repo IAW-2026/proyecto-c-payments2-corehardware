@@ -3,7 +3,8 @@ import { Payment } from '@/types/payments';
 import MercadoPagoBrick from '@/components/buyer/mercado-pago-brick';
 import { procesarOrdenPagoPro } from '@/actions/payment';
 
-export function PaymentModal({ payment, onClose }: { payment: Payment; onClose: () => void }) {
+
+export function PaymentModal({ payment, publicKey, onClose }: { payment: Payment; publicKey: string; onClose: () => void }) {
     const [status, setStatus] = useState<'paying' | 'success'>('paying');
     
     const handlePayment = async (formData: any) => {
@@ -26,6 +27,7 @@ export function PaymentModal({ payment, onClose }: { payment: Payment; onClose: 
                         
                         <MercadoPagoBrick 
                             amount={Number(payment.monto)}
+                            publicKey={publicKey}
                             onSubmit={handlePayment}
                             onSuccess={(id) => {
                                 console.log("Pago exitoso:", id);

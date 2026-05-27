@@ -4,7 +4,7 @@ import crypto from 'crypto';
 import { prisma } from '@/lib/prisma'; // Asegúrate de tener esta importación
 
 export async function procesarOrdenPagoPro(
-    pagoId: string, 
+    pagoId: string,
     submitData: {
         total_amount: string;
         payment_method_id: string;
@@ -14,6 +14,23 @@ export async function procesarOrdenPagoPro(
     }
 ) {
     try {
+        // 1. Obtener el sellerClerkUserId asociado al pago
+        const pago = await prisma.pago.findUnique({
+            where: { id: pagoId },
+            select: { sellerClerkUserId: true }
+        });
+
+        if (!pago) return { success: false, error: "Pago no encontrado" };
+
+        // 2. Obtener el accessToken del vendedor
+        const credencial = await prisma.credencialVendedor.findUnique({
+            where: { clerkUserId: pago.sellerClerkUserId },
+            select: { accessToken: true }
+        });
+
+        if (!credencial?.accessToken) return { success: false, error: "Credenciales no configuradas" };
+
+
         const idempotencyKey = crypto.randomUUID();
         const montoFormateado = Number(submitData.total_amount).toFixed(2);
 
@@ -41,7 +58,7 @@ export async function procesarOrdenPagoPro(
             headers: {
                 'Content-Type': 'application/json',
                 'X-Idempotency-Key': idempotencyKey,
-                'Authorization': `Bearer ${process.env.MERCADOPAGO_ACCESS_TOKEN}`,
+                'Authorization': `Bearer ${credencial.accessToken}`,
             },
             body: JSON.stringify(orderBody),
         });
@@ -64,14 +81,33 @@ export async function getPagos() {
         const pagos = await prisma.pago.findMany({
             orderBy: { fecha: 'desc' }
         });
-        
+
         // Transformamos decimales de Prisma a strings o números para que el cliente los entienda
         return pagos.map(p => ({
             ...p,
-            monto: p.monto.toString() 
+            monto: p.monto.toString()
         }));
     } catch (error) {
         console.error("Error al obtener pagos:", error);
         return [];
     }
+}
+
+
+export async function getVendedorPublicKey(pagoId: string) {
+    // 1. Obtener el sellerClerkUserId del pago
+    const pago = await prisma.pago.findUnique({
+        where: { id: pagoId },
+        select: { sellerClerkUserId: true }
+    });
+
+    if (!pago) return null;
+
+    // 2. Buscar la credencial usando el sellerClerkUserId como vendedorId
+    const credencial = await prisma.credencialVendedor.findUnique({
+        where: { clerkUserId: pago.sellerClerkUserId },
+        select: { publicKey: true }
+    });
+
+    return credencial?.publicKey || null;
 }
