@@ -14,60 +14,83 @@ const MP_STATUS_MAP: Record<string, string> = {
 };
 
 export async function POST(req: NextRequest) {
-    // 1. Leer el body primero (es necesario para el fallback del dataId y para procesar el pago)
-    const body = await req.json();
+    try {
+        const body = await req.json();
+        const xSignature = req.headers.get("x-signature") ?? "";
+        const xRequestId = req.headers.get("x-request-id") ?? "";
+        const dataId = req.nextUrl.searchParams.get("data.id") ?? body.data?.id ?? "";
 
-    // 2. Obtener datos de firma y URL
-    const xSignature = req.headers.get("x-signature") ?? "";
-    const xRequestId = req.headers.get("x-request-id") ?? "";
-    
-    // Obtenemos data.id de la URL (si existe) o del body (como fallback para el simulador)
-    const dataId = req.nextUrl.searchParams.get("data.id") ?? body.data?.id ?? "";
-    
-    // 3. Validar firma (parseando con split por coma como dicta la doc)
-    const secret = process.env.MERCADOPAGO_SECRET_KEY!;
-    const parts = xSignature.split(',');
-    let ts, hash;
+        // Log de datos recibidos
+        console.log("--- Inicio de Webhook ---");
+        console.log("x-signature:", xSignature);
+        console.log("x-request-id:", xRequestId);
+        console.log("dataId detectado:", dataId);
 
-    parts.forEach(part => {
-        const [key, value] = part.split('=');
-        if (key?.trim() === 'ts') ts = value?.trim();
-        if (key?.trim() === 'v1') hash = value?.trim();
-    });
+        const secret = process.env.MERCADOPAGO_SECRET_KEY!;
+        const parts = xSignature.split(',');
+        let ts, hash;
 
-    if (!ts || !hash) return NextResponse.json({ message: "Firma incompleta" }, { status: 401 });
+        parts.forEach(part => {
+            const [key, value] = part.split('=');
+            if (key?.trim() === 'ts') ts = value?.trim();
+            if (key?.trim() === 'v1') hash = value?.trim();
+        });
 
-    // 4. Calcular HMAC usando el template de la documentación
-    const manifest = `id:${dataId};request-id:${xRequestId};ts:${ts};`;
-    const expected = crypto.createHmac("sha256", secret).update(manifest).digest("hex");
+        if (!ts || !hash) {
+            console.error("Firma incompleta: ts o hash no encontrados");
+            return NextResponse.json({ message: "Firma incompleta" }, { status: 401 });
+        }
 
-    if (expected !== hash) return NextResponse.json({ message: "Firma inválida" }, { status: 401 });
+        const manifest = `id:${dataId};request-id:${xRequestId};ts:${ts};`;
+        const expected = crypto.createHmac("sha256", secret).update(manifest).digest("hex");
 
-    // 5. Procesar evento
-    if (body.type !== "payment") return NextResponse.json({ received: true });
+        if (expected !== hash) {
+            console.error("Firma inválida. Esperado:", hash, "Calculado:", expected);
+            return NextResponse.json({ message: "Firma inválida" }, { status: 401 });
+        }
 
-    const mpPaymentId = body.data?.id;
+        if (body.type !== "payment") {
+            console.log("Evento ignorado (no es payment):", body.type);
+            return NextResponse.json({ received: true });
+        }
 
-    // Consultar el pago a la API de MP
-    const mpRes = await fetch(`https://api.mercadopago.com/v1/payments/${mpPaymentId}`, {
-        headers: { Authorization: `Bearer ${process.env.MERCADOPAGO_ACCESS_TOKEN}` },
-    });
+        const mpPaymentId = body.data?.id;
+        console.log("Consultando pago ID:", mpPaymentId);
 
-    if (!mpRes.ok) return NextResponse.json({ message: "Error al consultar MP" }, { status: 502 });
+        const mpRes = await fetch(`https://api.mercadopago.com/v1/payments/${mpPaymentId}`, {
+            headers: { 
+                Authorization: `Bearer ${process.env.MERCADOPAGO_ACCESS_TOKEN}` 
+            },
+        });
 
-    const mpData = await mpRes.json();
-    const externalReference = mpData.external_reference;
+        if (!mpRes.ok) {
+            const errorText = await mpRes.text();
+            console.error("Error al consultar MP. Status:", mpRes.status, "Body:", errorText);
+            return NextResponse.json({ message: "Error al consultar MP", details: errorText }, { status: 502 });
+        }
 
-    if (!externalReference) return NextResponse.json({ received: true });
+        const mpData = await mpRes.json();
+        console.log("Pago consultado exitosamente, status:", mpData.status);
+        
+        const externalReference = mpData.external_reference;
+        if (!externalReference) {
+            console.log("No se encontró external_reference en el pago");
+            return NextResponse.json({ received: true });
+        }
 
-    // Actualizar DB
-    await prisma.pago.update({
-        where: { id: externalReference },
-        data: {
-            estado: MP_STATUS_MAP[mpData.status] ?? "desconocido",
-            formaDePago: mpData.payment_method_id,
-        },
-    });
+        await prisma.pago.update({
+            where: { id: externalReference },
+            data: {
+                estado: MP_STATUS_MAP[mpData.status] ?? "desconocido",
+                formaDePago: mpData.payment_method_id,
+            },
+        });
 
-    return NextResponse.json({ received: true }, { status: 200 });
+        console.log("Base de datos actualizada para:", externalReference);
+        return NextResponse.json({ received: true }, { status: 200 });
+
+    } catch (error) {
+        console.error("Error crítico en el webhook:", error);
+        return NextResponse.json({ message: "Error interno" }, { status: 500 });
+    }
 }
