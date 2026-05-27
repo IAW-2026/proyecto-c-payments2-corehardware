@@ -57,3 +57,21 @@ export async function procesarOrdenPagoPro(
         return { success: false, error: 'Error interno' };
     }
 }
+
+
+export async function getPagos() {
+    try {
+        const pagos = await prisma.pago.findMany({
+            orderBy: { fecha: 'desc' }
+        });
+        
+        // Transformamos decimales de Prisma a strings o números para que el cliente los entienda
+        return pagos.map(p => ({
+            ...p,
+            monto: p.monto.toString() 
+        }));
+    } catch (error) {
+        console.error("Error al obtener pagos:", error);
+        return [];
+    }
+}
