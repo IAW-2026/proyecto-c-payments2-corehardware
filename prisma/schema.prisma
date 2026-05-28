@@ -13,8 +13,8 @@ datasource db {
 
 model Pago {
     id                  String      @id @default(cuid())
-    buyerClerkUserId    String      @unique
-    sellerClerkUserId   String      @unique
+    buyerClerkUserId    String
+    sellerClerkUserId   String
     formaDePago         String
     estado              String
     pedidoId            String
