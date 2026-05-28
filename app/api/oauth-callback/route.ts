@@ -24,7 +24,7 @@ export async function GET(req: NextRequest) {
             },
             body: JSON.stringify({
                 client_id: process.env.MERCADOPAGO_CLIENT_ID,
-                client_secret: process.env.MERCADOPAGO_SECRET_KEY,
+                client_secret: process.env.MERCADOPAGO_CLIENT_SECRET,
                 grant_type: 'authorization_code',
                 code: code,
                 redirect_uri: process.env.MERCADOPAGO_REDIRECT_URI,
