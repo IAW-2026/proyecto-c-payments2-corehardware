@@ -58,15 +58,25 @@ export async function POST(req: NextRequest) {
         // 5. Determinar el endpoint de consulta según el tipo
         const topic = body.type; // 'payment' o 'order'
         const resourceId = body.data?.id;
+        const mpUserId = body.user_id;
 
-        if (!resourceId) return NextResponse.json({ received: true });
+        if (!resourceId || !mpUserId) return NextResponse.json({ received: true });
+
+        const credencial = await prisma.credencialVendedor.findUnique({
+            where: { mercadoPagoUserId: BigInt(mpUserId) }
+        });
+
+        if (!credencial) {
+            console.error(`Credencial no encontrada para el vendedor: ${mpUserId}`);
+            return NextResponse.json({ message: "Credencial no encontrada" }, { status: 404 });
+        }
 
         const endpoint = topic === 'order' 
             ? `https://api.mercadopago.com/v1/orders/${resourceId}`
             : `https://api.mercadopago.com/v1/payments/${resourceId}`;
 
         const mpRes = await fetch(endpoint, {
-            headers: { Authorization: `Bearer ${process.env.MERCADOPAGO_ACCESS_TOKEN}` }
+            headers: { Authorization: `Bearer ${credencial.accessToken}` }
         });
 
         if (!mpRes.ok) return NextResponse.json({ message: "Error al consultar MP" }, { status: 502 });
