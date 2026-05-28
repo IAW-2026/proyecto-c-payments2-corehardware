@@ -8,8 +8,8 @@ import { Prisma } from "@prisma/client"
 
 // Pagos realizados y cobrados disponibles para disputar
 const pagosDisputables: Payment[] = [
-    { id: '1', clerkUserId: '1', pedidoId: '1012', fecha: new Date('2025-05-10'), descripcion: 'Pedido #1012', monto: new Prisma.Decimal(184500), formaDePago: 'Tarjeta de crédito', estado: 'acreditado' },
-    { id: '2', clerkUserId: '1', pedidoId: '1008', fecha: new Date('2025-04-28'), descripcion: 'Pedido #1008', monto: new Prisma.Decimal(76200), formaDePago: 'Tarjeta de débito', estado: 'acreditado' },
+    { id: '1', buyerClerkUserId: '1', sellerClerkUserId: '1', pedidoId: '1012', fecha: new Date('2025-05-10'), descripcion: 'Pedido #1012', monto: '184500', formaDePago: 'Tarjeta de crédito', estado: 'acreditado' },
+    { id: '2', buyerClerkUserId: '1', sellerClerkUserId: '1', pedidoId: '1008', fecha: new Date('2025-04-28'), descripcion: 'Pedido #1008', monto: '76200', formaDePago: 'Tarjeta de débito', estado: 'acreditado' },
 ]
 
 export function NewDisputeModal({ onClose }: { onClose: () => void }) {

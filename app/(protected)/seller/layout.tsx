@@ -4,6 +4,7 @@ const tabs = [
     { label: 'Home', href: '/seller' },
     { label: 'Acreditaciones', href: '/seller/accreditations' },
     { label: 'Disputas', href: '/seller/disputes' },
+    { label: 'Autorización', href: '/seller/authorization' },
 ]
 
 export default function SellerLayout({ children }: { children: React.ReactNode }) {

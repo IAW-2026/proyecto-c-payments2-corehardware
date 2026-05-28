@@ -24,6 +24,9 @@ const statusLabel: Record<PaymentStatus, string> = {
 }
  
 export function PaymentRow({ payment, onPagar }: { payment: Payment; onPagar?: (p: Payment) => void }) {
+    // Normalizamos el estado a minúsculas porque la DB devuelve PENDIENTE
+    const estadoNormalizado = payment.estado.toLowerCase() as PaymentStatus;
+
     return (
         <tr className="border-b border-neutral-100 dark:border-neutral-800/60 last:border-0 hover:bg-neutral-50 dark:hover:bg-neutral-800/20 transition-colors">
             {/* Fecha — solo desktop */}
@@ -32,7 +35,9 @@ export function PaymentRow({ payment, onPagar }: { payment: Payment; onPagar?: (
             </td>
             {/* Descripción */}
             <td className="px-4 py-3.5">
-                <p className="text-sm font-medium text-neutral-800 dark:text-neutral-200">{payment.descripcion}</p>
+                <p className="text-sm font-medium text-neutral-800 dark:text-neutral-200">
+                    {payment.descripcion ?? 'Sin descripción'}
+                </p>
                 <p className="text-xs text-neutral-400 md:hidden mt-0.5">{formatFecha(payment.fecha)}</p>
             </td>
             {/* Forma de pago — solo desktop */}
@@ -46,10 +51,10 @@ export function PaymentRow({ payment, onPagar }: { payment: Payment; onPagar?: (
             {/* Estado / Acción */}
             <td className="px-4 py-3.5">
                 <div className="flex items-center justify-end gap-2">
-                    <Badge variant={statusVariant[payment.estado]}>
-                        {statusLabel[payment.estado]}
+                    <Badge variant={statusVariant[estadoNormalizado]}>
+                        {statusLabel[estadoNormalizado]}
                     </Badge>
-                    {payment.estado === 'pendiente' && onPagar && (
+                    {estadoNormalizado === 'pendiente' && onPagar && (
                         <ButtonPrimary onClick={() => onPagar(payment)} className="py-1 text-xs">
                             Pagar
                         </ButtonPrimary>

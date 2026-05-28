@@ -1,18 +1,49 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Payment } from '@/types/payments'
 import { PaymentRow } from '@/components/buyer/payment-row'
 import { PaymentModal } from '@/components/buyer/payment-modal'
 import { TabButton } from '@/components/ui/tab-button'
 import { Prisma } from '@prisma/client'
+import { getPagos, getVendedorPublicKey } from '@/actions/payment'
 
 
 type Tab = 'pendientes' | 'realizados'
 
 export default function PaymentsPage() {
-    const [tab, setTab] = useState<Tab>('pendientes')
-    const [pagoActivo, setPagoActivo] = useState<Payment | null>(null)
+    const [tab, setTab] = useState<'pendientes' | 'realizados'>('pendientes')
+    const [pagoActivo, setPagoActivo] = useState<{ payment: any, publicKey: string } | null>(null)
+    const [pagos, setPagos] = useState<any[]>([])
+
+
+    // Función intermedia:
+    const handleAbrirPago = async (payment: any) => {
+        const publicKey = await getVendedorPublicKey(payment.id);
+        if (publicKey) {
+            // Mantenemos los datos separados en lugar de incrustar la key en el objeto
+            setPagoActivo({ payment, publicKey });
+        }
+    }
+
+    useEffect(() => {
+        async function load() {
+            const data = await getPagos()
+            // AQUÍ VEMOS QUÉ LLEGA REALMENTE DE LA BASE DE DATOS
+            console.log("Datos recibidos de la DB:", JSON.stringify(data, null, 2))
+            setPagos(data)
+        }
+        load()
+    }, [])
+
+    // FILTRO ROBUSTO: Normaliza el estado para asegurar la comparación
+    const pagosPendientes = pagos.filter(p =>
+        p.estado?.toString().trim().toLowerCase() === 'pendiente'
+    )
+
+    const pagosRealizados = pagos.filter(p =>
+        p.estado?.toString().trim().toLowerCase() !== 'pendiente'
+    )
 
     const lista = tab === 'pendientes' ? pagosPendientes : pagosRealizados
 
@@ -66,7 +97,7 @@ export default function PaymentsPage() {
                                 <PaymentRow
                                     key={p.id}
                                     payment={p}
-                                    onPagar={tab === 'pendientes' ? setPagoActivo : undefined}
+                                    onPagar={tab === 'pendientes' ? (p) => handleAbrirPago(p) : undefined}
                                 />
                             ))
                         )}
@@ -76,7 +107,8 @@ export default function PaymentsPage() {
             {/* Modal */}
             {pagoActivo && (
                 <PaymentModal
-                    payment={pagoActivo}
+                    payment={pagoActivo.payment} // Pasas solo el objeto Payment
+                    publicKey={pagoActivo.publicKey} // Pasas la key como prop separada
                     onClose={() => setPagoActivo(null)}
                 />
             )}
@@ -91,12 +123,12 @@ export default function PaymentsPage() {
 // ─── Mock Data ────────────────────────────────────────────────────────────────
 
 const pagosRealizados: Payment[] = [
-    { id: '1', clerkUserId: '1', pedidoId: '1012', fecha: new Date('2025-05-10'), descripcion: 'Pedido #1012', monto: new Prisma.Decimal(184500), formaDePago: 'Tarjeta de crédito', estado: 'acreditado' },
-    { id: '2', clerkUserId: '1', pedidoId: '1008', fecha: new Date('2025-04-28'), descripcion: 'Pedido #1008', monto: new Prisma.Decimal(76200), formaDePago: 'Tarjeta de débito', estado: 'acreditado' },
-    { id: '3', clerkUserId: '1', pedidoId: '1003', fecha: new Date('2025-04-10'), descripcion: 'Pedido #1003', monto: new Prisma.Decimal(312000), formaDePago: 'Tarjeta de crédito', estado: 'rechazado' },
+    { id: '1', buyerClerkUserId: '1', sellerClerkUserId: '1', pedidoId: '1012', fecha: new Date('2025-05-10'), descripcion: 'Pedido #1012', monto: '184500', formaDePago: 'Tarjeta de crédito', estado: 'acreditado' },
+    { id: '2', buyerClerkUserId: '1', sellerClerkUserId: '1', pedidoId: '1008', fecha: new Date('2025-04-28'), descripcion: 'Pedido #1008', monto: '76200', formaDePago: 'Tarjeta de débito', estado: 'acreditado' },
+    { id: '3', buyerClerkUserId: '1', sellerClerkUserId: '1', pedidoId: '1003', fecha: new Date('2025-04-10'), descripcion: 'Pedido #1003', monto: '312000', formaDePago: 'Tarjeta de crédito', estado: 'rechazado' },
 ]
 
 const pagosPendientes: Payment[] = [
-    { id: '4', clerkUserId: '1', pedidoId: '1015', fecha: new Date('2025-05-22'), descripcion: 'Pedido #1015', monto: new Prisma.Decimal(95800), formaDePago: '', estado: 'pendiente' },
-    { id: '5', clerkUserId: '1', pedidoId: '1014', fecha: new Date('2025-05-20'), descripcion: 'Pedido #1014', monto: new Prisma.Decimal(210000), formaDePago: '', estado: 'pendiente' },
+    { id: '4', buyerClerkUserId: '1', sellerClerkUserId: '1', pedidoId: '1015', fecha: new Date('2025-05-22'), descripcion: 'Pedido #1015', monto: '150', formaDePago: '', estado: 'pendiente' },
+    { id: '5', buyerClerkUserId: '1', sellerClerkUserId: '1', pedidoId: '1014', fecha: new Date('2025-05-20'), descripcion: 'Pedido #1014', monto: '210000', formaDePago: '', estado: 'pendiente' },
 ]

@@ -12,22 +12,40 @@ datasource db {
 }
 
 model Pago {
-    id              String      @id @default(cuid())
-    clerkUserId     String
-    formaDePago     String
-    estado          String
-    pedidoId        String
-    fecha           DateTime
-    descripcion     String?
-    monto           Decimal     @db.Decimal(10, 2)
+    id                  String      @id @default(cuid())
+    buyerClerkUserId    String      @unique
+    sellerClerkUserId   String      @unique
+    formaDePago         String
+    estado              String
+    pedidoId            String
+    fecha               DateTime
+    descripcion         String?
+    monto               Decimal     @db.Decimal(10, 2)
 }
 
 model Disputa {
     id                  String      @id @default(cuid())
-    clerkUserId         String
+    clerkUserId         String      @unique
     pagoId              String
     fechaDeInicio       DateTime
     fechaDeFinalizacion DateTime?
     estado              String
     descripcion         String?
+}
+
+model CredencialVendedor {
+    id                String    @id @default(cuid())
+    clerkUserId       String    @unique
+
+    vendedorId        String    @unique 
+    
+    mercadoPagoUserId BigInt    @unique 
+    
+    accessToken       String    @db.Text
+    refreshToken      String    @db.Text
+    publicKey         String?   @db.Text
+    
+    expiresIn         Int
+    updatedAt         DateTime  @updatedAt
+    createdAt         DateTime  @default(now())
 }
