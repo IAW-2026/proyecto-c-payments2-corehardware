@@ -47,6 +47,7 @@ export async function GET(req: NextRequest) {
                     accessToken: data.access_token,
                     refreshToken: data.refresh_token,
                     expiresIn: data.expires_in,
+                    publicKey: data.public_key,
                 },
                 create: {
                     clerkUserId: userId,
@@ -55,6 +56,7 @@ export async function GET(req: NextRequest) {
                     accessToken: data.access_token,
                     refreshToken: data.refresh_token,
                     expiresIn: data.expires_in,
+                    publicKey: data.public_key,
                 },
             });
             return NextResponse.json({ success: true, user_id: credencial.mercadoPagoUserId.toString() });
