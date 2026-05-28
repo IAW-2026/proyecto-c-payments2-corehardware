@@ -30,7 +30,11 @@ export async function POST(req: NextRequest) {
             if (key?.trim() === 'v1') hash = value?.trim() ?? "";
         });
 
+        console.log("Webhook Debug - Raw Headers:", { xSignature, xRequestId });
+        console.log("Webhook Debug - Parsed Data:", { ts, hash, dataId });
+
         if (!ts || !hash || !dataId) {
+            console.error("Webhook Error - Firma o datos incompletos");
             return NextResponse.json({ message: "Firma o datos incompletos" }, { status: 401 });
         }
 
@@ -39,7 +43,12 @@ export async function POST(req: NextRequest) {
         const secret = process.env.MERCADOPAGO_SECRET_KEY!;
         const expected = crypto.createHmac("sha256", secret).update(manifest).digest("hex");
 
+        console.log("Webhook Debug - Manifest:", manifest);
+        console.log("Webhook Debug - Hash esperado:", expected);
+        console.log("Webhook Debug - Hash recibido:", hash);
+
         if (expected !== hash) {
+            console.error("Webhook Error - Firma inválida");
             return NextResponse.json({ message: "Firma inválida" }, { status: 401 });
         }
 

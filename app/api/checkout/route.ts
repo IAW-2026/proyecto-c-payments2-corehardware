@@ -3,7 +3,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 
-
 const checkoutOrderSchema = z.object({
     id: z.union([z.string(), z.number()]), 
     fecha: z.iso.datetime(),
@@ -32,10 +31,15 @@ export async function POST(req: NextRequest) {
 
         const body = result.data;
 
+        // // Validación de identidad: comprador_id debe coincidir con el usuario autenticado
+        // if (body.comprador_id !== userId) {
+        //     return NextResponse.json({ message: "ID de comprador no coincide con el usuario autenticado" }, { status: 403 });
+        // }
+
         const pago = await prisma.pago.create({
             data: {
-                sellerClerkUserId: userId,
-                buyerClerkUserId: '1',
+                sellerClerkUserId: body.vendedor_id,
+                buyerClerkUserId: userId,
                 formaDePago: "",
                 estado: "PENDIENTE",
                 pedidoId: String(body.id),
