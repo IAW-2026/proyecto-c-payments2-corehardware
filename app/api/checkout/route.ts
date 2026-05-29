@@ -14,10 +14,15 @@ const checkoutOrderSchema = z.object({
 
 export async function POST(req: NextRequest) {
     try {
+        // ***************************************************************************************************************************************************
+        // En la etapa 3 se usar al token de Clerk para esto
+
         const { userId } = await auth();
         if (!userId) {
             return NextResponse.json({ message: "No autorizado" }, { status: 401 });
         }
+
+        // ***************************************************************************************************************************************************
 
         const json = await req.json();
         const result = checkoutOrderSchema.safeParse(json);
@@ -31,11 +36,6 @@ export async function POST(req: NextRequest) {
 
         const body = result.data;
 
-        // // Validación de identidad: comprador_id debe coincidir con el usuario autenticado
-        // if (body.comprador_id !== userId) {
-        //     return NextResponse.json({ message: "ID de comprador no coincide con el usuario autenticado" }, { status: 403 });
-        // }
-
         const pago = await prisma.pago.create({
             data: {
                 sellerClerkUserId: body.vendedor_id,
@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
                 estado: "pendiente",
                 pedidoId: String(body.id),
                 fecha: new Date(body.fecha),
-                descripcion: null,
+                descripcion: "Pago por el pedido " + String(body.id),
                 monto: body.monto,
             },
         });
