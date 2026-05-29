@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 const isProtectedRoute = createRouteMatcher([
     "/buyer(.*)",
     "/seller(.*)",
-    "/admin(.*)"
+    "/admin(.*)",
 ]);
 const validRoles = ["buyer", "seller", "admin"] as const;
 type Role = (typeof validRoles)[number];
@@ -36,6 +36,8 @@ function homeFor(role: Role): string {
 
 
 export default clerkMiddleware(async (auth, req) => {
+    const { userId } = await auth();
+
     if (isProtectedRoute(req)) {
         const { userId } = await auth();
 
@@ -58,6 +60,18 @@ export default clerkMiddleware(async (auth, req) => {
 
             return NextResponse.next();
         }
+    }
+    
+    if (userId && req.nextUrl.pathname === "/" ) {
+        const client = await clerkClient();
+        const user = await client.users.getUser(userId);
+        const rawRole = user.publicMetadata?.role;
+        
+        if (!isRole(rawRole)) {
+            return new NextResponse("Forbidden", { status: 403 });
+        }
+
+        return NextResponse.redirect(new URL(homeFor(rawRole), req.url));
     }
 });
 
