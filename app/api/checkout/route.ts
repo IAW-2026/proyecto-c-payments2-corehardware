@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
                 sellerClerkUserId: body.vendedor_id,
                 buyerClerkUserId: userId,
                 formaDePago: "",
-                estado: "PENDIENTE",
+                estado: "pendiente",
                 pedidoId: String(body.id),
                 fecha: new Date(body.fecha),
                 descripcion: null,

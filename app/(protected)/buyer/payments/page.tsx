@@ -5,7 +5,6 @@ import { Payment } from '@/types/payments'
 import { PaymentRow } from '@/components/buyer/payment-row'
 import { PaymentModal } from '@/components/buyer/payment-modal'
 import { TabButton } from '@/components/ui/tab-button'
-import { Prisma } from '@prisma/client'
 import { getPagos, getVendedorPublicKey } from '@/actions/payment'
 
 

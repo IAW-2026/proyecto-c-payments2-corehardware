@@ -25,8 +25,8 @@ model Pago {
 
 model Disputa {
     id                  String      @id @default(cuid())
-    clerkUserId         String      @unique
-    pagoId              String
+    clerkUserId         String
+    pagoId              String      @unique
     fechaDeInicio       DateTime
     fechaDeFinalizacion DateTime?
     estado              String

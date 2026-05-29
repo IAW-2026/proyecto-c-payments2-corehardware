@@ -24,8 +24,7 @@ const statusLabel: Record<PaymentStatus, string> = {
 }
  
 export function PaymentRow({ payment, onPagar }: { payment: Payment; onPagar?: (p: Payment) => void }) {
-    // Normalizamos el estado a minúsculas porque la DB devuelve PENDIENTE
-    const estadoNormalizado = payment.estado.toLowerCase() as PaymentStatus;
+    const estado = payment.estado as PaymentStatus;
 
     return (
         <tr className="border-b border-neutral-100 dark:border-neutral-800/60 last:border-0 hover:bg-neutral-50 dark:hover:bg-neutral-800/20 transition-colors">
@@ -51,10 +50,10 @@ export function PaymentRow({ payment, onPagar }: { payment: Payment; onPagar?: (
             {/* Estado / Acción */}
             <td className="px-4 py-3.5">
                 <div className="flex items-center justify-end gap-2">
-                    <Badge variant={statusVariant[estadoNormalizado]}>
-                        {statusLabel[estadoNormalizado]}
+                    <Badge variant={statusVariant[estado]}>
+                        {statusLabel[estado]}
                     </Badge>
-                    {estadoNormalizado === 'pendiente' && onPagar && (
+                    {estado === 'pendiente' && onPagar && (
                         <ButtonPrimary onClick={() => onPagar(payment)} className="py-1 text-xs">
                             Pagar
                         </ButtonPrimary>

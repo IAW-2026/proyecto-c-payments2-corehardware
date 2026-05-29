@@ -75,7 +75,6 @@ export async function procesarOrdenPagoPro(
     }
 }
 
-
 export async function getPagos() {
     try {
         const pagos = await prisma.pago.findMany({
