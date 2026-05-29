@@ -3,6 +3,7 @@ import { ClerkProvider, Show, SignInButton, SignUpButton, UserButton } from '@cl
 import { Geist, Geist_Mono } from 'next/font/google'
 import './globals.css'
 import { ButtonPrimary, ButtonSecondary } from '@/components/ui/button'
+import Link from 'next/link'
 
 const geistSans = Geist({
     variable: '--font-geist-sans',
@@ -29,22 +30,22 @@ export default function RootLayout({
             <body className="min-h-full flex flex-col bg-neutral-50 text-neutral-900 dark:bg-neutral-950 dark:text-neutral-100 transition-colors duration-200">
                 <ClerkProvider signInUrl="/sign-in" signUpUrl="/sign-up">
                     <header className="border-b border-neutral-200 dark:border-neutral-900 flex justify-between items-center p-4 gap-4 h-16">
-                        <div className="pl-4 flex items-baseline gap-0.5">
+                        <Link href="/" className="pl-4 flex items-baseline gap-0.5">
                             <span className="text-2xl font-bold text-neutral-900 dark:text-neutral-100 tracking-tight">
                                 CoreHardware
                             </span>
                             <span className="text-base sm:text-lg font-normal text-green-600 dark:text-green-500">
                                 Payments
                             </span>
-                        </div>
+                        </Link>
                         <div className="flex items-center gap-2">
                             <Show when="signed-out">
                                 <SignInButton>
                                     <ButtonSecondary>Sign In</ButtonSecondary>
                                 </SignInButton>
-                                <SignUpButton>
+                                <Link href="/sign-up">
                                     <ButtonPrimary>Sign Up</ButtonPrimary>
-                                </SignUpButton>
+                                </Link>
                             </Show>
                             <Show when="signed-in">
                                 <UserButton />
