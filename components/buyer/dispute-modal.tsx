@@ -1,21 +1,45 @@
+'use client'
+
 import { formatMonto } from "@/lib/formatters"
 import { useState } from "react"
-import { Input } from "../ui/input"
 import { ButtonClose, ButtonPrimary, ButtonSecondary } from "../ui/button"
-import { Payment } from "@/types/payments"
-import { Prisma } from "@prisma/client"
+import { Payment } from '@/types/payments'
+import { createDisputa } from "@/actions/disputes"
 
+type ModalState = 'form' | 'success'
 
-// Pagos realizados y cobrados disponibles para disputar
-const pagosDisputables: Payment[] = [
-    { id: '1', buyerClerkUserId: '1', sellerClerkUserId: '1', pedidoId: '1012', fecha: new Date('2025-05-10'), descripcion: 'Pedido #1012', monto: '184500', formaDePago: 'Tarjeta de crédito', estado: 'acreditado' },
-    { id: '2', buyerClerkUserId: '1', sellerClerkUserId: '1', pedidoId: '1008', fecha: new Date('2025-04-28'), descripcion: 'Pedido #1008', monto: '76200', formaDePago: 'Tarjeta de débito', estado: 'acreditado' },
-]
-
-export function NewDisputeModal({ onClose }: { onClose: () => void }) {
-    const [pedidoId, setPedidoId] = useState('')
+export function NewDisputeModal({
+    onClose,
+    pagosDisputables,
+}: {
+    onClose: () => void
+    pagosDisputables: Payment[]
+}) {
+    const [estado, setEstado] = useState<ModalState>('form')
+    const [pagoId, setPagoId] = useState('')
     const [descripcion, setDescripcion] = useState('')
-    const [contacto, setContacto] = useState('')
+
+    async function handleSubmit() {
+        if (!pagoId || !descripcion.trim()) return
+        await createDisputa(pagoId, descripcion)
+        setEstado('success')
+    }
+
+    if (estado === 'success') {
+        return (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neutral-950/60 backdrop-blur-sm">
+                <div className="w-full max-w-md bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 shadow-2xl overflow-hidden">
+                    <div className="px-5 py-8 text-center space-y-3">
+                        <p className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">Disputa iniciada</p>
+                        <p className="text-xs text-neutral-500">Tu queja fue registrada. Nos pondremos en contacto a la brevedad.</p>
+                    </div>
+                    <div className="px-5 pb-5">
+                        <ButtonPrimary className="w-full" onClick={onClose}>Aceptar</ButtonPrimary>
+                    </div>
+                </div>
+            </div>
+        )
+    }
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neutral-950/60 backdrop-blur-sm">
@@ -37,14 +61,14 @@ export function NewDisputeModal({ onClose }: { onClose: () => void }) {
                     <div className="space-y-1.5">
                         <label className="text-xs font-medium text-neutral-400">Pedido</label>
                         <select
-                            value={pedidoId}
-                            onChange={(e) => setPedidoId(e.target.value)}
+                            value={pagoId}
+                            onChange={(e) => setPagoId(e.target.value)}
                             className="w-full px-3 py-2 bg-white dark:bg-neutral-950 border border-neutral-300 dark:border-neutral-800 rounded-lg text-sm text-neutral-800 dark:text-neutral-200 focus:outline-none focus:border-green-600 focus:ring-2 focus:ring-green-600/10 dark:focus:border-green-500 dark:focus:ring-green-500/10 transition-all"
                         >
                             <option value="">Seleccioná un pedido</option>
                             {pagosDisputables.map((p) => (
-                                <option key={p.pedidoId} value={p.pedidoId}>
-                                    {p.descripcion} · {formatMonto(p.monto)}
+                                <option key={p.id} value={p.id}>
+                                    {p.descripcion ?? `Pedido #${p.pedidoId}`} · {formatMonto(Number(p.monto))}
                                 </option>
                             ))}
                         </select>
@@ -62,23 +86,19 @@ export function NewDisputeModal({ onClose }: { onClose: () => void }) {
                         />
                     </div>
 
-                    {/* Contacto */}
-                    <div className="space-y-1.5">
-                        <label className="text-xs font-medium text-neutral-400">Medio de contacto</label>
-                        <Input
-                            value={contacto}
-                            onChange={(e) => setContacto(e.target.value)}
-                            type="text"
-                            placeholder="Email o teléfono"
-                        />
-                    </div>
+                    {/* Aviso contacto */}
+                    <p className="text-xs text-neutral-400">
+                        Al iniciar la disputa aceptás compartir tu mail y teléfono con el vendedor para facilitar la resolución.
+                    </p>
 
                 </div>
 
                 {/* Footer */}
                 <div className="px-5 pb-5 flex gap-2">
                     <ButtonSecondary onClick={onClose} className="flex-1">Cancelar</ButtonSecondary>
-                    <ButtonPrimary className="flex-1">Iniciar disputa</ButtonPrimary>
+                    <ButtonPrimary onClick={handleSubmit} className="flex-1" disabled={!pagoId || !descripcion.trim()}>
+                        Iniciar disputa
+                    </ButtonPrimary>
                 </div>
 
             </div>

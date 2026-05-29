@@ -4,5 +4,4 @@ export type DisputeStatus = 'pendiente' | 'reembolsada' | 'repuesta' | 'rechazad
 
 export type Dispute = Omit<Disputa, 'estado'> & {
     estado: DisputeStatus
-    contacto: string
 }
