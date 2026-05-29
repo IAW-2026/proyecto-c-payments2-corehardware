@@ -38,22 +38,21 @@ export default async function BuyerHomePage() {
 
     const ultimoPedido = pagosRecientes[0] ?? null
 
-    const alertas: { id: string; mensaje: string; tipo: string }[] = []
+    const alertas: { mensaje: string; tipo: string }[] = []
 
-    if (pagosPendientes.length > 0)
+    if (pagosPendientes.length > 0) {
         alertas.push({
-            id: 'pagos',
             mensaje: `Tenés ${pagosPendientes.length} pago${pagosPendientes.length > 1 ? 's' : ''} pendiente${pagosPendientes.length > 1 ? 's' : ''} de completar.`,
             tipo: 'warning',
         })
+    }
 
-    const disputaResuelta = disputasRecientes.find(d => d.fechaDeFinalizacion && d.estado === 'reembolsada')
-    if (disputaResuelta)
+    for (const d of disputasRecientes.filter(d => d.estado !== 'pendiente')) {
         alertas.push({
-            id: disputaResuelta.id,
-            mensaje: 'Tu disputa fue resuelta con reembolso.',
+            mensaje: `Tu disputa fue resuelta con estado: ${d.estado}.`,
             tipo: 'accent',
         })
+    }
 
     const actividad = [
         ...pagosRecientes.map(p => ({
@@ -87,7 +86,7 @@ export default async function BuyerHomePage() {
             {/* Alertas */}
             {alertas.length > 0 && (
                 <div className="space-y-2">
-                    {alertas.map((a) => <AlertBanner key={a.id} {...a} />)}
+                    {alertas.map((a, i) => <AlertBanner key={i} {...a} />)}
                 </div>
             )}
 

@@ -26,6 +26,7 @@ model Pago {
 model Disputa {
     id                  String      @id @default(cuid())
     clerkUserId         String
+    pedidoId            String      @unique
     pagoId              String      @unique
     fechaDeInicio       DateTime
     fechaDeFinalizacion DateTime?
