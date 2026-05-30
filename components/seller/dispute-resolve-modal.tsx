@@ -33,7 +33,7 @@ export function DisputeResolveModal({ disputa, onClose, onResolver }: {
                     {/* Detalle */}
                     <div className="bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-lg p-4 space-y-1">
                         <p className="text-sm text-neutral-700 dark:text-neutral-300">{disputa.descripcion}</p>
-                        <p className="text-xs font-mono text-neutral-500 mt-1">{disputa.contacto}</p>
+                        <p className="text-xs font-mono text-neutral-500 mt-1">Contacto placeholder</p>
                     </div>
 
                     {/* Opciones */}

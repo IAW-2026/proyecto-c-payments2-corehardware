@@ -27,7 +27,7 @@ export function DisputeRow({ disputa, onResolver }: { disputa: Dispute; onResolv
                 <p className="text-sm font-medium text-neutral-800 dark:text-neutral-200">Pago #{disputa.pagoId}</p>
                 <p className="text-xs text-neutral-400 mt-0.5 md:hidden">{formatFecha(disputa.fechaDeInicio)}</p>
                 <p className="text-xs text-neutral-400 mt-0.5 line-clamp-1">{disputa.descripcion}</p>
-                <p className="text-xs font-mono text-neutral-500 dark:text-neutral-500 mt-0.5">{disputa.contacto}</p>
+                <p className="text-xs font-mono text-neutral-500 dark:text-neutral-500 mt-0.5">Contacto placeholder</p>
             </td>
             <td className="hidden md:table-cell px-4 py-3.5 font-mono text-sm font-semibold text-neutral-900 dark:text-neutral-100 whitespace-nowrap">
                 {'hardcoded' + formatMonto(12345)}

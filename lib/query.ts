@@ -104,3 +104,13 @@ export async function getVendedorPublicKey(pagoId: string): Promise<string | nul
 
     return credencial?.publicKey || null;
 }
+
+
+export async function getAcreditacionesSeller(sellerId: string): Promise<Payment[]> {
+    const pagos = await prisma.pago.findMany({
+        where: { sellerClerkUserId: sellerId },
+        orderBy: { fecha: 'desc' },
+    });
+    
+    return pagos.map(toPayment);
+}

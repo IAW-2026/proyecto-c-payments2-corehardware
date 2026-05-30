@@ -29,8 +29,11 @@ const sellers: Record<string, {
     },
 }
 
-export async function GET(_req: NextRequest, { params }: { params: { id: string } }) {
-    const seller = sellers[params.id]
-    if (!seller) return NextResponse.json({ message: 'Vendedor no encontrado' }, { status: 404 })
-    return NextResponse.json(seller)
+export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params;
+    const seller = sellers[id];
+    
+    if (!seller) return NextResponse.json({ message: 'Vendedor no encontrado' }, { status: 404 });
+    
+    return NextResponse.json(seller);
 }

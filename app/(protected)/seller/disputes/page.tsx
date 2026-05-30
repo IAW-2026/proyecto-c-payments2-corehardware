@@ -93,8 +93,8 @@ export default function SellerDisputasPage() {
 // ─── Mock Data ────────────────────────────────────────────────────────────────
 
 const disputas: Dispute[] = [
-    { id: '1', clerkUserId: '1', pagoId:'', fechaDeInicio: new Date('2025-05-22'), fechaDeFinalizacion: null, descripcion: 'Recibi un producto dañado, la caja llegó golpeada y el item no funciona.',       contacto: 'juan@email.com',        estado: 'pendiente'},
-    { id: '2', clerkUserId: '1', pagoId:'', fechaDeInicio: new Date('2025-05-20'), fechaDeFinalizacion: null, descripcion: 'El producto recibido no coincide con el que pedí, es un modelo diferente.',       contacto: '+54 9 11 1234-5678',    estado: 'pendiente'},
-    { id: '3', clerkUserId: '1', pagoId:'', fechaDeInicio: new Date('2025-05-10'), fechaDeFinalizacion: null, descripcion: 'El paquete nunca llegó a la dirección indicada.',                                 contacto: 'carlos@email.com',      estado: 'rechazada' },
-    { id: '4', clerkUserId: '1', pagoId:'', fechaDeInicio: new Date('2025-04-28'), fechaDeFinalizacion: null, descripcion: 'El producto llegó pero era una unidad de reposición diferente a la solicitada.',  contacto: 'ana@email.com',         estado: 'repuesta'},
+    { id: '1', clerkUserId: '1', pedidoId:'', pagoId:'', fechaDeInicio: new Date('2025-05-22'), fechaDeFinalizacion: null, descripcion: 'Recibi un producto dañado, la caja llegó golpeada y el item no funciona.',   estado: 'pendiente'},
+    { id: '2', clerkUserId: '1', pedidoId:'', pagoId:'', fechaDeInicio: new Date('2025-05-20'), fechaDeFinalizacion: null, descripcion: 'El producto recibido no coincide con el que pedí, es un modelo diferente.',    estado: 'pendiente'},
+    { id: '3', clerkUserId: '1', pedidoId:'', pagoId:'', fechaDeInicio: new Date('2025-05-10'), fechaDeFinalizacion: null, descripcion: 'El paquete nunca llegó a la dirección indicada.',                  estado: 'rechazada' },
+    { id: '4', clerkUserId: '1', pedidoId:'', pagoId:'', fechaDeInicio: new Date('2025-04-28'), fechaDeFinalizacion: null, descripcion: 'El producto llegó pero era una unidad de reposición diferente a la solicitada.',   estado: 'repuesta'},
 ]

@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-export async function GET(_req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params;
     return NextResponse.json({
-        id: params.id,
+        id: id,
         fecha: '2025-05-22',
         comprador_id: 1,
         vendedor_id: 1,
@@ -10,5 +11,5 @@ export async function GET(_req: NextRequest, { params }: { params: { id: string 
         monto: '95800.00',
         estado: 'pendiente',
         envio_id: null,
-    })
+    });
 }
