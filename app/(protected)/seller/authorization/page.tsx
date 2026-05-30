@@ -1,10 +1,14 @@
+import { auth } from '@clerk/nextjs/server'
 import { ButtonPrimary } from '@/components/ui/button'
-import { redirect } from 'next/navigation'
-import { cookies } from 'next/headers'
 import { redirectToMercadoPago } from '@/actions/seller-auth'
+import { getIsSellerAuthorized } from '@/lib/query'
+import { CheckCircle2 } from 'lucide-react'
 
 
-export default function SellerAuthorizationPage() {
+export default async function SellerAuthorizationPage() {
+    const { userId } = await auth()
+    const isAuthorized = await getIsSellerAuthorized(userId!)
+    
     return (
         <div className="max-w-6xl mx-auto space-y-8">
  
@@ -39,11 +43,18 @@ export default function SellerAuthorizationPage() {
                     ))}
                 </ul>
                 
-                <form action={redirectToMercadoPago}>
-                    <ButtonPrimary type="submit">
-                        Autorizar con MercadoPago
-                    </ButtonPrimary>
-                </form>
+                {isAuthorized ? (
+                    <div className="flex items-center gap-2 text-sm font-medium text-green-600 dark:text-green-500 bg-green-50 dark:bg-green-900/20 p-3 rounded-lg">
+                        <CheckCircle2 className="w-5 h-5" />
+                        Ya estás autorizado
+                    </div>
+                ) : (
+                    <form action={redirectToMercadoPago}>
+                        <ButtonPrimary type="submit">
+                            Autorizar con MercadoPago
+                        </ButtonPrimary>
+                    </form>
+                )}
  
             </div>
  
