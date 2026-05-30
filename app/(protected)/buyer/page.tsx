@@ -69,7 +69,7 @@ export default async function BuyerHomePage() {
             descripcion: d.descripcion ?? 'Disputa',
             fecha: d.fechaDeInicio.toISOString(),
             estado: d.estado,
-            monto: 0,
+            monto: d.pago ? Number(d.pago.monto) : 0,
         })),
     ].sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime())
 

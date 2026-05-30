@@ -21,6 +21,7 @@ model Pago {
     fecha               DateTime
     descripcion         String?
     monto               Decimal     @db.Decimal(10, 2)
+    disputa             Disputa?
 }
 
 model Disputa {
@@ -28,6 +29,7 @@ model Disputa {
     clerkUserId         String
     pedidoId            String      @unique
     pagoId              String      @unique
+    pago                Pago        @relation(fields: [pagoId], references: [id])
     fechaDeInicio       DateTime
     fechaDeFinalizacion DateTime?
     estado              String
