@@ -4,6 +4,8 @@ import { prisma } from "./prisma";
 import { Payment } from '@/types/payments'
 import { Dispute } from '@/types/dispute'
 import { toPayment, toDispute } from '@/lib/mappers';
+import { CredencialVendedor } from "@prisma/client";
+import { AdminDashboardSummary } from "@/types/admin-dashboard-summary";
 
 
 export async function getPagosPendientes(userId: string): Promise<Payment[]> {
@@ -185,4 +187,57 @@ export async function getIsSellerAuthorized(userId: string): Promise<boolean> {
         select: { id: true }
     });
     return !!credencial;
+}
+
+
+export async function getAdminDashboardSummary(): Promise<AdminDashboardSummary> {
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+
+    const [pagosHoy, pendientes, disputasActivas, vendedoresActivos] = await Promise.all([
+        prisma.pago.findMany({ where: { fecha: { gte: hoy } } }),
+        prisma.pago.count({ where: { estado: 'pendiente' } }),
+        prisma.disputa.count({ where: { estado: 'pendiente' } }),
+        prisma.credencialVendedor.count()
+    ]);
+
+    return {
+        pagosHoy: { 
+            cantidad: pagosHoy.length, 
+            monto: pagosHoy.reduce((acc, p) => acc + Number(p.monto), 0) 
+        },
+        pendientes,
+        disputasActivas,
+        vendedoresActivos,
+    };
+}
+
+export async function getAdminActividadReciente(): Promise<{
+    pagos: Payment[];
+    disputas: Dispute[];
+}> {
+    const [pagos, disputas] = await Promise.all([
+        prisma.pago.findMany({ orderBy: { fecha: 'desc' }, take: 10 }),
+        prisma.disputa.findMany({ 
+            orderBy: { fechaDeInicio: 'desc' }, 
+            take: 10, 
+            include: { pago: true } 
+        })
+    ]);
+
+    return {
+        pagos: pagos.map(toPayment),
+        disputas: disputas.map(toDispute)
+    };
+}
+
+export async function getUltimosVendedores() {
+    return await prisma.credencialVendedor.findMany({
+        orderBy: { createdAt: 'desc' },
+        take: 10,
+        select: {
+            clerkUserId: true,
+            createdAt: true
+        }
+    });
 }
