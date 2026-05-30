@@ -1,5 +1,7 @@
-"use client";
+'use client'
 
-export default function ErrorPage() {
-    return <div>Error</div>;
+import { ErrorView } from '@/components/errors/error-view'
+
+export default function Error({ reset }: { reset: () => void }) {
+    return <ErrorView reset={reset} />
 }
