@@ -1,45 +1,53 @@
+'use server';
+
 import { prisma } from "./prisma";
-import { Payment, PaymentStatus } from '@/types/payments'
-import { Dispute, DisputeStatus } from '@/types/dispute'
+import { Payment } from '@/types/payments'
+import { Dispute } from '@/types/dispute'
+import { toPayment, toDispute } from '@/lib/mappers';
 
 
-export async function getPagosPendientes(userId: string) {
-    return prisma.pago.findMany({
+export async function getPagosPendientes(userId: string): Promise<Payment[]> {
+    const pagos = await prisma.pago.findMany({
         where: { buyerClerkUserId: userId, estado: 'pendiente' },
         orderBy: { fecha: 'desc' },
-    })
+    });
+    return pagos.map(toPayment);
 }
 
-export async function getDisputasActivas(userId: string) {
-    return prisma.disputa.findMany({
+export async function getDisputasActivas(userId: string): Promise<Dispute[]> {
+    const disputas = await prisma.disputa.findMany({
         where: { clerkUserId: userId, fechaDeFinalizacion: null },
         orderBy: { fechaDeInicio: 'desc' },
-    })
+    });
+    return disputas.map(toDispute);
 }
 
-export async function getPagosRecientes(userId: string) {
-    return prisma.pago.findMany({
+export async function getPagosRecientes(userId: string): Promise<Payment[]> {
+    const pagos = await prisma.pago.findMany({
         where: { buyerClerkUserId: userId },
         orderBy: { fecha: 'desc' },
-        take: 20,
-    })
+        take: 10,
+    });
+    return pagos.map(toPayment);
 }
 
-export async function getDisputasRecientes(userId: string) {
-    return prisma.disputa.findMany({
+export async function getDisputasRecientes(userId: string): Promise<Dispute[]> {
+    const disputas = await prisma.disputa.findMany({
         where: { clerkUserId: userId },
         orderBy: { fechaDeInicio: 'desc' },
-        take: 20,
-    })
+        take: 10,
+        include: { pago: true }
+    });
+    return disputas.map(toDispute);
 }
 
 export async function getPagosDisputables(userId: string): Promise<Payment[]> {
     const disputasExistentes = await prisma.disputa.findMany({
         where: { clerkUserId: userId },
         select: { pagoId: true },
-    })
+    });
 
-    const pagoIdsConDisputa = disputasExistentes.map((d) => d.pagoId)
+    const pagoIdsConDisputa = disputasExistentes.map((d) => d.pagoId);
 
     const pagos = await prisma.pago.findMany({
         where: {
@@ -48,13 +56,9 @@ export async function getPagosDisputables(userId: string): Promise<Payment[]> {
             id: { notIn: pagoIdsConDisputa },
         },
         orderBy: { fecha: 'desc' },
-    })
+    });
 
-    return pagos.map((p) => ({
-        ...p,
-        monto: p.monto.toString(),
-        estado: p.estado as PaymentStatus,
-    }))
+    return pagos.map(toPayment);
 }
 
 export async function getDisputasBuyer(userId: string): Promise<{
@@ -64,22 +68,39 @@ export async function getDisputasBuyer(userId: string): Promise<{
     const disputas = await prisma.disputa.findMany({
         where: { clerkUserId: userId },
         orderBy: { fechaDeInicio: 'desc' },
-    })
+        include: { pago: true } 
+    });
 
-    const pagos = await prisma.pago.findMany({
-        where: { id: { in: disputas.map((d) => d.pagoId) } },
-    })
-
-    const pagosPorId = Object.fromEntries(pagos.map((p) => [p.id, p]))
-
-    const disputasConEstado = disputas.map((d) => ({
-        ...d,
-        estado: d.estado as DisputeStatus,
-    }))
+    const disputasConPago = disputas.map(toDispute);
 
     const montos = new Map(
-        disputasConEstado.map((d) => [d, pagosPorId[d.pagoId]?.monto.toString() ?? '0'])
-    )
+        disputasConPago.map((d) => [d, d.pago?.monto ?? '0'])
+    );
 
-    return { disputas: disputasConEstado, montos }
+    return { disputas: disputasConPago, montos };
+}
+
+export async function getPagos(userId: string): Promise<Payment[]> {
+    const pagos = await prisma.pago.findMany({
+        where: { buyerClerkUserId: userId },
+        orderBy: { fecha: 'desc' },
+    });
+
+    return pagos.map(toPayment);
+}
+
+export async function getVendedorPublicKey(pagoId: string): Promise<string | null> {
+    const pago = await prisma.pago.findUnique({
+        where: { id: pagoId },
+        select: { sellerClerkUserId: true }
+    });
+
+    if (!pago) return null;
+
+    const credencial = await prisma.credencialVendedor.findUnique({
+        where: { clerkUserId: pago.sellerClerkUserId },
+        select: { publicKey: true }
+    });
+
+    return credencial?.publicKey || null;
 }

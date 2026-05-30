@@ -75,38 +75,3 @@ export async function procesarOrdenPagoPro(
     }
 }
 
-export async function getPagos() {
-    try {
-        const pagos = await prisma.pago.findMany({
-            orderBy: { fecha: 'desc' }
-        });
-
-        // Transformamos decimales de Prisma a strings o números para que el cliente los entienda
-        return pagos.map(p => ({
-            ...p,
-            monto: p.monto.toString()
-        }));
-    } catch (error) {
-        console.error("Error al obtener pagos:", error);
-        return [];
-    }
-}
-
-
-export async function getVendedorPublicKey(pagoId: string) {
-    // 1. Obtener el sellerClerkUserId del pago
-    const pago = await prisma.pago.findUnique({
-        where: { id: pagoId },
-        select: { sellerClerkUserId: true }
-    });
-
-    if (!pago) return null;
-
-    // 2. Buscar la credencial usando el sellerClerkUserId como vendedorId
-    const credencial = await prisma.credencialVendedor.findUnique({
-        where: { clerkUserId: pago.sellerClerkUserId },
-        select: { publicKey: true }
-    });
-
-    return credencial?.publicKey || null;
-}
