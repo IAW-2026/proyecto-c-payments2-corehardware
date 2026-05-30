@@ -177,3 +177,12 @@ export async function getSellerActividadReciente(sellerId: string) {
         disputas: disputas.map(toDispute)
     };
 }
+
+
+export async function getIsSellerAuthorized(userId: string): Promise<boolean> {
+    const credencial = await prisma.credencialVendedor.findUnique({
+        where: { clerkUserId: userId },
+        select: { id: true }
+    });
+    return !!credencial;
+}
