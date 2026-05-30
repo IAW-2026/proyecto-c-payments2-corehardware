@@ -114,3 +114,16 @@ export async function getAcreditacionesSeller(sellerId: string): Promise<Payment
     
     return pagos.map(toPayment);
 }
+
+export async function getDisputasSeller(sellerId: string): Promise<Dispute[]> {
+    const disputas = await prisma.disputa.findMany({
+        where: {
+            pago: {
+                sellerClerkUserId: sellerId
+            }
+        },
+        include: { pago: true },
+        orderBy: { fechaDeInicio: 'desc' },
+    });
+    return disputas.map(toDispute);
+}
