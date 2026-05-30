@@ -1,16 +1,4 @@
-import { Badge } from '@/components/ui/badge'
-
-const badgeVariant: Record<string, React.ComponentProps<typeof Badge>['variant']> = {
-    activo:         'accent',
-    expira_pronto:  'warning',
-    sin_credencial: 'danger',
-}
-
-const badgeLabel: Record<string, string> = {
-    activo:         'Activo',
-    expira_pronto:  'Expira pronto',
-    sin_credencial: 'Sin credencial',
-}
+import { formatFecha } from '@/lib/formatters'
 
 export function VendedoresTable({ vendedores }: { vendedores: any[] }) {
     return (
@@ -19,21 +7,19 @@ export function VendedoresTable({ vendedores }: { vendedores: any[] }) {
                 <tbody>
                     {vendedores.map((v) => (
                         <tr
-                            key={v.clerkUserId}
+                            key={v.id}
                             className="border-b border-neutral-100 dark:border-neutral-800/60 last:border-0 hover:bg-neutral-50 dark:hover:bg-neutral-800/20 transition-colors"
                         >
                             <td className="px-4 py-3.5">
                                 <p className="text-sm font-medium text-neutral-800 dark:text-neutral-200">
-                                    {v.nombre}
+                                    {v.razon_social}
                                 </p>
                                 <p className="text-xs text-neutral-400 mt-0.5 font-mono">
-                                    MP #{v.mercadoPagoUserId.toString()}
+                                    {v.cuit}
                                 </p>
                             </td>
-                            <td className="px-4 py-3.5 text-right">
-                                <Badge variant={badgeVariant[v.estado]}>
-                                    {badgeLabel[v.estado]}
-                                </Badge>
+                            <td className="px-4 py-3.5 text-right text-xs text-neutral-400 font-mono whitespace-nowrap">
+                                {formatFecha(v.createdAt)}
                             </td>
                         </tr>
                     ))}

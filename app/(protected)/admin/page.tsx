@@ -1,37 +1,40 @@
 import { CreditCard, MessageSquareWarning, Users, Activity } from 'lucide-react'
 import { SummaryCard } from '@/components/ui/summary-card'
-import { Notification } from '@/components/ui/notification'
 import { RecentActivityTable } from '@/components/admin/recent-activity-table'
 import { VendedoresTable } from '@/components/admin/vendedores-table'
 import { formatMonto } from '@/lib/formatters'
+import { getAdminDashboardSummary, getAdminActividadReciente, getUltimosVendedores } from '@/lib/query'
+
 
 export default async function AdminHomePage() {
-    // TODO: reemplazar con datos reales
-    const resumen = {
-        pagosHoy: { cantidad: 0, monto: 0 },
-        pendientes: 0,
-        disputasActivas: 0,
-        disputasCriticas: 0,
-        vendedoresActivos: 0,
-    }
-    const actividad: any[] = []
-    const vendedores: any[] = []
+    const [resumen, actividadData, ultimosVendedores] = await Promise.all([
+        getAdminDashboardSummary(),
+        getAdminActividadReciente(),
+        getUltimosVendedores()
+    ])
 
-    const alertas = [
-        resumen.disputasCriticas > 0 && {
-            mensaje: `${resumen.disputasCriticas} disputa${resumen.disputasCriticas > 1 ? 's' : ''} sin resolver con más de 72 hs.`,
-            variant: 'danger' as const,
-        },
-        resumen.pendientes > 0 && {
-            mensaje: `${resumen.pendientes} pago${resumen.pendientes > 1 ? 's' : ''} pendiente${resumen.pendientes > 1 ? 's' : ''} de acreditar.`,
-            variant: 'warning' as const,
-        },
-        vendedores.some(v => v.estado === 'expira_pronto') && {
-            mensaje: 'Hay vendedores con credencial próxima a vencer.',
-            variant: 'warning' as const,
-        },
-    ].filter(Boolean) as { mensaje: string; variant: 'warning' | 'danger' }[]
+    const vendedores = await Promise.all(
+        ultimosVendedores.map(v => 
+            fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/mock/sellers/${v.clerkUserId}`, { cache: 'no-store' })
+                .then(res => res.json())
+                .then(data => ({ ...data, createdAt: v.createdAt }))
+        )
+    )
 
+    const actividad = [
+        ...actividadData.pagos.map(p => ({ 
+            ...p, 
+            tipo: 'pago' as const, 
+            fecha: p.fecha 
+        })),
+        ...actividadData.disputas.map(d => ({ 
+            ...d, 
+            tipo: 'disputa' as const, 
+            fecha: d.fechaDeInicio 
+        }))
+    ].sort((a, b) => b.fecha.getTime() - a.fecha.getTime())
+
+    
     return (
         <div className="max-w-6xl mx-auto space-y-8">
 
@@ -39,14 +42,6 @@ export default async function AdminHomePage() {
                 <h1 className="text-xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100">Inicio</h1>
                 <p className="text-sm text-neutral-500 mt-0.5">Estado general del sistema.</p>
             </div>
-
-            {alertas.length > 0 && (
-                <div className="space-y-2">
-                    {alertas.map((a, i) => (
-                        <Notification key={i} variant={a.variant}>{a.mensaje}</Notification>
-                    ))}
-                </div>
-            )}
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                 <SummaryCard
@@ -58,13 +53,11 @@ export default async function AdminHomePage() {
                     icon={Activity}
                     label="Pendientes de acreditar"
                     value={resumen.pendientes}
-                    accent={resumen.pendientes > 0}
                 />
                 <SummaryCard
                     icon={MessageSquareWarning}
                     label="Disputas activas"
                     value={resumen.disputasActivas}
-                    accent={resumen.disputasActivas > 0}
                 />
                 <SummaryCard
                     icon={Users}
@@ -82,7 +75,7 @@ export default async function AdminHomePage() {
                 </div>
                 <div className="space-y-3">
                     <h2 className="text-xs font-mono uppercase tracking-wider text-neutral-500 dark:text-neutral-500">
-                        Credenciales de vendedores
+                        Últimos vendedores autorizados
                     </h2>
                     <VendedoresTable vendedores={vendedores} />
                 </div>

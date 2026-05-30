@@ -43,7 +43,7 @@ export function RecentActivityTable({ actividad }: { actividad: any[] }) {
                                 </Badge>
                             </td>
                             <td className="px-4 py-3.5 font-mono text-sm font-semibold text-neutral-900 dark:text-neutral-100 whitespace-nowrap hidden sm:table-cell">
-                                {formatMonto(Number(a.monto))}
+                                {formatMonto(Number(a.tipo === 'pago' ? a.monto : a.pago?.monto))}
                             </td>
                             <td className="px-4 py-3.5 text-right">
                                 <Badge variant={badgeVariant[a.estado]}>
