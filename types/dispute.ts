@@ -5,5 +5,5 @@ export type DisputeStatus = 'pendiente' | 'reembolsada' | 'repuesta' | 'rechazad
 
 export type Dispute = Omit<Disputa, 'estado' | 'pago'> & {
     estado: DisputeStatus
-    pago?: Payment // Aquí definimos que 'pago' es parte del tipo y es opcional
+    pago?: Payment
 }
