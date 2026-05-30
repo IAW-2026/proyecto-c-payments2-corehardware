@@ -1,10 +1,10 @@
-'use client'
- 
+import { auth } from '@clerk/nextjs/server'
 import { CreditCard, MessageSquareWarning, TrendingUp } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Notification } from '@/components/ui/notification'
 import { SummaryCard } from '@/components/ui/summary-card'
 import { formatFecha, formatMonto } from '@/lib/formatters'
+import { getSellerDashboardSummary, getSellerActividadReciente } from '@/lib/query'
 
 const badgeVariant: Record<string, React.ComponentProps<typeof Badge>['variant']> = {
     pendiente:  'warning',
@@ -26,17 +26,53 @@ const badgeLabel: Record<string, string> = {
     rechazada:   'Rechazada',
 }
 
-export default function SellerHomePage() {
+export default async function SellerHomePage() {
+    const { userId } = await auth()
+    
+    // Usamos las queries optimizadas que ya definiste
+    const [resumen, actividadRaw] = await Promise.all([
+        getSellerDashboardSummary(userId!),
+        getSellerActividadReciente(userId!),
+    ])
+
+    const alertas: { id: number; mensaje: string; variant: 'warning' | 'danger' }[] = []
+
+    // Usamos el resultado directo de la query de resumen
+    if (resumen.disputasActivas > 0) {
+        alertas.push({ 
+            id: 1, 
+            mensaje: `Tenés ${resumen.disputasActivas} disputa${resumen.disputasActivas > 1 ? 's' : ''} sin resolver.`, 
+            variant: 'warning' 
+        })
+    }
+
+    // Mapeamos los datos de la actividad reciente optimizada
+    const actividad = [
+        ...actividadRaw.acreditaciones.map(a => ({
+            id: a.id,
+            tipo: 'acreditacion' as const,
+            descripcion: a.descripcion ?? `Pedido ${a.pedidoId}`,
+            fecha: a.fecha,
+            estado: a.estado,
+            monto: Number(a.monto),
+        })),
+        ...actividadRaw.disputas.map(d => ({
+            id: d.id,
+            tipo: 'disputa' as const,
+            descripcion: d.descripcion ?? 'Disputa',
+            fecha: d.fechaDeInicio,
+            estado: d.estado,
+            monto: d.pago ? Number(d.pago.monto) : 0,
+        })),
+    ].sort((a, b) => b.fecha.getTime() - a.fecha.getTime())
+
     return (
         <div className="max-w-6xl mx-auto space-y-8">
- 
-            {/* Encabezado */}
             <div>
                 <h1 className="text-xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100">Inicio</h1>
                 <p className="text-sm text-neutral-500 mt-0.5">Resumen de tu actividad.</p>
             </div>
  
-            {/* Alertas */}
             {alertas.length > 0 && (
                 <div className="space-y-2">
                     {alertas.map((a) => (
@@ -45,7 +81,6 @@ export default function SellerHomePage() {
                 </div>
             )}
  
-            {/* Resumen */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <SummaryCard
                     icon={CreditCard}
@@ -66,7 +101,6 @@ export default function SellerHomePage() {
                 />
             </div>
  
-            {/* Actividad reciente */}
             <div className="space-y-3">
                 <h2 className="text-xs font-mono uppercase tracking-wider text-neutral-500 dark:text-neutral-500">
                     Actividad reciente
@@ -99,27 +133,6 @@ export default function SellerHomePage() {
                     </table>
                 </div>
             </div>
- 
         </div>
     )
 }
-
-
-
-const resumen = {
-    acreditacionesPendientes: { cantidad: 2, monto: 305800 },
-    disputasActivas: 1,
-    totalAcreditadoMes: 572700,
-}
- 
-const actividad = [
-    { id: 1, tipo: 'acreditacion', descripcion: 'Pedido #1015', fecha: '2025-05-22', estado: 'pendiente',  monto: 95800  },
-    { id: 2, tipo: 'acreditacion', descripcion: 'Pedido #1014', fecha: '2025-05-20', estado: 'en_proceso', monto: 210000 },
-    { id: 3, tipo: 'disputa',      descripcion: 'Pedido #1012', fecha: '2025-05-15', estado: 'pendiente',  monto: 184500 },
-    { id: 4, tipo: 'acreditacion', descripcion: 'Pedido #1012', fecha: '2025-05-10', estado: 'acreditado', monto: 184500 },
-]
- 
-const alertas = [
-    { id: 1, mensaje: 'Tenés 1 disputa nueva sin resolver.', variant: 'warning' as const },
-    { id: 2, mensaje: 'El Pedido #1003 tuvo una acreditación rechazada.', variant: 'danger' as const },
-]
