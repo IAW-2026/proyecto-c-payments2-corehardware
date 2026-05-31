@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { UserButton } from '@clerk/nextjs'
 
+
 export default function ProtectedLayout({ children }: { children: React.ReactNode }) {
     return (
         <>

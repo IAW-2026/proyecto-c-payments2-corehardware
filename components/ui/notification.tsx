@@ -1,5 +1,6 @@
 import { HTMLAttributes } from 'react'
 
+
 type NotificationVariant = 'accent' | 'warning' | 'danger'
 
 interface NotificationProps extends HTMLAttributes<HTMLDivElement> {
@@ -11,6 +12,7 @@ const variantClasses: Record<NotificationVariant, { container: string; dot: stri
     warning: { container: 'bg-amber-500/10 border-amber-500/10',  dot: 'bg-amber-600 dark:bg-amber-400',  text: 'text-amber-800 dark:text-amber-400' },
     danger:  { container: 'bg-red-500/10 border-red-500/10',      dot: 'bg-red-600 dark:bg-red-400',      text: 'text-red-800 dark:text-red-400' },
 }
+
 
 export function Notification({ variant = 'accent', className = '', children, ...props }: NotificationProps) {
     const { container, dot, text } = variantClasses[variant]

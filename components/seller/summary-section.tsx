@@ -1,8 +1,9 @@
 import { auth } from '@clerk/nextjs/server'
 import { CreditCard, MessageSquareWarning, TrendingUp } from 'lucide-react'
-import { getSellerDashboardSummary } from '@/lib/query'
+import { getSellerDashboardSummary } from '@/lib/query/seller'
 import { SummaryCard } from '@/components/ui/summary-card'
 import { formatMonto } from '@/lib/formatters'
+
 
 export async function SellerSummarySection() {
     const { userId } = await auth()

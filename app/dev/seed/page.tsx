@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
 
+
 const BUYERS = {
     buyer1: 'user_3EAcu0oi7IdFgIhhIqNFO7bxmM2',
     buyer2: 'user_3EPiqm1dQiYgSxU3wI5SspkHOpy',
@@ -144,6 +145,7 @@ async function purgarCredenciales() {
     await prisma.credencialVendedor.deleteMany()
     revalidatePath('/', 'layout')
 }
+
 
 export default function SeedPage() {
     return (

@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation'
 import { ButtonSecondary } from '@/components/ui/button'
 
+
 export function NotFoundView() {
     const router = useRouter()
     return (

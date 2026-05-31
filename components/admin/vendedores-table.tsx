@@ -1,5 +1,6 @@
 import { formatFecha } from '@/lib/formatters'
 
+
 export function VendedoresTable({ vendedores }: { vendedores: any[] }) {
     return (
         <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl overflow-hidden">

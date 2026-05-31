@@ -4,7 +4,6 @@ import { DateRange } from "@/types/date-range";
 export function getRange(periodo: string): DateRange {
     const now = new Date();
     
-    // Cálculo del rango actual
     let start = new Date(now);
     let end = new Date(now);
 
@@ -25,7 +24,6 @@ export function getRange(periodo: string): DateRange {
             break;
     }
 
-    // Cálculo del periodo previo (misma duración que el actual)
     const duration = end.getTime() - start.getTime();
     const prevEnd = new Date(start.getTime());
     const prevStart = new Date(prevEnd.getTime() - duration);

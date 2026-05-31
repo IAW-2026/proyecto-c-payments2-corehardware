@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 
+
 const checkoutOrderSchema = z.object({
     id: z.union([z.string(), z.number()]), 
     fecha: z.iso.datetime(),
@@ -11,6 +12,7 @@ const checkoutOrderSchema = z.object({
     monto: z.number().positive("El monto debe ser mayor a 0"),
     productos: z.array(z.any()).min(1, "Debe incluir al menos un producto"),
 });
+
 
 export async function POST(req: NextRequest) {
     try {

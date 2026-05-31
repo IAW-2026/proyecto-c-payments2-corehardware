@@ -1,5 +1,6 @@
-import { getAdminActividadReciente } from '@/lib/query'
+import { getAdminActividadReciente } from '@/lib/query/admin'
 import { RecentActivityTable } from '@/components/admin/recent-activity-table'
+
 
 export async function AdminActivitySection() {
     const actividadData = await getAdminActividadReciente()

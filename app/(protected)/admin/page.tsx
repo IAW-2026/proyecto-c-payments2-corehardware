@@ -4,6 +4,7 @@ import { AdminActivitySection } from '@/components/admin/activity-section'
 import { AdminVendedoresSection } from '@/components/admin/vendedores-section'
 import { SummarySkeleton, ActivitySkeleton, VendedoresSkeleton } from '@/components/skeletons'
 
+
 export default function AdminHomePage() {
     return (
         <div className="max-w-6xl mx-auto space-y-8">

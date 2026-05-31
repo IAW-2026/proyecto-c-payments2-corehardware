@@ -1,7 +1,8 @@
 import { auth } from '@clerk/nextjs/server'
-import { getDisputasBuyer, getPagosDisputables, getCountDisputasActivas } from '@/lib/query'
+import { getDisputasBuyer, getPagosDisputables, getCountDisputasActivas } from '@/lib/query/buyer'
 import { DisputesView } from '@/components/buyer/disputes-view'
 import { ITEMS_PER_PAGE } from '@/lib/constants'
+
 
 export default async function DisputesPage({
     searchParams,

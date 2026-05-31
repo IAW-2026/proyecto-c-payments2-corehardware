@@ -1,7 +1,8 @@
 import { CreditCard, MessageSquareWarning, Users, Activity } from 'lucide-react'
 import { SummaryCard } from '@/components/ui/summary-card'
 import { formatMonto } from '@/lib/formatters'
-import { getAdminHomeSummary } from '@/lib/query'
+import { getAdminHomeSummary } from '@/lib/query/admin'
+
 
 export async function AdminSummarySection() {
     const resumen = await getAdminHomeSummary()

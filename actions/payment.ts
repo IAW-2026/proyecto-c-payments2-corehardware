@@ -1,7 +1,7 @@
 'use server';
 
 import crypto from 'crypto';
-import { prisma } from '@/lib/prisma'; // Asegúrate de tener esta importación
+import { prisma } from '@/lib/prisma';
 
 export async function procesarOrdenPagoPro(
     pagoId: string,
@@ -14,7 +14,6 @@ export async function procesarOrdenPagoPro(
     }
 ) {
     try {
-        // 1. Obtener el sellerClerkUserId asociado al pago
         const pago = await prisma.pago.findUnique({
             where: { id: pagoId },
             select: { sellerClerkUserId: true }
@@ -22,7 +21,6 @@ export async function procesarOrdenPagoPro(
 
         if (!pago) return { success: false, error: "Pago no encontrado" };
 
-        // 2. Obtener el accessToken del vendedor
         const credencial = await prisma.credencialVendedor.findUnique({
             where: { clerkUserId: pago.sellerClerkUserId },
             select: { accessToken: true }
@@ -35,7 +33,7 @@ export async function procesarOrdenPagoPro(
         const montoFormateado = Number(submitData.total_amount).toFixed(2);
 
         const orderBody = {
-            external_reference: pagoId, // ID REAL DE TU DB
+            external_reference: pagoId,
             type: "online",
             processing_mode: "automatic",
             total_amount: montoFormateado,

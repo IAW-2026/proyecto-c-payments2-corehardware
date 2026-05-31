@@ -4,6 +4,7 @@ import { SellerSummarySection } from '@/components/seller/summary-section'
 import { SellerActivitySection } from '@/components/seller/activity-section'
 import { AlertsSkeleton, SummarySkeleton, ActivitySkeleton } from '@/components/skeletons'
 
+
 export default function SellerHomePage() {
     return (
         <div className="max-w-6xl mx-auto space-y-8">

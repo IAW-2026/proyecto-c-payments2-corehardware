@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { SignInButton } from '@clerk/nextjs'
 import { ButtonPrimary, ButtonSecondary } from '@/components/ui/button'
 
+
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
     return (
         <>

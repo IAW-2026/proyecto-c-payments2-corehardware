@@ -4,6 +4,7 @@ import { initMercadoPago, CardPayment } from '@mercadopago/sdk-react';
 import { useState, useEffect } from 'react';
 import { getCustomVariables } from '@/lib/mp-style';
 
+
 interface Props {
     amount: number;
     publicKey: string;
@@ -11,6 +12,7 @@ interface Props {
     onSuccess: (orderId: string) => void;
     onError: (error: string) => void;
 }
+
 
 export default function MercadoPagoBrick({ amount, publicKey, onSubmit, onSuccess, onError }: Props) {
     const [isDark, setIsDark] = useState(false);

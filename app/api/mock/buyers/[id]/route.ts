@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 
+
 const buyers: Record<string, {
     id: string
     dni: number
@@ -34,6 +35,7 @@ const buyers: Record<string, {
         condicion_iva: 'Monotributista',
     },
 }
+
 
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     const { id } = await params;

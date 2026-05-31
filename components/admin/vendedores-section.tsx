@@ -1,5 +1,6 @@
-import { getUltimosVendedores } from '@/lib/query'
+import { getUltimosVendedores } from '@/lib/query/admin'
 import { VendedoresTable } from '@/components/admin/vendedores-table'
+
 
 export async function AdminVendedoresSection() {
     const ultimosVendedores = await getUltimosVendedores()

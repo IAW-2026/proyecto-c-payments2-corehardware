@@ -3,6 +3,7 @@
 import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
 
+
 export async function redirectToMercadoPago() {
     const state = crypto.randomUUID();
     

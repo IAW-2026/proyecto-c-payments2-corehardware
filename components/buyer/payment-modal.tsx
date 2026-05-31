@@ -8,7 +8,7 @@ export function PaymentModal({ payment, publicKey, onClose }: { payment: Payment
     const [status, setStatus] = useState<'paying' | 'success'>('paying');
     
     const handlePayment = async (formData: any) => {
-        return await procesarOrdenPagoPro(payment.id, { // Pasamos el ID real de tu DB
+        return await procesarOrdenPagoPro(payment.id, {
             total_amount: String(formData.transaction_amount),
             payment_method_id: formData.payment_method_id,
             token: formData.token,

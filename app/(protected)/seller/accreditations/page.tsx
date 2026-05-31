@@ -13,6 +13,7 @@ async function getNombreComprador(id: string): Promise<string> {
     return `${data.nombre} ${data.apellido}`;
 }
 
+
 export default async function SellerAcreditacionesPage({
     searchParams,
 }: {

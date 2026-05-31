@@ -2,6 +2,7 @@ import { formatFecha, formatMonto } from '@/lib/formatters'
 import { Payment } from '@/types/payments'
 import { Badge } from '@/components/ui/badge'
 
+
 const statusVariant: Record<string, React.ComponentProps<typeof Badge>['variant']> = {
     pendiente:  'warning',
     acreditado: 'accent',
@@ -15,6 +16,7 @@ const statusLabel: Record<string, string> = {
     rechazado:  'Rechazado',
     en_proceso: 'En proceso',
 }
+
 
 export function AccreditationRow({ 
     accreditation, 

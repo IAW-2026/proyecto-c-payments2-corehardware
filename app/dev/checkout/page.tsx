@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 
+
 export default function DevCheckoutPage() {
     const [formData, setFormData] = useState({
         id: "1001",
@@ -41,7 +42,7 @@ export default function DevCheckoutPage() {
             const payload = {
                 id: formData.id,
                 fecha: formData.fecha,
-                comprador_id: "ignored", // Requerido por Zod, pero ignorado por la API
+                comprador_id: "ignored",
                 vendedor_id: process.env.NEXT_PUBLIC_TEST_SELLER_CLERK_ID || "seller_123",
                 monto: formData.monto,
                 productos: productos

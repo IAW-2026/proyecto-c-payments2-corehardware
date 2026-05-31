@@ -2,6 +2,7 @@ import { auth } from '@clerk/nextjs/server'
 import { getPagosPendientes, getDisputasRecientes } from '@/lib/query'
 import { AlertBanner } from '@/components/buyer/alert-banner'
 
+
 export async function AlertsSection() {
     const { userId } = await auth()
     const [pagosPendientes, disputasRecientes] = await Promise.all([

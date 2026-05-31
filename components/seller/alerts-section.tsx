@@ -1,6 +1,7 @@
 import { auth } from '@clerk/nextjs/server'
-import { getSellerDashboardSummary } from '@/lib/query'
+import { getSellerDashboardSummary } from '@/lib/query/seller'
 import { Notification } from '@/components/ui/notification'
+
 
 export async function SellerAlertsSection() {
     const { userId } = await auth()

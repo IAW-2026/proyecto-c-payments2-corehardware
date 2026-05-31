@@ -1,7 +1,8 @@
 import { auth } from '@clerk/nextjs/server'
-import { getCountDisputasSellerPendientes, getDisputasSeller } from '@/lib/query'
+import { getCountDisputasSellerPendientes, getDisputasSeller } from '@/lib/query/seller'
 import { SellerDisputasView } from '@/components/seller/disputes-view'
 import { ITEMS_PER_PAGE } from '@/lib/constants'
+
 
 async function getEmailComprador(id: string): Promise<string> {
     const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/mock/buyers/${id}`)
@@ -9,6 +10,7 @@ async function getEmailComprador(id: string): Promise<string> {
     const data = await res.json()
     return data.mail
 }
+
 
 export default async function SellerDisputasPage({
     searchParams,

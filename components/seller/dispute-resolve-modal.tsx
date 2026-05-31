@@ -1,6 +1,7 @@
 import { ButtonClose, ButtonDanger, ButtonMuted, ButtonSecondary } from '@/components/ui/button'
 import { Dispute, DisputeStatus } from '@/types/dispute';
 
+
 type ResolutionStatus = Exclude<DisputeStatus, 'pendiente'>
 
 const opciones: { estado: ResolutionStatus; label: string }[] = [
@@ -8,6 +9,7 @@ const opciones: { estado: ResolutionStatus; label: string }[] = [
     { estado: 'repuesta',    label: 'Reponer'     },
     { estado: 'rechazada',   label: 'Rechazar'    },
 ]
+
 
 export function DisputeResolveModal({ disputa, onClose, onResolver }: {
     disputa: Dispute

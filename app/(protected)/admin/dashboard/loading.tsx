@@ -7,14 +7,12 @@ export default function Loading() {
                 <div className="h-7 w-28 rounded bg-neutral-100 dark:bg-neutral-800 animate-pulse" />
                 <div className="h-4 w-48 rounded bg-neutral-100 dark:bg-neutral-800 animate-pulse" />
             </div>
-            {/* filtros */}
             <div className="flex flex-wrap gap-3">
                 <div className="h-9 w-40 rounded-lg bg-neutral-100 dark:bg-neutral-800 animate-pulse" />
                 <div className="h-9 w-44 rounded-lg bg-neutral-100 dark:bg-neutral-800 animate-pulse" />
                 <div className="h-9 w-48 rounded-lg bg-neutral-100 dark:bg-neutral-800 animate-pulse" />
             </div>
             <KPIsSkeleton />
-            {/* chart */}
             <div className="h-64 rounded-xl bg-neutral-100 dark:bg-neutral-800 animate-pulse" />
             <ActivitySkeleton />
         </div>

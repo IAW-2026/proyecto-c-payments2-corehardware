@@ -3,7 +3,9 @@
 import { usePathname } from 'next/navigation'
 import { TabItem, TabItemActive } from '@/components/ui/nav-tabs'
 
+
 type Tab = { label: string; href: string }
+
 
 export default function SideNav({ tabs }: { tabs: Tab[] }) {
     const pathname = usePathname()

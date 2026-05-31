@@ -1,5 +1,6 @@
 import { HTMLAttributes } from 'react'
  
+
 type BadgeVariant = 'default' | 'accent' | 'mono' | 'warning' | 'danger'
  
 interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
@@ -14,6 +15,7 @@ const variantClasses: Record<BadgeVariant, string> = {
     danger:  'bg-red-100 text-red-800 border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/20',
 }
  
+
 export function Badge({ variant = 'default', className = '', ...props }: BadgeProps) {
     return (
         <span

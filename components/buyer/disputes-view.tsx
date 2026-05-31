@@ -22,6 +22,7 @@ interface DisputesViewProps {
     totalActivas: number
 }
 
+
 export function DisputesView({
     disputas,
     montos,

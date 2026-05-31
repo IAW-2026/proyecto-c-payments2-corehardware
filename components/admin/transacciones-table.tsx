@@ -3,6 +3,7 @@ import { formatMonto, formatFecha } from '@/lib/formatters'
 import { Payment } from '@/types/payments'
 import { PAGINATION_NEXT_LABEL, PAGINATION_PREV_LABEL, PaginationButton } from '../ui/pagination-button'
 
+
 const badgeVariant: Record<string, React.ComponentProps<typeof Badge>['variant']> = {
     pendiente:   'warning',
     acreditado:  'accent',
@@ -22,6 +23,7 @@ const badgeLabel: Record<string, string> = {
     cancelado:   'Cancelado',
     contracargo: 'Contracargo',
 }
+
 
 export function TransaccionesTable({
     transacciones,

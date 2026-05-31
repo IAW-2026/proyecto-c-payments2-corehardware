@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { ArrowRight, ShieldCheck, Clock, MessageSquareWarning } from 'lucide-react'
 import { ButtonPrimary, ButtonSecondary } from '@/components/ui/button'
 
+
 const pillars = [
     {
         icon: ArrowRight,
@@ -24,6 +25,7 @@ const pillars = [
         description: 'Panel de administración para supervisar la operación completa de la plataforma.',
     },
 ]
+
 
 export default function LandingPage() {
     return (

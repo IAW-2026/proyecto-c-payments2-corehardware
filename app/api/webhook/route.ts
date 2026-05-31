@@ -2,16 +2,18 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import crypto from "crypto";
 
+
 const MP_STATUS_MAP: Record<string, string> = {
     pending:      "pendiente",
     in_process:   "en_proceso",
     approved:     "acreditado",
-    processed:    "acreditado", // Estado para 'orders'
+    processed:    "acreditado",
     rejected:     "rechazado",
     cancelled:    "cancelado",
     refunded:     "reembolsado",
     charged_back: "contracargo",
 };
+
 
 export async function POST(req: NextRequest) {
     try {
@@ -30,9 +32,6 @@ export async function POST(req: NextRequest) {
             if (key?.trim() === 'v1') hash = value?.trim() ?? "";
         });
 
-        console.log("Webhook Debug - Raw Headers:", { xSignature, xRequestId });
-        console.log("Webhook Debug - Parsed Data:", { ts, hash, dataId });
-
         if (!ts || !hash || !dataId) {
             console.error("Webhook Error - Firma o datos incompletos");
             return NextResponse.json({ message: "Firma o datos incompletos" }, { status: 401 });
@@ -42,10 +41,6 @@ export async function POST(req: NextRequest) {
         const manifest = `id:${dataId.toLowerCase()};request-id:${xRequestId};ts:${ts};`;
         const secret = process.env.MERCADOPAGO_SECRET_KEY!;
         const expected = crypto.createHmac("sha256", secret).update(manifest).digest("hex");
-
-        console.log("Webhook Debug - Manifest:", manifest);
-        console.log("Webhook Debug - Hash esperado:", expected);
-        console.log("Webhook Debug - Hash recibido:", hash);
 
         if (expected !== hash) {
             console.error("Webhook Error - Firma inválida");
@@ -67,7 +62,6 @@ export async function POST(req: NextRequest) {
         });
 
         if (!credencial) {
-            console.error(`Credencial no encontrada para el vendedor: ${mpUserId}`);
             return NextResponse.json({ message: "Credencial no encontrada" }, { status: 404 });
         }
 
@@ -93,7 +87,6 @@ export async function POST(req: NextRequest) {
                 estado: MP_STATUS_MAP[mpData.status] ?? "desconocido",
             };
 
-            // Solo agregar formaDePago si está presente
             if (formaDePago) {
                 dataToUpdate.formaDePago = formaDePago;
             }
@@ -107,7 +100,6 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ received: true }, { status: 200 });
 
     } catch (error) {
-        console.error("Error en Webhook:", error);
         return NextResponse.json({ message: "Error interno" }, { status: 500 });
     }
 }

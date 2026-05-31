@@ -2,6 +2,7 @@ import { formatFecha, formatMonto } from "@/lib/formatters";
 import { Badge } from "../ui/badge";
 import { Dispute, DisputeStatus } from "@/types/dispute";
 
+
 const estadoVariant: Record<DisputeStatus, React.ComponentProps<typeof Badge>['variant']> = {
     pendiente:   'warning',
     reembolsada: 'accent',
@@ -9,13 +10,13 @@ const estadoVariant: Record<DisputeStatus, React.ComponentProps<typeof Badge>['v
     repuesta: 'accent',  
 }
 
-
 const estadoLabel: Record<DisputeStatus, string> = {
     pendiente:   'Pendiente',
     reembolsada: 'Reembolsada',
     rechazada:   'Rechazada',
     repuesta: 'Repuesta',
 }
+
 
 export function DisputeRow({ disputa, monto }: { disputa: Dispute, monto: string }) {
     return (

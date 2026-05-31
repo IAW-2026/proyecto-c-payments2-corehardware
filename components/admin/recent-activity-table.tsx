@@ -1,6 +1,7 @@
 import { Badge } from '@/components/ui/badge'
 import { formatFecha, formatMonto } from '@/lib/formatters'
 
+
 const badgeVariant: Record<string, React.ComponentProps<typeof Badge>['variant']> = {
     pendiente:   'warning',
     acreditado:  'accent',
@@ -18,6 +19,7 @@ const badgeLabel: Record<string, string> = {
     repuesta:    'Repuesta',
     rechazada:   'Rechazada',
 }
+
 
 export function RecentActivityTable({ actividad }: { actividad: any[] }) {
     return (

@@ -17,6 +17,7 @@ const estadoLabel: Record<string, string> = {
     reembolsado: 'Reembolsado',
 }
 
+
 export function DashboardFilters({
     periodos,
     periodo,

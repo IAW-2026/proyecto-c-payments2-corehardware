@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { ShoppingCart, Store } from 'lucide-react'
 import { ButtonPrimary } from '@/components/ui/button'
 
+
 const roles = [
     {
         icon: ShoppingCart,
@@ -18,6 +19,7 @@ const roles = [
         Button: ButtonPrimary,
     },
 ]
+
 
 export default function SignUpRolePage() {
     return (

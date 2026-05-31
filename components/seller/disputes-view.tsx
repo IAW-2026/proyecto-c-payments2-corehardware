@@ -20,6 +20,7 @@ interface SellerDisputasViewProps {
     totalPendientesAbsoluto: number
 }
 
+
 export function SellerDisputasView({
     initialDisputas,
     mapaEmails,

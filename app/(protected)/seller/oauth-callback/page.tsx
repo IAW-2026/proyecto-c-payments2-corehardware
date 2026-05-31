@@ -2,6 +2,7 @@ import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 
+
 export default async function MercadoPagoCallbackPage({
     searchParams,
 }: {
@@ -10,12 +11,10 @@ export default async function MercadoPagoCallbackPage({
     const { userId } = await auth();
     const { code } = await searchParams;
 
-    // 1. Verificaciones básicas
     if (!userId) redirect("/sign-in");
     if (!code) redirect("/error?message=codigo_no_presente");
 
     try {
-        // 2. Intercambio de código por token (mismo POST que tenías)
         const response = await fetch('https://api.mercadopago.com/oauth/token', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -35,7 +34,6 @@ export default async function MercadoPagoCallbackPage({
             redirect("/error?message=error_mercado_pago");
         }
 
-        // 3. Persistencia en DB (mismo upsert)
         await prisma.credencialVendedor.upsert({
             where: { mercadoPagoUserId: BigInt(data.user_id) },
             update: {
@@ -56,7 +54,6 @@ export default async function MercadoPagoCallbackPage({
             },
         });
 
-        // 4. Redirección final al éxito
         redirect("/seller/authorization");
 
     } catch (error) {

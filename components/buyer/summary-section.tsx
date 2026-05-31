@@ -1,8 +1,9 @@
 import { auth } from '@clerk/nextjs/server'
 import { CreditCard, MessageSquareWarning, Package } from 'lucide-react'
-import { getPagosPendientes, getDisputasActivas, getPagosRecientes } from '@/lib/query'
+import { getPagosPendientes, getDisputasActivas, getPagosRecientes } from '@/lib/query/buyer'
 import { SummaryCard } from '@/components/ui/summary-card'
 import { formatMonto } from '@/lib/formatters'
+
 
 export async function SummarySection() {
     const { userId } = await auth()

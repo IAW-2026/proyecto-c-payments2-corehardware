@@ -6,7 +6,9 @@ import { ButtonClose, ButtonPrimary, ButtonSecondary } from "../ui/button"
 import { Payment } from '@/types/payments'
 import { createDisputa } from "@/actions/disputes"
 
+
 type ModalState = 'form' | 'success'
+
 
 export function NewDisputeModal({
     onClose,

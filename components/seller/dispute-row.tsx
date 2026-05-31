@@ -3,6 +3,7 @@ import { Badge } from '@/components/ui/badge'
 import { ButtonPrimary } from '@/components/ui/button'
 import { Dispute, DisputeStatus } from '@/types/dispute'
 
+
 const estadoVariant: Record<DisputeStatus, React.ComponentProps<typeof Badge>['variant']> = {
     pendiente:   'warning',
     reembolsada: 'accent',
@@ -16,6 +17,7 @@ const estadoLabel: Record<DisputeStatus, string> = {
     rechazada:   'Rechazada',
     repuesta:    'Repuesta',
 }
+
 
 export function DisputeRow({ disputa, emailComprador, onResolver }: { 
     disputa: Dispute; 

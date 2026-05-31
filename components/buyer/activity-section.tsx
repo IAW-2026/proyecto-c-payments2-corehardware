@@ -1,7 +1,8 @@
 import { auth } from '@clerk/nextjs/server'
-import { getPagosRecientes, getDisputasRecientes } from '@/lib/query'
+import { getPagosRecientes, getDisputasRecientes } from '@/lib/query/buyer'
 import { Badge } from '@/components/ui/badge'
 import { formatFecha, formatMonto } from '@/lib/formatters'
+
 
 const badgeVariant: Record<string, React.ComponentProps<typeof Badge>['variant']> = {
     pendiente: 'warning',
@@ -20,6 +21,7 @@ const badgeLabel: Record<string, string> = {
     repuesta: 'Repuesta',
     rechazada: 'Rechazada',
 }
+
 
 export async function ActivitySection() {
     const { userId } = await auth()

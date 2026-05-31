@@ -9,6 +9,7 @@ import {
 import { TabButton } from '@/components/ui/tab-button'
 import { formatMonto } from '@/lib/formatters'
 
+
 function CustomTooltip({ active, payload, label }: any) {
     if (!active || !payload?.length) return null
     return (
@@ -22,6 +23,7 @@ function CustomTooltip({ active, payload, label }: any) {
         </div>
     )
 }
+
 
 export function DashboardCharts({ datos }: { datos: any[] }) {
     const [tab, setTab] = useState<'volumen' | 'disputas'>('volumen')

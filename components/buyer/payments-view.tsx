@@ -9,6 +9,7 @@ import { TabButton } from '@/components/ui/tab-button'
 import { getVendedorPublicKey } from '@/lib/query'
 import { PAGINATION_NEXT_LABEL, PAGINATION_PREV_LABEL, PaginationButton } from '@/components/ui/pagination-button'
 
+
 interface PaymentsViewProps {
     initialPagos: Payment[]
     total: number
@@ -17,6 +18,7 @@ interface PaymentsViewProps {
     tab: 'pendientes' | 'realizados'
     totalPendientesAbsoluto: number
 }
+
 
 export function PaymentsView({ 
     initialPagos, 

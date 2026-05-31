@@ -2,7 +2,8 @@ import { formatFecha, formatMonto } from "@/lib/formatters"
 import { Payment, PaymentStatus } from "@/types/payments"
 import { Badge } from "@/components/ui/badge"
 import { ButtonPrimary } from "@/components/ui/button"
- 
+
+
 const statusVariant: Record<PaymentStatus, React.ComponentProps<typeof Badge>['variant']> = {
     pendiente:   'warning',
     acreditado:  'accent',
@@ -22,7 +23,8 @@ const statusLabel: Record<PaymentStatus, string> = {
     reembolsado: 'Reembolsado',
     contracargo: 'Contracargo',
 }
- 
+
+
 export function PaymentRow({ payment, onPagar }: { payment: Payment; onPagar?: (p: Payment) => void }) {
     const estado = payment.estado as PaymentStatus;
 

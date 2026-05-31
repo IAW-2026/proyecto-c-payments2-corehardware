@@ -1,6 +1,7 @@
 import { TrendingUp, TrendingDown } from 'lucide-react'
 import { formatMonto } from '@/lib/formatters'
 
+
 function Delta({ value, suffix = '%', invertir = false }: { value: number; suffix?: string; invertir?: boolean }) {
     const sube = value >= 0
     const esBueno = invertir ? !sube : sube
@@ -18,6 +19,7 @@ function Delta({ value, suffix = '%', invertir = false }: { value: number; suffi
         </span>
     )
 }
+
 
 export function DashboardKPIs({ resumen }: { resumen: any }) {
     return (
