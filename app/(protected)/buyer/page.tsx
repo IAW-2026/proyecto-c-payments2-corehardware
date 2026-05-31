@@ -2,7 +2,7 @@ import { Suspense } from 'react'
 import { AlertsSection } from '@/components/buyer/alerts-section'
 import { SummarySection } from '@/components/buyer/summary-section'
 import { ActivitySection } from '@/components/buyer/activity-section'
-import { AlertsSkeleton, SummarySkeleton, ActivitySkeleton } from '@/components/buyer/skeletons'
+import { AlertsSkeleton, SummarySkeleton, ActivitySkeleton } from '@/components/skeletons'
 
 export default function BuyerHomePage() {
     return (

@@ -1,4 +1,4 @@
-import { ActivitySkeleton } from '@/components/buyer/skeletons'
+import { ActivitySkeleton } from '@/components/skeletons'
 
 export default function Loading() {
   return (

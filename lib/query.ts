@@ -229,8 +229,7 @@ export async function getCountDisputasSellerPendientes(sellerId: string): Promis
     });
 }
 
-
-export async function getSellerDashboardSummary(sellerId: string) {
+export const getSellerDashboardSummary = cache(async (sellerId: string) => {
     const inicioMes = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
 
     const [pendientes, disputasActivas, acreditadoMes] = await Promise.all([
@@ -260,7 +259,7 @@ export async function getSellerDashboardSummary(sellerId: string) {
         disputasActivas: disputasActivas,
         totalAcreditadoMes: Number(acreditadoMes._sum.monto ?? 0)
     };
-}
+})
 
 export async function getSellerActividadReciente(sellerId: string) {
     const [acreditaciones, disputas] = await Promise.all([
