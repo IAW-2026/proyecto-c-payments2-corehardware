@@ -13,11 +13,13 @@ export type AdminDashboardSummary = {
     current: {
         pagosMonto: string;
         pagosCantidad: number;
-        disputas: number
+        disputas: number;
+        rechazados: number
     };
     previous: {
         pagosMonto: string;
         pagosCantidad: number;
-        disputas: number
+        disputas: number;
+        rechazados: number
     };
 };

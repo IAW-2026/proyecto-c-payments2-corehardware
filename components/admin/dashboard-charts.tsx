@@ -91,7 +91,7 @@ export function DashboardCharts({ datos }: { datos: any[] }) {
                                 width={30}
                                 allowDecimals={false}
                             />
-                            <Tooltip content={<CustomTooltip />} />
+                            <Tooltip content={<CustomTooltip />} cursor={{ fill: 'transparent' }} />
                             <Bar
                                 dataKey="disputas"
                                 name="Disputas"
