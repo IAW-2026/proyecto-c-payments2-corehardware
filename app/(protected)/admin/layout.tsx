@@ -1,9 +1,12 @@
+'use client'
+
 import SideNav from '@/components/ui/side-nav'
+import { Home, LayoutDashboard } from 'lucide-react'
 
 
 const tabs = [
-    { label: 'Home', href: '/admin' },
-    { label: 'Dashboard', href: '/admin/dashboard' },
+    { label: 'Home', href: '/admin', icon: Home },
+    { label: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
 ]
 
 

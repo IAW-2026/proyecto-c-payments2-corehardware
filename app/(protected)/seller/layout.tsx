@@ -1,11 +1,14 @@
+'use client'
+
 import SideNav from '@/components/ui/side-nav'
+import { CircleDollarSign, Home, MessageSquareWarning, ShieldCheck } from 'lucide-react'
 
 
 const tabs = [
-    { label: 'Home', href: '/seller' },
-    { label: 'Acreditaciones', href: '/seller/accreditations' },
-    { label: 'Disputas', href: '/seller/disputes' },
-    { label: 'Autorización', href: '/seller/authorization' },
+    { label: 'Home', href: '/seller', icon: Home },
+    { label: 'Acreditaciones', href: '/seller/accreditations', icon: CircleDollarSign },
+    { label: 'Disputas', href: '/seller/disputes', icon: MessageSquareWarning },
+    { label: 'Autorización', href: '/seller/authorization', icon: ShieldCheck },
 ]
 
 

@@ -1,10 +1,13 @@
+'use client'
+
 import SideNav from '@/components/ui/side-nav'
+import { Home, CreditCard, MessageSquareWarning } from 'lucide-react'
 
 
 const tabs = [
-    { label: 'Home', href: '/buyer' },
-    { label: 'Pagos', href: '/buyer/payments' },
-    { label: 'Disputas', href: '/buyer/disputes' },
+    { label: 'Home', href: '/buyer', icon: Home },
+    { label: 'Pagos', href: '/buyer/payments', icon: CreditCard },
+    { label: 'Disputas', href: '/buyer/disputes', icon: MessageSquareWarning },
 ]
 
 

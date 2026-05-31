@@ -7,9 +7,9 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
     return (
         <>
             <header className="border-b border-neutral-200 dark:border-neutral-900 flex justify-between items-center p-4 gap-4 h-16">
-                <Link href="/" className="pl-4 flex items-baseline gap-0.5">
-                    <span className="text-2xl font-bold text-neutral-900 dark:text-neutral-100 tracking-tight">CoreHardware</span>
-                    <span className="text-base sm:text-lg font-normal text-green-600 dark:text-green-500">Payments</span>
+                <Link href="/" className="pl-4 flex flex-col sm:flex-row sm:items-baseline gap-0 sm:gap-0.5">
+                    <span className="text-2xl font-bold text-neutral-900 dark:text-neutral-100 tracking-tight leading-tight">CoreHardware</span>
+                    <span className="text-xs sm:text-lg font-normal text-green-600 dark:text-green-500 leading-tight">Payments</span>
                 </Link>
                 <div className="flex items-center gap-2">
                     <SignInButton>

@@ -1,26 +1,30 @@
 import Link from 'next/link'
 import { AnchorHTMLAttributes } from 'react'
 import { LinkProps } from 'next/link'
- 
+import { LucideIcon } from 'lucide-react'
 
-type tabProps = AnchorHTMLAttributes<HTMLAnchorElement> & LinkProps
+type tabProps = AnchorHTMLAttributes<HTMLAnchorElement> & LinkProps & { icon?: LucideIcon }
 
-
-export function TabItemActive({ className = '', ...props }: tabProps) {
+export function TabItemActive({ className = '', icon: Icon, children, ...props }: tabProps) {
     return (
         <Link
-            className={`flex-1 md:flex-none text-sm md:text-lg font-medium text-neutral-900 dark:text-neutral-100 bg-neutral-100 dark:bg-neutral-900 border-b-2 md:border-b-0 md:border-l-2 border-green-500 px-3 py-2 ${className}`}
+            className={`flex-1 sm:flex-none md:flex-none text-sm md:text-lg font-medium text-neutral-900 dark:text-neutral-100 bg-neutral-100 dark:bg-neutral-900 border-b-2 md:border-b-0 md:border-l-2 border-green-500 px-3 py-2 flex items-center justify-center sm:justify-start gap-2 ${className}`}
             {...props}
-        />
+        >
+            {Icon && <Icon className="w-4 h-4 shrink-0" strokeWidth={1.75} />}
+            {children && <span className="hidden sm:inline">{children}</span>}
+        </Link>
     )
 }
 
-export function TabItem({ className = '', ...props }: tabProps) {
+export function TabItem({ className = '', icon: Icon, children, ...props }: tabProps) {
     return (
         <Link
-            className={`flex-1 md:flex-none text-sm md:text-lg text-neutral-600 dark:text-neutral-400 border-b-2 md:border-b-0 md:border-l-2 border-transparent hover:bg-neutral-100
-                dark:hover:bg-neutral-900 hover:text-neutral-900 dark:hover:text-neutral-100 active:bg-neutral-200 dark:active:bg-neutral-800 px-3 py-2 transition-colors cursor-pointer ${className}`}
+            className={`flex-1 sm:flex-none md:flex-none text-sm md:text-lg text-neutral-600 dark:text-neutral-400 border-b-2 md:border-b-0 md:border-l-2 border-transparent hover:bg-neutral-100 dark:hover:bg-neutral-900 hover:text-neutral-900 dark:hover:text-neutral-100 active:bg-neutral-200 dark:active:bg-neutral-800 px-3 py-2 transition-colors cursor-pointer flex items-center justify-center sm:justify-start gap-2 ${className}`}
             {...props}
-        />
+        >
+            {Icon && <Icon className="w-4 h-4 shrink-0" strokeWidth={1.75} />}
+            {children && <span className="hidden sm:inline">{children}</span>}
+        </Link>
     )
 }

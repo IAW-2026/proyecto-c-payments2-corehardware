@@ -62,7 +62,7 @@ export default clerkMiddleware(async (auth, req) => {
         }
     }
     
-    if (userId && req.nextUrl.pathname === "/" ) {
+    if (userId && (req.nextUrl.pathname === "/" || req.nextUrl.pathname === "/sign-up" )) {
         const client = await clerkClient();
         const user = await client.users.getUser(userId);
         const rawRole = user.publicMetadata?.role;
