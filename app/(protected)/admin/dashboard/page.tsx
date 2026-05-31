@@ -36,17 +36,23 @@ export default async function AdminDashboardPage({
     const curMonto = parseFloat(summary.current.pagosMonto)
     const prevMonto = parseFloat(summary.previous.pagosMonto)
 
+    const tasaDisputasCur = summary.current.pagosCantidad > 0 ? (summary.current.disputas / summary.current.pagosCantidad) * 100 : 0
+    const tasaDisputasPrev = summary.previous.pagosCantidad > 0 ? (summary.previous.disputas / summary.previous.pagosCantidad) * 100 : 0
+
+    const tasaRechazoCur = summary.current.pagosCantidad > 0 ? (summary.current.rechazados / summary.current.pagosCantidad) * 100 : 0
+    const tasaRechazoPrev = summary.previous.pagosCantidad > 0 ? (summary.previous.rechazados / summary.previous.pagosCantidad) * 100 : 0
+
     const resumen = {
         totalProcesado: curMonto,
         totalProcesadoDelta: prevMonto !== 0 ? ((curMonto - prevMonto) / prevMonto) * 100 : 0,
         cantidadPagos: summary.current.pagosCantidad,
         cantidadPagosDelta: summary.previous.pagosCantidad !== 0
             ? ((summary.current.pagosCantidad - summary.previous.pagosCantidad) / summary.previous.pagosCantidad) * 100
-            : 0,
-        tasaDisputas: summary.current.pagosCantidad > 0 ? (summary.current.disputas / summary.current.pagosCantidad) * 100 : 0,
-        tasaDisputasDelta: 0,
-        tasaRechazo: 0,
-        tasaRechazoDelta: 0,
+            : summary.current.pagosCantidad > 0 ? 100 : 0,
+        tasaDisputas: tasaDisputasCur,
+        tasaDisputasDelta: tasaDisputasCur - tasaDisputasPrev,
+        tasaRechazo: tasaRechazoCur,
+        tasaRechazoDelta: tasaRechazoCur - tasaRechazoPrev,
     }
 
     const mapaDias = new Map<string, { fechaObj: Date; monto: number; disputas: number }>()
@@ -83,9 +89,17 @@ export default async function AdminDashboardPage({
             monto: dia.monto,
             disputas: dia.disputas
         })
+        )
+
+    const idsVendedores = Array.from(new Set(pagos.map(p => p.sellerClerkUserId)))
+    const nombresVendedores = await Promise.all(
+        idsVendedores.map(id =>
+            fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/mock/sellers/${id}`, { cache: 'no-store' })
+                .then(res => res.json())
+                .then(data => [id, data.razon_social as string])
+        )
     )
-
-
+    const mapaVendedores = Object.fromEntries(nombresVendedores)
 
     return (
         <div className="max-w-6xl mx-auto space-y-8">
@@ -110,7 +124,7 @@ export default async function AdminDashboardPage({
 
             <div className="space-y-3">
                 <h2 className="text-xs font-mono uppercase tracking-wider text-neutral-500 dark:text-neutral-500">
-                    Transacciones · {total} resultado{/* {total !== 1 ? 's' : ''} */}
+                    Transacciones · {total} resultado{total !== 1 ? 's' : ''}
                 </h2>
                 <TransaccionesTable
                     transacciones={pagos}
@@ -118,6 +132,7 @@ export default async function AdminDashboardPage({
                     offset={offset}
                     limit={ITEMS_PER_PAGE}
                     searchParams={{ periodo, estado, q }}
+                    mapaVendedores={mapaVendedores}
                 />
             </div>
 

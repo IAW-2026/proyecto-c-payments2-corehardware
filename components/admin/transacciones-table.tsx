@@ -29,12 +29,14 @@ export function TransaccionesTable({
     offset,
     limit,
     searchParams,
+    mapaVendedores,
 }: {
     transacciones: Payment[]
     total: number
     offset: number
     limit: number
     searchParams: Record<string, string>
+    mapaVendedores: Record<string, string>
 }) {
     const hasPrev = offset > 0
     const hasNext = offset + limit < total
@@ -75,7 +77,7 @@ export function TransaccionesTable({
                                     </p>
                                 </td>
                                 <td className="px-4 py-3.5 hidden md:table-cell">
-                                    <p className="text-sm text-neutral-700 dark:text-neutral-300">{t.sellerClerkUserId}</p>
+                                    <p className="text-sm text-neutral-700 dark:text-neutral-300">{mapaVendedores[t.sellerClerkUserId] ?? t.sellerClerkUserId}</p>
                                 </td>
                                 <td className="px-4 py-3.5 font-mono text-sm font-semibold text-neutral-900 dark:text-neutral-100 whitespace-nowrap hidden md:table-cell">
                                     {formatMonto(Number(t.monto))}
