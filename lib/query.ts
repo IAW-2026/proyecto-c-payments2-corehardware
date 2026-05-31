@@ -1,5 +1,6 @@
 'use server';
 
+import { cache } from 'react'
 import { prisma } from "./prisma";
 import { Payment } from '@/types/payments'
 import { Dispute } from '@/types/dispute'
@@ -8,13 +9,13 @@ import { AdminDashboardSummary, AdminHomeSummary } from "@/types/admin-summaries
 import { getRange } from "@/lib/date-range-helper";
 
 
-export async function getPagosPendientes(userId: string): Promise<Payment[]> {
+export const getPagosPendientes = cache(async (userId: string): Promise<Payment[]> => {
     const pagos = await prisma.pago.findMany({
         where: { buyerClerkUserId: userId, estado: 'pendiente' },
         orderBy: { fecha: 'desc' },
     });
     return pagos.map(toPayment);
-}
+})
 
 export async function getDisputasActivas(userId: string): Promise<Dispute[]> {
     const disputas = await prisma.disputa.findMany({
@@ -33,7 +34,7 @@ export async function getPagosRecientes(userId: string): Promise<Payment[]> {
     return pagos.map(toPayment);
 }
 
-export async function getDisputasRecientes(userId: string): Promise<Dispute[]> {
+export const getDisputasRecientes = cache(async (userId: string): Promise<Dispute[]> => {
     const disputas = await prisma.disputa.findMany({
         where: { clerkUserId: userId },
         orderBy: { fechaDeInicio: 'desc' },
@@ -41,7 +42,8 @@ export async function getDisputasRecientes(userId: string): Promise<Dispute[]> {
         include: { pago: true }
     });
     return disputas.map(toDispute);
-}
+})
+
 
 export async function getPagosDisputables(userId: string): Promise<Payment[]> {
     const disputasExistentes = await prisma.disputa.findMany({
@@ -227,8 +229,7 @@ export async function getCountDisputasSellerPendientes(sellerId: string): Promis
     });
 }
 
-
-export async function getSellerDashboardSummary(sellerId: string) {
+export const getSellerDashboardSummary = cache(async (sellerId: string) => {
     const inicioMes = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
 
     const [pendientes, disputasActivas, acreditadoMes] = await Promise.all([
@@ -258,7 +259,7 @@ export async function getSellerDashboardSummary(sellerId: string) {
         disputasActivas: disputasActivas,
         totalAcreditadoMes: Number(acreditadoMes._sum.monto ?? 0)
     };
-}
+})
 
 export async function getSellerActividadReciente(sellerId: string) {
     const [acreditaciones, disputas] = await Promise.all([
