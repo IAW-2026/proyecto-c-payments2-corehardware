@@ -3,12 +3,19 @@
 import { initMercadoPago, CardPayment } from '@mercadopago/sdk-react';
 import { useState, useEffect } from 'react';
 import { getCustomVariables } from '@/lib/mp-style';
+import type { ICardPaymentFormData, ICardPaymentBrickPayer } from '@mercadopago/sdk-react/esm/bricks/cardPayment/type';
 
+
+interface MpResponse {
+    success: boolean;
+    orderId: string;
+    error: string;
+}
 
 interface Props {
     amount: number;
     publicKey: string;
-    onSubmit: (formData: any) => Promise<any>;
+    onSubmit: (formData: ICardPaymentFormData<ICardPaymentBrickPayer>) => Promise<MpResponse>;
     onSuccess: (orderId: string) => void;
     onError: (error: string) => void;
 }
@@ -19,7 +26,7 @@ export default function MercadoPagoBrick({ amount, publicKey, onSubmit, onSucces
 
     useEffect(() => {
         initMercadoPago(publicKey);
-    }, []);
+    }, [publicKey]);
 
     useEffect(() => {
         const media = window.matchMedia('(prefers-color-scheme: dark)');
@@ -44,7 +51,7 @@ export default function MercadoPagoBrick({ amount, publicKey, onSubmit, onSucces
                         const res = await onSubmit(formData);
                         if (res.success) onSuccess(res.orderId);
                         else onError(res.error);
-                    } catch (e) {
+                    } catch {
                         onError("Error de comunicación.");
                     }
                 }}

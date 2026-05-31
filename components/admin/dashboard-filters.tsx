@@ -1,12 +1,11 @@
 'use client'
 
 import { useRouter, usePathname } from 'next/navigation'
-import { useTransition, useState, useEffect } from 'react'
+import { useTransition, useState, useEffect, useCallback } from 'react'
 import { Select } from '@/components/ui/select'
 import { Input } from '@/components/ui/input'
 
 
-const TIPOS = ['todos', 'pagos', 'disputas']
 const ESTADOS = ['todos', 'pendiente', 'acreditado', 'rechazado', 'reembolsado']
 
 const estadoLabel: Record<string, string> = {
@@ -34,7 +33,7 @@ export function DashboardFilters({
     const [, startTransition] = useTransition()
     const [searchQuery, setSearchQuery] = useState(q ?? '')
 
-    function update(params: Record<string, string>) {
+    const update = useCallback((params: Record<string, string>) => {
         const nuevoEstado = { periodo, estado, q, ...params }
         const sp = new URLSearchParams()
 
@@ -58,7 +57,7 @@ export function DashboardFilters({
         const query = searchString ? `?${searchString}` : ''
 
         startTransition(() => router.replace(`${pathname}${query}`))
-    }
+    }, [periodo, estado, q, pathname, router]);
 
     useEffect(() => {
         if (searchQuery === q) return
@@ -68,7 +67,7 @@ export function DashboardFilters({
         }, 300)
 
         return () => clearTimeout(timer)
-    }, [searchQuery, q])
+    }, [searchQuery, q, update])
 
     return (
         <div className="flex flex-wrap gap-3 items-center">
@@ -88,7 +87,7 @@ export function DashboardFilters({
             </div>
             <div className="flex-1 min-w-[180px] max-w-xs">
                 <Input
-                    placeholder="Buscar pedido o vendedor…"
+                    placeholder="Buscar pedido…"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                 />

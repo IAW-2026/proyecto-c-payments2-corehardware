@@ -3,6 +3,7 @@
 import crypto from 'crypto';
 import { prisma } from '@/lib/prisma';
 
+
 export async function procesarOrdenPagoPro(
     pagoId: string,
     submitData: {
@@ -12,21 +13,21 @@ export async function procesarOrdenPagoPro(
         installments: number;
         email: string;
     }
-) {
+): Promise<{ success: boolean; orderId: string; error: string }> {
     try {
         const pago = await prisma.pago.findUnique({
             where: { id: pagoId },
             select: { sellerClerkUserId: true }
         });
 
-        if (!pago) return { success: false, error: "Pago no encontrado" };
+        if (!pago) return { success: false, orderId: '', error: "Pago no encontrado" };
 
         const credencial = await prisma.credencialVendedor.findUnique({
             where: { clerkUserId: pago.sellerClerkUserId },
             select: { accessToken: true }
         });
 
-        if (!credencial?.accessToken) return { success: false, error: "Credenciales no configuradas" };
+        if (!credencial?.accessToken) return { success: false, orderId: '', error: "Vendedor no autorizado" };
 
 
         const idempotencyKey = crypto.randomUUID();
@@ -64,12 +65,12 @@ export async function procesarOrdenPagoPro(
         const data = await response.json();
 
         if (!response.ok) {
-            return { success: false, error: data.message || 'Error en MP' };
+            return { success: false, orderId: '', error: data.message || 'Error en MP' };
         }
 
-        return { success: true, orderId: data.id };
-    } catch (error) {
-        return { success: false, error: 'Error interno' };
+        return { success: true, orderId: data.id, error: '' };
+    } catch {
+        return { success: false, orderId: '', error: 'Error interno' };
     }
 }
 

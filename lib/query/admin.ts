@@ -6,6 +6,7 @@ import { Dispute } from '@/types/dispute'
 import { toPayment, toDispute } from '@/lib/mappers';
 import { AdminDashboardSummary, AdminHomeSummary } from "@/types/admin-summaries";
 import { getRange } from "@/lib/date-range-helper";
+import { Prisma } from "@prisma/client";
 
 
 export async function getAdminHomeSummary(): Promise<AdminHomeSummary> {
@@ -123,7 +124,7 @@ export async function getAdminPagos(params: {
     q: string,
     periodo: string
 }): Promise<{ pagos: Payment[], total: number }> {
-    const where: any = {};
+    const where: Prisma.PagoWhereInput = {};
 
     const { start, end } = getRange(params.periodo);
     where.fecha = { gte: start, lte: end };

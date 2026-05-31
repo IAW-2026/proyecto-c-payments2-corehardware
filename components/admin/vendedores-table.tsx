@@ -1,7 +1,19 @@
 import { formatFecha } from '@/lib/formatters'
 
 
-export function VendedoresTable({ vendedores }: { vendedores: any[] }) {
+interface Vendedor {
+    id: string;
+    cuit: string;
+    razon_social: string;
+    direccion: string;
+    mail: string;
+    celular: string;
+    condicion_iva: string;
+    createdAt: Date;
+}
+
+
+export function VendedoresTable({ vendedores }: { vendedores: Vendedor[] }) {
     return (
         <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl overflow-hidden">
             <table className="w-full">

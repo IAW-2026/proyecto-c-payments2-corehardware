@@ -11,7 +11,7 @@ export default function DevCheckoutPage() {
         productosRaw: "[10, 11, 12]" 
     });
 
-    const [response, setResponse] = useState<any>(null);
+    const [response, setResponse] = useState<unknown>(null);
     const [status, setStatus] = useState<number | null>(null);
     const [loading, setLoading] = useState(false);
 
@@ -30,10 +30,10 @@ export default function DevCheckoutPage() {
             setResponse(null);
             setStatus(null);
 
-            let productos: any[] = [];
+            let productos: string[] = [];
             try {
                 productos = JSON.parse(formData.productosRaw);
-            } catch (err) {
+            } catch {
                 alert("El campo de productos debe ser un JSON válido (ej: [1, 2, 3])");
                 setLoading(false);
                 return;

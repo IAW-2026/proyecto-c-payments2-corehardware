@@ -1,5 +1,7 @@
 import { Badge } from '@/components/ui/badge'
 import { formatFecha, formatMonto } from '@/lib/formatters'
+import { Dispute } from '@/types/dispute'
+import { Payment } from '@/types/payments'
 
 
 const badgeVariant: Record<string, React.ComponentProps<typeof Badge>['variant']> = {
@@ -20,8 +22,12 @@ const badgeLabel: Record<string, string> = {
     rechazada:   'Rechazada',
 }
 
+type ActivityItem = 
+    | (Payment & { tipo: 'pago'; fecha: Date }) 
+    | (Dispute & { tipo: 'disputa'; fecha: Date })
 
-export function RecentActivityTable({ actividad }: { actividad: any[] }) {
+
+export function RecentActivityTable({ actividad }: { actividad: ActivityItem[] }) {
     return (
         <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl overflow-hidden">
             <table className="w-full">

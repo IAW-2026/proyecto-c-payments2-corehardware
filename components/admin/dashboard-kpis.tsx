@@ -20,8 +20,19 @@ function Delta({ value, suffix = '%', invertir = false }: { value: number; suffi
     )
 }
 
+interface DashboardResumen {
+    totalProcesado: number;
+    totalProcesadoDelta: number;
+    cantidadPagos: number;
+    cantidadPagosDelta: number;
+    tasaDisputas: number;
+    tasaDisputasDelta: number;
+    tasaRechazo: number;
+    tasaRechazoDelta: number;
+}
 
-export function DashboardKPIs({ resumen }: { resumen: any }) {
+
+export function DashboardKPIs({ resumen }: { resumen: DashboardResumen }) {
     return (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-5">

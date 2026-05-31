@@ -1,5 +1,5 @@
 import { auth } from '@clerk/nextjs/server'
-import { getAcreditacionesSeller, getCountAcreditacionesSellerPendientes } from '@/lib/query'
+import { getAcreditacionesSeller, getCountAcreditacionesSellerPendientes } from '@/lib/query/seller'
 import { AccreditationsView } from '@/components/seller/accreditations-view'
 import { ITEMS_PER_PAGE } from '@/lib/constants';
 

@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { Payment } from '@/types/payments'
 import { Dispute } from '@/types/dispute'
 import { toPayment, toDispute } from '@/lib/mappers';
+import { Prisma } from '@prisma/client';
 
 
 export const getPagosPendientes = cache(async (userId: string): Promise<Payment[]> => {
@@ -77,7 +78,7 @@ export async function getDisputasBuyer(
     total: number
     montos: Map<Dispute, string>
 }> {
-    const where: any = { clerkUserId: userId };
+    const where: Prisma.DisputaWhereInput = { clerkUserId: userId };
 
     if (tab === 'activas') {
         where.estado = 'pendiente';
@@ -118,7 +119,7 @@ export async function getPagos(
     limit = 20,
     tab?: 'pendientes' | 'realizados'
 ): Promise<{ pagos: Payment[], total: number }> {
-    const where: any = { buyerClerkUserId: userId };
+    const where: Prisma.PagoWhereInput = { buyerClerkUserId: userId };
 
     if (tab === 'pendientes') {
         where.estado = 'pendiente';

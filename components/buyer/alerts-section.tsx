@@ -1,5 +1,5 @@
 import { auth } from '@clerk/nextjs/server'
-import { getPagosPendientes, getDisputasRecientes } from '@/lib/query'
+import { getPagosPendientes, getDisputasRecientes } from '@/lib/query/buyer'
 import { AlertBanner } from '@/components/buyer/alert-banner'
 
 

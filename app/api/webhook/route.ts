@@ -83,7 +83,8 @@ export async function POST(req: NextRequest) {
             const formaDePago = mpData.payment_method_id || mpData.payments?.[0]?.payment_method_id;
 
             // Definir datos de actualización dinámicos
-            const dataToUpdate: any = {
+            
+            const dataToUpdate: { estado: string; formaDePago?: string } = {
                 estado: MP_STATUS_MAP[mpData.status] ?? "desconocido",
             };
 
@@ -99,7 +100,7 @@ export async function POST(req: NextRequest) {
 
         return NextResponse.json({ received: true }, { status: 200 });
 
-    } catch (error) {
+    } catch {
         return NextResponse.json({ message: "Error interno" }, { status: 500 });
     }
 }

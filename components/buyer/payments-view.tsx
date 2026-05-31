@@ -6,7 +6,7 @@ import { Payment } from '@/types/payments'
 import { PaymentRow } from '@/components/buyer/payment-row'
 import { PaymentModal } from '@/components/buyer/payment-modal'
 import { TabButton } from '@/components/ui/tab-button'
-import { getVendedorPublicKey } from '@/lib/query'
+import { getVendedorPublicKey } from '@/lib/query/buyer'
 import { PAGINATION_NEXT_LABEL, PAGINATION_PREV_LABEL, PaginationButton } from '@/components/ui/pagination-button'
 
 
@@ -31,9 +31,9 @@ export function PaymentsView({
     const router = useRouter()
     const pathname = usePathname()
     const [, startTransition] = useTransition()
-    const [pagoActivo, setPagoActivo] = useState<{ payment: any, publicKey: string } | null>(null)
+    const [pagoActivo, setPagoActivo] = useState<{ payment: Payment, publicKey: string } | null>(null);
     
-    const handleAbrirPago = async (payment: any) => {
+    const handleAbrirPago = async (payment: Payment) => {
         const publicKey = await getVendedorPublicKey(payment.id);
         if (publicKey) {
             setPagoActivo({ payment, publicKey });

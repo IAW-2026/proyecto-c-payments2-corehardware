@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { Payment } from '@/types/payments'
 import { Dispute } from '@/types/dispute'
 import { toPayment, toDispute } from '@/lib/mappers';
+import { Prisma } from '@prisma/client';
 
 
 export async function getAcreditacionesSeller(
@@ -13,7 +14,7 @@ export async function getAcreditacionesSeller(
     limit = 20,
     tab?: 'pendientes' | 'acreditados'
 ): Promise<{ acreditaciones: Payment[], total: number }> {
-    const where: any = { sellerClerkUserId: sellerId };
+    const where: Prisma.PagoWhereInput = { sellerClerkUserId: sellerId };
 
     if (tab === 'pendientes') {
         where.estado = { in: ['pendiente', 'en_proceso'] };
@@ -51,7 +52,7 @@ export async function getDisputasSeller(
     limit = 20,
     tab?: 'pendientes' | 'resueltas'
 ): Promise<{ disputas: Dispute[], total: number }> {
-    const where: any = { pago: { sellerClerkUserId: sellerId } };
+    const where: Prisma.DisputaWhereInput = { pago: { sellerClerkUserId: sellerId } };
 
     if (tab === 'pendientes') {
         where.estado = 'pendiente';

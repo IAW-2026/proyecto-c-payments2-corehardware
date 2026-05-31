@@ -2,12 +2,13 @@ import { useState } from 'react';
 import { Payment } from '@/types/payments';
 import MercadoPagoBrick from '@/components/buyer/mercado-pago-brick';
 import { procesarOrdenPagoPro } from '@/actions/payment';
+import { ICardPaymentFormData, ICardPaymentBrickPayer } from '@mercadopago/sdk-react/esm/bricks/cardPayment/type';
 
 
 export function PaymentModal({ payment, publicKey, onClose }: { payment: Payment; publicKey: string; onClose: () => void }) {
     const [status, setStatus] = useState<'paying' | 'success'>('paying');
     
-    const handlePayment = async (formData: any) => {
+    const handlePayment = async (formData: ICardPaymentFormData<ICardPaymentBrickPayer>) => {
         return await procesarOrdenPagoPro(payment.id, {
             total_amount: String(formData.transaction_amount),
             payment_method_id: formData.payment_method_id,
