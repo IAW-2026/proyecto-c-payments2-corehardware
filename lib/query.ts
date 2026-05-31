@@ -166,17 +166,38 @@ export async function getAcreditacionesSeller(sellerId: string): Promise<Payment
     return pagos.map(toPayment);
 }
 
-export async function getDisputasSeller(sellerId: string): Promise<Dispute[]> {
-    const disputas = await prisma.disputa.findMany({
-        where: {
-            pago: {
-                sellerClerkUserId: sellerId
-            }
-        },
-        include: { pago: true },
-        orderBy: { fechaDeInicio: 'desc' },
+export async function getDisputasSeller(
+    sellerId: string,
+    offset = 0,
+    limit = 20,
+    tab?: 'pendientes' | 'resueltas'
+): Promise<{ disputas: Dispute[], total: number }> {
+    const where: any = { pago: { sellerClerkUserId: sellerId } };
+
+    if (tab === 'pendientes') {
+        where.estado = 'pendiente';
+    } else if (tab === 'resueltas') {
+        where.estado = { not: 'pendiente' };
+    }
+
+    const [disputasRaw, total] = await Promise.all([
+        prisma.disputa.findMany({
+            where,
+            include: { pago: true },
+            orderBy: { fechaDeInicio: 'desc' },
+            skip: offset,
+            take: limit,
+        }),
+        prisma.disputa.count({ where })
+    ]);
+
+    return { disputas: disputasRaw.map(toDispute), total };
+}
+
+export async function getCountDisputasSellerPendientes(sellerId: string): Promise<number> {
+    return await prisma.disputa.count({
+        where: { estado: 'pendiente', pago: { sellerClerkUserId: sellerId } }
     });
-    return disputas.map(toDispute);
 }
 
 

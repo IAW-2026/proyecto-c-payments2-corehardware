@@ -6,7 +6,7 @@ import { TabButton } from '@/components/ui/tab-button'
 import { ButtonPrimary } from '@/components/ui/button'
 import { DisputeRow } from '@/components/buyer/dispute-row'
 import { NewDisputeModal } from '@/components/buyer/dispute-modal'
-import { Dispute, DisputeStatus } from '@/types/dispute'
+import { Dispute } from '@/types/dispute'
 import { Payment } from '@/types/payments'
 import { PAGINATION_NEXT_LABEL, PAGINATION_PREV_LABEL, PaginationButton } from '@/components/ui/pagination-button'
 
@@ -21,8 +21,6 @@ interface DisputesViewProps {
     tab: 'activas' | 'resueltas'
     totalActivas: number
 }
-
-type DisputeTab = 'activas' | 'resueltas'
 
 export function DisputesView({
     disputas,

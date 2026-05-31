@@ -1,35 +1,55 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useTransition } from 'react'
+import { useRouter, usePathname } from 'next/navigation'
 import { TabButton } from '@/components/ui/tab-button'
 import { DisputeRow } from '@/components/seller/dispute-row'
 import { DisputeResolveModal } from '@/components/seller/dispute-resolve-modal'
 import { Dispute, DisputeStatus } from '@/types/dispute'
 import { resolverDisputa } from '@/actions/disputes'
+import { PaginationButton, PAGINATION_PREV_LABEL, PAGINATION_NEXT_LABEL } from '@/components/ui/pagination-button'
 
-type DisputeTab = 'pendientes' | 'resueltas'
-type ResolutionStatus = Exclude<DisputeStatus, 'pendiente'>
 
 interface SellerDisputasViewProps {
     initialDisputas: Dispute[]
     mapaEmails: Record<string, string>
+    total: number
+    offset: number
+    limit: number
+    tab: 'pendientes' | 'resueltas'
+    totalPendientesAbsoluto: number
 }
 
-export function SellerDisputasView({ initialDisputas, mapaEmails }: SellerDisputasViewProps) {
-    const [tab, setTab] = useState<DisputeTab>('pendientes')
+export function SellerDisputasView({
+    initialDisputas,
+    mapaEmails,
+    total,
+    offset,
+    limit,
+    tab,
+    totalPendientesAbsoluto
+}: SellerDisputasViewProps) {
+    const router = useRouter()
+    const pathname = usePathname()
+    const [, startTransition] = useTransition()
     const [disputaActiva, setDisputaActiva] = useState<Dispute | null>(null)
-    const [lista, setLista] = useState<Dispute[]>(initialDisputas)
 
-    const pendientes = lista.filter((d) => d.estado === 'pendiente')
-    const resueltas = lista.filter((d) => d.estado !== 'pendiente')
-    const items = tab === 'pendientes' ? pendientes : resueltas
+    function cambiarTab(nuevaTab: 'pendientes' | 'resueltas') {
+        const sp = new URLSearchParams()
+        sp.set('tab', nuevaTab)
+        startTransition(() => router.replace(`${pathname}?${sp.toString()}`))
+    }
 
-    async function handleResolver(id: string, estado: ResolutionStatus) {
-        // Llamada a la server action
+    function buildHref(nuevoOffset: number) {
+        const sp = new URLSearchParams({ tab, offset: nuevoOffset.toString() })
+        return `${pathname}?${sp.toString()}`
+    }
+
+    const hasPrev = offset > 0
+    const hasNext = offset + limit < total
+
+    async function handleResolver(id: string, estado: Exclude<DisputeStatus, 'pendiente'>) {
         await resolverDisputa(id, estado)
-
-        // Actualización local para reflejar el cambio sin recargar la página
-        setLista((prev) => prev.map((d) => d.id === id ? { ...d, estado } : d))
         setDisputaActiva(null)
     }
 
@@ -43,15 +63,15 @@ export function SellerDisputasView({ initialDisputas, mapaEmails }: SellerDisput
             </div>
 
             <div className="flex border-b border-neutral-200 dark:border-neutral-800">
-                <TabButton active={tab === 'pendientes'} onClick={() => setTab('pendientes')}>
+                <TabButton active={tab === 'pendientes'} onClick={() => cambiarTab('pendientes')}>
                     Pendientes
-                    {pendientes.length > 0 && (
+                    {totalPendientesAbsoluto > 0 && (
                         <span className="ml-2 inline-flex items-center justify-center w-4 h-4 rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400 text-xs font-mono">
-                            {pendientes.length}
+                            {totalPendientesAbsoluto}
                         </span>
                     )}
                 </TabButton>
-                <TabButton active={tab === 'resueltas'} onClick={() => setTab('resueltas')}>
+                <TabButton active={tab === 'resueltas'} onClick={() => cambiarTab('resueltas')}>
                     Resueltas
                 </TabButton>
             </div>
@@ -68,14 +88,14 @@ export function SellerDisputasView({ initialDisputas, mapaEmails }: SellerDisput
                         </tr>
                     </thead>
                     <tbody>
-                        {items.length === 0 ? (
+                        {initialDisputas.length === 0 ? (
                             <tr>
                                 <td colSpan={4} className="py-16 text-center text-sm text-neutral-400 dark:text-neutral-600">
-                                    No hay disputas {tab === 'pendientes' ? 'pendientes' : 'resueltas'}.
+                                    No hay disputas {tab}.
                                 </td>
                             </tr>
                         ) : (
-                            items.map((d) => (
+                            initialDisputas.map((d) => (
                                 <DisputeRow
                                     key={d.id}
                                     disputa={d}
@@ -87,6 +107,29 @@ export function SellerDisputasView({ initialDisputas, mapaEmails }: SellerDisput
                     </tbody>
                 </table>
             </div>
+
+            {(hasPrev || hasNext) && (
+                <div className="flex items-center justify-between text-xs text-neutral-500 dark:text-neutral-500">
+                    <span className="font-mono">
+                        {offset + 1}–{Math.min(offset + limit, total)} de {total}
+                    </span>
+                    <div className="flex items-center gap-2">
+                        <PaginationButton 
+                            href={buildHref(Math.max(0, offset - limit))} 
+                            disabled={!hasPrev}
+                        >
+                            {PAGINATION_PREV_LABEL}
+                        </PaginationButton>
+                        
+                        <PaginationButton 
+                            href={buildHref(offset + limit)} 
+                            disabled={!hasNext}
+                        >
+                            {PAGINATION_NEXT_LABEL}
+                        </PaginationButton>
+                    </div>
+                </div>
+            )}
 
             {disputaActiva && (
                 <DisputeResolveModal
