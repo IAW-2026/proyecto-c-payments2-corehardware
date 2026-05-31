@@ -157,13 +157,40 @@ export async function getVendedorPublicKey(pagoId: string): Promise<string | nul
 }
 
 
-export async function getAcreditacionesSeller(sellerId: string): Promise<Payment[]> {
-    const pagos = await prisma.pago.findMany({
-        where: { sellerClerkUserId: sellerId },
-        orderBy: { fecha: 'desc' },
+export async function getAcreditacionesSeller(
+    sellerId: string,
+    offset = 0,
+    limit = 20,
+    tab?: 'pendientes' | 'acreditados'
+): Promise<{ acreditaciones: Payment[], total: number }> {
+    const where: any = { sellerClerkUserId: sellerId };
+
+    if (tab === 'pendientes') {
+        where.estado = { in: ['pendiente', 'en_proceso'] };
+    } else if (tab === 'acreditados') {
+        where.estado = { in: ['acreditado', 'rechazado'] };
+    }
+
+    const [pagosRaw, total] = await Promise.all([
+        prisma.pago.findMany({
+            where,
+            orderBy: { fecha: 'desc' },
+            skip: offset,
+            take: limit,
+        }),
+        prisma.pago.count({ where })
+    ]);
+
+    return { acreditaciones: pagosRaw.map(toPayment), total };
+}
+
+export async function getCountAcreditacionesSellerPendientes(sellerId: string): Promise<number> {
+    return await prisma.pago.count({
+        where: { 
+            sellerClerkUserId: sellerId,
+            estado: { in: ['pendiente', 'en_proceso'] }
+        }
     });
-    
-    return pagos.map(toPayment);
 }
 
 export async function getDisputasSeller(
