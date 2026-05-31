@@ -4,7 +4,6 @@ import { prisma } from "./prisma";
 import { Payment } from '@/types/payments'
 import { Dispute } from '@/types/dispute'
 import { toPayment, toDispute } from '@/lib/mappers';
-import { CredencialVendedor } from "@prisma/client";
 import { AdminDashboardSummary, AdminHomeSummary } from "@/types/admin-summaries";
 import { getRange } from "@/lib/date-range-helper";
 
@@ -64,23 +63,48 @@ export async function getPagosDisputables(userId: string): Promise<Payment[]> {
     return pagos.map(toPayment);
 }
 
-export async function getDisputasBuyer(userId: string): Promise<{
+export async function getDisputasBuyer(
+    userId: string,
+    offset = 0,
+    limit = 20,
+    tab?: 'activas' | 'resueltas'
+): Promise<{
     disputas: Dispute[]
+    total: number
     montos: Map<Dispute, string>
 }> {
-    const disputas = await prisma.disputa.findMany({
-        where: { clerkUserId: userId },
-        orderBy: { fechaDeInicio: 'desc' },
-        include: { pago: true } 
-    });
+    const where: any = { clerkUserId: userId };
 
-    const disputasConPago = disputas.map(toDispute);
+    if (tab === 'activas') {
+        where.estado = 'pendiente';
+    } else if (tab === 'resueltas') {
+        where.estado = { not: 'pendiente' };
+    }
+
+    const [disputas, total] = await Promise.all([
+        prisma.disputa.findMany({
+            where,
+            orderBy: { fechaDeInicio: 'desc' },
+            skip: offset,
+            take: limit,
+            include: { pago: true } 
+        }),
+        prisma.disputa.count({ where })
+    ]);
+
+    const disputasMapeadas = disputas.map(toDispute);
 
     const montos = new Map(
-        disputasConPago.map((d) => [d, d.pago?.monto ?? '0'])
+        disputasMapeadas.map((d) => [d, d.pago?.monto ?? '0'])
     );
 
-    return { disputas: disputasConPago, montos };
+    return { disputas: disputasMapeadas, total, montos };
+}
+
+export async function getCountDisputasActivas(userId: string): Promise<number> {
+    return await prisma.disputa.count({
+        where: { clerkUserId: userId, estado: 'pendiente' }
+    });
 }
 
 export async function getPagos(
