@@ -3,12 +3,12 @@ import { SummaryCard } from '@/components/ui/summary-card'
 import { RecentActivityTable } from '@/components/admin/recent-activity-table'
 import { VendedoresTable } from '@/components/admin/vendedores-table'
 import { formatMonto } from '@/lib/formatters'
-import { getAdminDashboardSummary, getAdminActividadReciente, getUltimosVendedores } from '@/lib/query'
+import { getAdminHomeSummary, getAdminActividadReciente, getUltimosVendedores } from '@/lib/query'
 
 
 export default async function AdminHomePage() {
     const [resumen, actividadData, ultimosVendedores] = await Promise.all([
-        getAdminDashboardSummary(),
+        getAdminHomeSummary(),
         getAdminActividadReciente(),
         getUltimosVendedores()
     ])

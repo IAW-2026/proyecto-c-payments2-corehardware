@@ -4,6 +4,7 @@ import { DashboardKPIs } from '@/components/admin/dashboard-kpis'
 import { DashboardCharts } from '@/components/admin/dashboard-charts'
 import { TransaccionesTable } from '@/components/admin/transacciones-table'
 import { ButtonSecondary } from '@/components/ui/button'
+import { getAdminPagos, getAdminSummary, getDisputasChartData, getPagosChartData } from '@/lib/query'
 
 const LIMIT = 20
 
@@ -13,34 +14,80 @@ type Periodo = typeof PERIODOS[number]
 export default async function AdminDashboardPage({
     searchParams,
 }: {
-    searchParams: {
+    searchParams: Promise<{
         periodo?: string
-        tipo?: string
         estado?: string
         q?: string
         offset?: string
-    }
+    }>
 }) {
-    const periodo = (PERIODOS.includes(searchParams.periodo as Periodo) ? searchParams.periodo : PERIODOS[1]) as Periodo
-    const tipo    = searchParams.tipo   ?? 'todos'
-    const estado  = searchParams.estado ?? 'todos'
-    const q       = searchParams.q      ?? ''
-    const offset  = Math.max(0, parseInt(searchParams.offset ?? '0', 10))
+    const params = await searchParams;
 
-    // TODO: reemplazar con datos reales
+    const periodo = (PERIODOS.includes(params.periodo as Periodo) ? params.periodo : PERIODOS[1]) as Periodo
+    const estado = params.estado ?? 'todos'
+    const q = params.q ?? ''
+    const offset = Math.max(0, parseInt(params.offset ?? '0', 10))
+
+    const [summary, { pagos, total }, pagosChart, disputasChart] = await Promise.all([
+        getAdminSummary(periodo),
+        getAdminPagos({ offset, limit: LIMIT, estado, q, periodo }),
+        getPagosChartData(periodo),
+        getDisputasChartData(periodo)
+    ])
+
+    const curMonto = parseFloat(summary.current.pagosMonto)
+    const prevMonto = parseFloat(summary.previous.pagosMonto)
+
     const resumen = {
-        totalProcesado: 0,
-        totalProcesadoDelta: 0,
-        cantidadPagos: 0,
-        cantidadPagosDelta: 0,
-        tasaDisputas: 0,
+        totalProcesado: curMonto,
+        totalProcesadoDelta: prevMonto !== 0 ? ((curMonto - prevMonto) / prevMonto) * 100 : 0,
+        cantidadPagos: summary.current.pagosCantidad,
+        cantidadPagosDelta: summary.previous.pagosCantidad !== 0
+            ? ((summary.current.pagosCantidad - summary.previous.pagosCantidad) / summary.previous.pagosCantidad) * 100
+            : 0,
+        tasaDisputas: summary.current.pagosCantidad > 0 ? (summary.current.disputas / summary.current.pagosCantidad) * 100 : 0,
         tasaDisputasDelta: 0,
         tasaRechazo: 0,
         tasaRechazoDelta: 0,
     }
-    const grafico: any[] = []
-    const transacciones: any[] = []
-    const total = 0
+
+    const mapaDias = new Map<string, { fechaObj: Date; monto: number; disputas: number }>()
+
+    pagosChart.forEach((p) => {
+        const fechaObj = new Date(p.fecha)
+        const fechaKey = fechaObj.toDateString()
+        const montoNum = parseFloat(p.monto) || 0
+
+        const existente = mapaDias.get(fechaKey)
+        if (existente) {
+            existente.monto += montoNum
+        } else {
+            mapaDias.set(fechaKey, { fechaObj, monto: montoNum, disputas: 0 })
+        }
+    })
+
+    disputasChart.forEach((d) => {
+        const fechaObj = new Date(d.fechaDeInicio)
+        const fechaKey = fechaObj.toDateString()
+
+        const existente = mapaDias.get(fechaKey)
+        if (existente) {
+            existente.disputas += 1
+        } else {
+            mapaDias.set(fechaKey, { fechaObj, monto: 0, disputas: 1 })
+        }
+    })
+
+    const grafico = Array.from(mapaDias.values())
+        .sort((a, b) => a.fechaObj.getTime() - b.fechaObj.getTime())
+        .map((dia) => ({
+            label: dia.fechaObj.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' }),
+            monto: dia.monto,
+            disputas: dia.disputas
+        })
+    )
+
+
 
     return (
         <div className="max-w-6xl mx-auto space-y-8">
@@ -50,16 +97,11 @@ export default async function AdminDashboardPage({
                     <h1 className="text-xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100">Dashboard</h1>
                     <p className="text-sm text-neutral-500 mt-0.5">Análisis de pagos y disputas.</p>
                 </div>
-                <ButtonSecondary className="flex items-center gap-2 shrink-0">
-                    <Download className="w-4 h-4" />
-                    Exportar CSV
-                </ButtonSecondary>
             </div>
 
             <DashboardFilters
                 periodos={[...PERIODOS]}
                 periodo={periodo}
-                tipo={tipo}
                 estado={estado}
                 q={q}
             />
@@ -73,11 +115,11 @@ export default async function AdminDashboardPage({
                     Transacciones · {total} resultado{/* {total !== 1 ? 's' : ''} */}
                 </h2>
                 <TransaccionesTable
-                    transacciones={transacciones}
+                    transacciones={pagos}
                     total={total}
                     offset={offset}
                     limit={LIMIT}
-                    searchParams={{ periodo, tipo, estado, q }}
+                    searchParams={{ periodo, estado, q }}
                 />
             </div>
 
