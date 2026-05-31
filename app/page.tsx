@@ -186,24 +186,27 @@ export default function LandingPage() {
                         </div>
                         <div className="bg-neutral-100/60 dark:bg-neutral-900/60 border border-neutral-200 dark:border-neutral-800 rounded-xl p-6 space-y-4">
                             <div className="space-y-1.5">
-                                <label className="text-xs font-medium text-neutral-400">Nombre</label>
+                                <label htmlFor="nombre" className="text-xs font-medium text-neutral-400">Nombre</label>
                                 <input
                                     type="text"
+                                    id="nombre"
                                     placeholder="Tu nombre"
                                     className="w-full px-3 py-2 bg-white dark:bg-neutral-950 border border-neutral-300 dark:border-neutral-800 rounded-lg text-sm text-neutral-800 dark:text-neutral-200 placeholder:text-neutral-400 dark:placeholder:text-neutral-700 focus:outline-none focus:border-green-600 focus:ring-2 focus:ring-green-600/10 dark:focus:border-green-500 dark:focus:ring-green-500/10 transition-all"
                                 />
                             </div>
                             <div className="space-y-1.5">
-                                <label className="text-xs font-medium text-neutral-400">Email</label>
+                                <label htmlFor="email" className="text-xs font-medium text-neutral-400">Email</label>
                                 <input
                                     type="email"
+                                    id="email"
                                     placeholder="tu@email.com"
                                     className="w-full px-3 py-2 bg-white dark:bg-neutral-950 border border-neutral-300 dark:border-neutral-800 rounded-lg text-sm text-neutral-800 dark:text-neutral-200 placeholder:text-neutral-400 dark:placeholder:text-neutral-700 focus:outline-none focus:border-green-600 focus:ring-2 focus:ring-green-600/10 dark:focus:border-green-500 dark:focus:ring-green-500/10 transition-all"
                                 />
                             </div>
                             <div className="space-y-1.5">
-                                <label className="text-xs font-medium text-neutral-400">Mensaje</label>
+                                <label htmlFor="mensaje" className="text-xs font-medium text-neutral-400">Mensaje</label>
                                 <textarea
+                                    id="mensaje"
                                     rows={3}
                                     placeholder="Contanos en qué podemos ayudarte..."
                                     className="w-full px-3 py-2 bg-white dark:bg-neutral-950 border border-neutral-300 dark:border-neutral-800 rounded-lg text-sm text-neutral-800 dark:text-neutral-200 placeholder:text-neutral-400 dark:placeholder:text-neutral-700 focus:outline-none focus:border-green-600 focus:ring-2 focus:ring-green-600/10 dark:focus:border-green-500 dark:focus:ring-green-500/10 transition-all resize-none"
