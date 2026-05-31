@@ -1,7 +1,7 @@
 import { Suspense } from 'react'
-import { AdminSummarySection } from '@/components/admin/summary-section'
+import { SummarySection } from '@/components/admin/summary-section'
 import { AdminActivitySection } from '@/components/admin/activity-section'
-import { AdminVendedoresSection } from '@/components/admin/vendedores-section'
+import { SellersSection } from '@/components/admin/sellers-section'
 import { SummarySkeleton, ActivitySkeleton, VendedoresSkeleton } from '@/components/skeletons'
 
 
@@ -14,7 +14,7 @@ export default function AdminHomePage() {
             </div>
 
             <Suspense fallback={<SummarySkeleton columns={4} />}>
-                <AdminSummarySection />
+                <SummarySection />
             </Suspense>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -22,7 +22,7 @@ export default function AdminHomePage() {
                     <AdminActivitySection />
                 </Suspense>
                 <Suspense fallback={<VendedoresSkeleton />}>
-                    <AdminVendedoresSection />
+                    <SellersSection />
                 </Suspense>
             </div>
         </div>

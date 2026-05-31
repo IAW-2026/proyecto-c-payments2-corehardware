@@ -1,21 +1,21 @@
 'use client'
 
-import { formatMonto } from "@/lib/formatters"
+import { formatAmount } from "@/lib/formatters"
 import { useState } from "react"
 import { ButtonClose, ButtonPrimary, ButtonSecondary } from "../ui/button"
 import { Payment } from '@/types/payments'
-import { createDisputa } from "@/actions/disputes"
+import { createDispute } from "@/actions/disputes"
 
 
 type ModalState = 'form' | 'success'
 
 
-export function NewDisputeModal({
+export function DisputeModal({
     onClose,
-    pagosDisputables,
+    disputablePayments,
 }: {
     onClose: () => void
-    pagosDisputables: Payment[]
+    disputablePayments: Payment[]
 }) {
     const [estado, setEstado] = useState<ModalState>('form')
     const [pagoId, setPagoId] = useState('')
@@ -23,7 +23,7 @@ export function NewDisputeModal({
 
     async function handleSubmit() {
         if (!pagoId || !descripcion.trim()) return
-        await createDisputa(pagoId, descripcion)
+        await createDispute(pagoId, descripcion)
         setEstado('success')
     }
 
@@ -68,9 +68,9 @@ export function NewDisputeModal({
                             className="w-full px-3 py-2 bg-white dark:bg-neutral-950 border border-neutral-300 dark:border-neutral-800 rounded-lg text-sm text-neutral-800 dark:text-neutral-200 focus:outline-none focus:border-green-600 focus:ring-2 focus:ring-green-600/10 dark:focus:border-green-500 dark:focus:ring-green-500/10 transition-all"
                         >
                             <option value="">Seleccioná un pedido</option>
-                            {pagosDisputables.map((p) => (
+                            {disputablePayments.map((p) => (
                                 <option key={p.id} value={p.id}>
-                                    {p.descripcion ?? `Pedido #${p.pedidoId}`} · {formatMonto(Number(p.monto))}
+                                    {p.descripcion ?? `Pedido #${p.pedidoId}`} · {formatAmount(Number(p.monto))}
                                 </option>
                             ))}
                         </select>

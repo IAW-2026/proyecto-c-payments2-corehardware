@@ -1,13 +1,13 @@
 import { auth } from '@clerk/nextjs/server'
 import { ButtonPrimary } from '@/components/ui/button'
 import { redirectToMercadoPago } from '@/actions/seller-auth'
-import { getIsSellerAuthorized } from '@/lib/query/seller'
+import { fetchIsSellerAuthorized } from '@/lib/query/seller'
 import { CheckCircle2 } from 'lucide-react'
 
 
 export default async function SellerAuthorizationPage() {
     const { userId } = await auth()
-    const isAuthorized = await getIsSellerAuthorized(userId!)
+    const isAuthorized = await fetchIsSellerAuthorized(userId!)
     
     return (
         <div className="max-w-6xl mx-auto space-y-8">

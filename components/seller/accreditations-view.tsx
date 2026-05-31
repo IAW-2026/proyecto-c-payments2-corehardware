@@ -31,7 +31,7 @@ export function AccreditationsView({
     const pathname = usePathname()
     const [, startTransition] = useTransition()
 
-    function cambiarTab(nuevaTab: 'pendientes' | 'acreditados') {
+    function switchTab(nuevaTab: 'pendientes' | 'acreditados') {
         const sp = new URLSearchParams()
         sp.set('tab', nuevaTab)
         startTransition(() => router.replace(`${pathname}?${sp.toString()}`))
@@ -57,7 +57,7 @@ export function AccreditationsView({
 
             {/* Tabs */}
             <div className="flex border-b border-neutral-200 dark:border-neutral-800">
-                <TabButton active={tab === 'pendientes'} onClick={() => cambiarTab('pendientes')}>
+                <TabButton active={tab === 'pendientes'} onClick={() => switchTab('pendientes')}>
                     Pendientes
                     {totalPendientesAbsoluto > 0 && (
                         <span className="ml-2 inline-flex items-center justify-center w-4 h-4 rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400 text-xs font-mono">
@@ -65,7 +65,7 @@ export function AccreditationsView({
                         </span>
                     )}
                 </TabButton>
-                <TabButton active={tab === 'acreditados'} onClick={() => cambiarTab('acreditados')}>
+                <TabButton active={tab === 'acreditados'} onClick={() => switchTab('acreditados')}>
                     Acreditados
                 </TabButton>
             </div>

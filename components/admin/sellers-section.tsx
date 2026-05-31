@@ -1,11 +1,11 @@
-import { getUltimosVendedores } from '@/lib/query/admin'
-import { VendedoresTable } from '@/components/admin/vendedores-table'
+import { fetchLatestSellers } from '@/lib/query/admin'
+import { SellersTable } from '@/components/admin/sellers-table'
 
 
-export async function AdminVendedoresSection() {
-    const ultimosVendedores = await getUltimosVendedores()
+export async function SellersSection() {
+    const ultimosVendedores = await fetchLatestSellers()
 
-    const vendedores = await Promise.all(
+    const sellers = await Promise.all(
         ultimosVendedores.map(v =>
             fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/mock/sellers/${v.clerkUserId}`, { cache: 'no-store' })
                 .then(res => res.json())
@@ -18,7 +18,7 @@ export async function AdminVendedoresSection() {
             <h2 className="text-xs font-mono uppercase tracking-wider text-neutral-500 dark:text-neutral-500">
                 Últimos vendedores autorizados
             </h2>
-            <VendedoresTable vendedores={vendedores} />
+            <SellersTable sellers={sellers} />
         </div>
     )
 }

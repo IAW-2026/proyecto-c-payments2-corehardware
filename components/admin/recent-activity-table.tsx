@@ -1,5 +1,5 @@
 import { Badge } from '@/components/ui/badge'
-import { formatFecha, formatMonto } from '@/lib/formatters'
+import { formatDate, formatAmount } from '@/lib/formatters'
 import { Dispute } from '@/types/dispute'
 import { Payment } from '@/types/payments'
 
@@ -42,7 +42,7 @@ export function RecentActivityTable({ actividad }: { actividad: ActivityItem[] }
                                     {a.descripcion ?? `Pedido ${a.pedidoId}`}
                                 </p>
                                 <p className="text-xs text-neutral-400 mt-0.5 font-mono">
-                                    {formatFecha(a.fecha)}
+                                    {formatDate(a.fecha)}
                                 </p>
                             </td>
                             <td className="px-4 py-3.5">
@@ -51,7 +51,7 @@ export function RecentActivityTable({ actividad }: { actividad: ActivityItem[] }
                                 </Badge>
                             </td>
                             <td className="px-4 py-3.5 font-mono text-sm font-semibold text-neutral-900 dark:text-neutral-100 whitespace-nowrap hidden sm:table-cell">
-                                {formatMonto(Number(a.tipo === 'pago' ? a.monto : a.pago?.monto))}
+                                {formatAmount(Number(a.tipo === 'pago' ? a.monto : a.pago?.monto))}
                             </td>
                             <td className="px-4 py-3.5 text-right">
                                 <Badge variant={badgeVariant[a.estado]}>

@@ -9,34 +9,34 @@ import { getRange } from "@/lib/date-range-helper";
 import { Prisma } from "@prisma/client";
 
 
-export async function getAdminHomeSummary(): Promise<AdminHomeSummary> {
-    const hoy = new Date();
-    hoy.setHours(0, 0, 0, 0);
+export async function fetchAdminHomeSummary(): Promise<AdminHomeSummary> {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
-    const [pagosHoy, pendientes, disputasActivas, vendedoresActivos] = await Promise.all([
-        prisma.pago.findMany({ where: { fecha: { gte: hoy } } }),
+    const [paymentsToday, pending, activeDisputes, activeSellers] = await Promise.all([
+        prisma.pago.findMany({ where: { fecha: { gte: today } } }),
         prisma.pago.count({ where: { estado: 'pendiente' } }),
         prisma.disputa.count({ where: { estado: 'pendiente' } }),
         prisma.credencialVendedor.count()
     ]);
 
     return {
-        pagosHoy: {
-            cantidad: pagosHoy.length,
-            monto: pagosHoy.reduce((acc, p) => acc + Number(p.monto), 0)
+        paymentsToday: {
+            quantity: paymentsToday.length,
+            amount: paymentsToday.reduce((acc, p) => acc + Number(p.monto), 0)
         },
-        pendientes,
-        disputasActivas,
-        vendedoresActivos,
+        pending,
+        activeDisputes,
+        activeSellers,
     };
 }
 
 
-export async function getAdminActividadReciente(): Promise<{
-    pagos: Payment[];
-    disputas: Dispute[];
+export async function fetchAdminRecentActivity(): Promise<{
+    payments: Payment[];
+    disputes: Dispute[];
 }> {
-    const [pagos, disputas] = await Promise.all([
+    const [payments, disputes] = await Promise.all([
         prisma.pago.findMany({ orderBy: { fecha: 'desc' }, take: 10 }),
         prisma.disputa.findMany({
             orderBy: { fechaDeInicio: 'desc' },
@@ -46,13 +46,13 @@ export async function getAdminActividadReciente(): Promise<{
     ]);
 
     return {
-        pagos: pagos.map(toPayment),
-        disputas: disputas.map(toDispute)
+        payments: payments.map(toPayment),
+        disputes: disputes.map(toDispute)
     };
 }
 
 
-export async function getUltimosVendedores() {
+export async function fetchLatestSellers() {
     return await prisma.credencialVendedor.findMany({
         orderBy: { createdAt: 'desc' },
         take: 10,
@@ -64,11 +64,11 @@ export async function getUltimosVendedores() {
 }
 
 
-export async function getAdminSummary(periodo: string): Promise<AdminDashboardSummary> {
+export async function fetchAdminDashboardSummary(periodo: string): Promise<AdminDashboardSummary> {
     const { start, end, prevStart, prevEnd } = getRange(periodo);
 
     const fetchData = async (s: Date, e: Date) => {
-        const [pagos, disputas, rechazados] = await Promise.all([
+        const [payments, disputes, rejected] = await Promise.all([
             prisma.pago.aggregate({
                 where: { fecha: { gte: s, lte: e } },
                 _sum: { monto: true },
@@ -83,10 +83,10 @@ export async function getAdminSummary(periodo: string): Promise<AdminDashboardSu
         ]);
 
         return {
-            pagosMonto: pagos._sum.monto?.toString() ?? "0",
-            pagosCantidad: pagos._count.id,
-            disputas,
-            rechazados
+            paymentsAmount: payments._sum.monto?.toString() ?? "0",
+            paymentsQuantity: payments._count.id,
+            disputes,
+            rejected
         };
     };
 
@@ -99,31 +99,31 @@ export async function getAdminSummary(periodo: string): Promise<AdminDashboardSu
 }
 
 
-export async function getPagosChartData(periodo: string): Promise<Payment[]> {
+export async function fetchPaymentsChartData(periodo: string): Promise<Payment[]> {
     const { start, end } = getRange(periodo);
-    const pagos = await prisma.pago.findMany({
+    const payments = await prisma.pago.findMany({
         where: { fecha: { gte: start, lte: end } }
     });
-    return pagos.map(toPayment);
+    return payments.map(toPayment);
 }
 
 
-export async function getDisputasChartData(periodo: string): Promise<Dispute[]> {
+export async function fetchDisputesChartData(periodo: string): Promise<Dispute[]> {
     const { start, end } = getRange(periodo);
-    const disputas = await prisma.disputa.findMany({
+    const disputes = await prisma.disputa.findMany({
         where: { fechaDeInicio: { gte: start, lte: end } }
     });
-    return disputas.map(toDispute);
+    return disputes.map(toDispute);
 }
 
 
-export async function getAdminPagos(params: {
+export async function fetchPaymentsForAdmin(params: {
     offset: number,
     limit: number,
     estado: string,
     q: string,
     periodo: string
-}): Promise<{ pagos: Payment[], total: number }> {
+}): Promise<{ payments: Payment[], total: number }> {
     const where: Prisma.PagoWhereInput = {};
 
     const { start, end } = getRange(params.periodo);
@@ -141,7 +141,7 @@ export async function getAdminPagos(params: {
         ];
     }
 
-    const [pagos, total] = await Promise.all([
+    const [payments, total] = await Promise.all([
         prisma.pago.findMany({
             where,
             orderBy: { fecha: 'desc' },
@@ -151,5 +151,5 @@ export async function getAdminPagos(params: {
         prisma.pago.count({ where })
     ]);
 
-    return { pagos: pagos.map(toPayment), total };
+    return { payments: payments.map(toPayment), total };
 }

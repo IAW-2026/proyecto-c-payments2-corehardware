@@ -1,5 +1,5 @@
 import { TrendingUp, TrendingDown } from 'lucide-react'
-import { formatMonto } from '@/lib/formatters'
+import { formatAmount } from '@/lib/formatters'
 
 
 function Delta({ value, suffix = '%', invertir = false }: { value: number; suffix?: string; invertir?: boolean }) {
@@ -20,48 +20,48 @@ function Delta({ value, suffix = '%', invertir = false }: { value: number; suffi
     )
 }
 
-interface DashboardResumen {
-    totalProcesado: number;
-    totalProcesadoDelta: number;
-    cantidadPagos: number;
-    cantidadPagosDelta: number;
-    tasaDisputas: number;
-    tasaDisputasDelta: number;
-    tasaRechazo: number;
-    tasaRechazoDelta: number;
+interface DashboardKPIs {
+    totalProcessed: number;
+    totalProcessedDelta: number;
+    paymentsQuantity: number;
+    paymentsQuantityDelta: number;
+    disputesRatio: number;
+    disputesRatioDelta: number;
+    rejectionRatio: number;
+    rejectionRatioDelta: number;
 }
 
 
-export function DashboardKPIs({ resumen }: { resumen: DashboardResumen }) {
+export function DashboardKPIs({ kpis }: { kpis: DashboardKPIs }) {
     return (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-5">
                 <p className="text-xs text-neutral-500 dark:text-neutral-400">Total procesado</p>
                 <p className="text-lg font-bold font-mono text-neutral-900 dark:text-neutral-100 leading-tight mt-1">
-                    {formatMonto(resumen.totalProcesado)}
+                    {formatAmount(kpis.totalProcessed)}
                 </p>
-                <Delta value={resumen.totalProcesadoDelta} />
+                <Delta value={kpis.totalProcessedDelta} />
             </div>
             <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-5">
                 <p className="text-xs text-neutral-500 dark:text-neutral-400">Pagos totales</p>
                 <p className="text-lg font-bold font-mono text-neutral-900 dark:text-neutral-100 leading-tight mt-1">
-                    {resumen.cantidadPagos}
+                    {kpis.paymentsQuantity}
                 </p>
-                <Delta value={resumen.cantidadPagosDelta} suffix=" pagos" />
+                <Delta value={kpis.paymentsQuantityDelta} suffix=" pagos" />
             </div>
             <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-5">
                 <p className="text-xs text-neutral-500 dark:text-neutral-400">Tasa de disputas</p>
                 <p className="text-lg font-bold font-mono text-neutral-900 dark:text-neutral-100 leading-tight mt-1">
-                    {resumen.tasaDisputas.toFixed(1)}%
+                    {kpis.disputesRatio.toFixed(1)}%
                 </p>
-                <Delta value={resumen.tasaDisputasDelta} invertir />
+                <Delta value={kpis.disputesRatioDelta} invertir />
             </div>
             <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-5">
                 <p className="text-xs text-neutral-500 dark:text-neutral-400">Tasa de rechazo</p>
                 <p className="text-lg font-bold font-mono text-neutral-900 dark:text-neutral-100 leading-tight mt-1">
-                    {resumen.tasaRechazo.toFixed(1)}%
+                    {kpis.rejectionRatio.toFixed(1)}%
                 </p>
-                <Delta value={resumen.tasaRechazoDelta} invertir />
+                <Delta value={kpis.rejectionRatioDelta} invertir />
             </div>
         </div>
     )

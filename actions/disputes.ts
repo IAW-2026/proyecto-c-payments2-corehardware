@@ -6,7 +6,7 @@ import { revalidatePath } from 'next/cache'
 import { DisputeStatus } from '@/types/dispute'
 
 
-export async function createDisputa(pagoId: string, descripcion: string) {
+export async function createDispute(pagoId: string, descripcion: string) {
     const { userId } = await auth()
 
     const pago = await prisma.pago.findUnique({
@@ -32,15 +32,15 @@ export async function createDisputa(pagoId: string, descripcion: string) {
 }
 
 
-export async function resolverDisputa(disputaId: string, nuevoEstado: DisputeStatus) {
-    if (nuevoEstado === 'pendiente') {
+export async function resolveDispute(disputeId: string, newState: DisputeStatus) {
+    if (newState === 'pendiente') {
         throw new Error('El estado no puede ser pendiente al resolver.')
     }
 
     await prisma.disputa.update({
-        where: { id: disputaId },
+        where: { id: disputeId },
         data: {
-            estado: nuevoEstado,
+            estado: newState,
             fechaDeFinalizacion: new Date(),
         },
     })

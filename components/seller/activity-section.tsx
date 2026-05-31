@@ -1,7 +1,7 @@
 import { auth } from '@clerk/nextjs/server'
-import { getSellerActividadReciente } from '@/lib/query/seller'
+import { fetchSellerRecentActivity } from '@/lib/query/seller'
 import { Badge } from '@/components/ui/badge'
-import { formatFecha, formatMonto } from '@/lib/formatters'
+import { formatDate, formatAmount } from '@/lib/formatters'
 
 
 const badgeVariant: Record<string, React.ComponentProps<typeof Badge>['variant']> = {
@@ -25,12 +25,12 @@ const badgeLabel: Record<string, string> = {
 }
 
 
-export async function SellerActivitySection() {
+export async function ActivitySection() {
     const { userId } = await auth()
-    const actividadRaw = await getSellerActividadReciente(userId!)
+    const actividadRaw = await fetchSellerRecentActivity(userId!)
 
     const actividad = [
-        ...actividadRaw.acreditaciones.map(a => ({
+        ...actividadRaw.accreditations.map(a => ({
             id: a.id,
             tipo: 'acreditacion' as const,
             descripcion: a.descripcion ?? `Pedido ${a.pedidoId}`,
@@ -38,7 +38,7 @@ export async function SellerActivitySection() {
             estado: a.estado,
             monto: Number(a.monto),
         })),
-        ...actividadRaw.disputas.map(d => ({
+        ...actividadRaw.disputes.map(d => ({
             id: d.id,
             tipo: 'disputa' as const,
             descripcion: d.descripcion ?? 'Disputa',
@@ -67,7 +67,7 @@ export async function SellerActivitySection() {
                                 <tr key={a.id} className="border-b border-neutral-100 dark:border-neutral-800/60 last:border-0 hover:bg-neutral-50 dark:hover:bg-neutral-800/20 transition-colors">
                                     <td className="px-4 py-3.5">
                                         <p className="text-sm font-medium text-neutral-800 dark:text-neutral-200">{a.descripcion}</p>
-                                        <p className="text-xs text-neutral-400 mt-0.5 font-mono">{formatFecha(a.fecha)}</p>
+                                        <p className="text-xs text-neutral-400 mt-0.5 font-mono">{formatDate(a.fecha)}</p>
                                     </td>
                                     <td className="px-4 py-3.5 hidden md:table-cell">
                                         <Badge variant={a.tipo === 'acreditacion' ? 'default' : 'warning'}>
@@ -75,7 +75,7 @@ export async function SellerActivitySection() {
                                         </Badge>
                                     </td>
                                     <td className="px-4 py-3.5 font-mono text-sm font-semibold text-neutral-900 dark:text-neutral-100 whitespace-nowrap hidden md:table-cell">
-                                        {formatMonto(a.monto)}
+                                        {formatAmount(a.monto)}
                                     </td>
                                     <td className="px-4 py-3.5 text-right">
                                         <Badge variant={badgeVariant[a.estado]}>

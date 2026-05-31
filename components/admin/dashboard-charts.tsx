@@ -7,7 +7,7 @@ import {
     XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from 'recharts'
 import { TabButton } from '@/components/ui/tab-button'
-import { formatMonto } from '@/lib/formatters'
+import { formatAmount } from '@/lib/formatters'
 
 
 interface TooltipPayload {
@@ -24,7 +24,7 @@ function CustomTooltip({ active, payload, label }: { active?: boolean, payload?:
             <p className="font-mono text-neutral-500 mb-1">{label}</p>
             {payload.map((p: TooltipPayload) => (
                 <p key={p.dataKey} style={{ color: p.color }} className="font-mono">
-                    {p.name}: {p.dataKey === 'monto' ? formatMonto(p.value) : p.value}
+                    {p.name}: {p.dataKey === 'monto' ? formatAmount(p.value) : p.value}
                 </p>
             ))}
         </div>
@@ -74,7 +74,7 @@ export function DashboardCharts({ datos }: { datos: ChartData[] }) {
                                 axisLine={false}
                                 tickLine={false}
                                 width={56}
-                                tickFormatter={(v) => formatMonto(v)}
+                                tickFormatter={(v) => formatAmount(v)}
                             />
                             <Tooltip content={<CustomTooltip />} />
                             <Area

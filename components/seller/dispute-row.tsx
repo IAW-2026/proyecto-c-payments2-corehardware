@@ -1,4 +1,4 @@
-import { formatFecha, formatMonto } from '@/lib/formatters'
+import { formatDate, formatAmount } from '@/lib/formatters'
 import { Badge } from '@/components/ui/badge'
 import { ButtonPrimary } from '@/components/ui/button'
 import { Dispute, DisputeStatus } from '@/types/dispute'
@@ -28,16 +28,16 @@ export function DisputeRow({ disputa, emailComprador, onResolver }: {
     return (
         <tr className="border-b border-neutral-100 dark:border-neutral-800/60 last:border-0 hover:bg-neutral-50 dark:hover:bg-neutral-800/20 transition-colors">
             <td className="hidden md:table-cell px-4 py-3.5 font-mono text-xs text-neutral-400 whitespace-nowrap">
-                {formatFecha(disputa.fechaDeInicio)}
+                {formatDate(disputa.fechaDeInicio)}
             </td>
             <td className="px-4 py-3.5">
                 <p className="text-sm font-medium text-neutral-800 dark:text-neutral-200">{pago?.descripcion || 'Sin descripción'}</p>
-                <p className="text-xs text-neutral-400 mt-0.5 md:hidden">{formatFecha(disputa.fechaDeInicio)}</p>
+                <p className="text-xs text-neutral-400 mt-0.5 md:hidden">{formatDate(disputa.fechaDeInicio)}</p>
                 <p className="text-xs text-neutral-400 mt-0.5 line-clamp-1">{disputa.descripcion}</p>
                 <p className="text-xs font-mono text-neutral-500 dark:text-neutral-500 mt-0.5">{emailComprador}</p>
             </td>
             <td className="hidden md:table-cell px-4 py-3.5 font-mono text-sm font-semibold text-neutral-900 dark:text-neutral-100 whitespace-nowrap">
-                {pago ? formatMonto(Number(pago.monto)) : '-'}
+                {pago ? formatAmount(Number(pago.monto)) : '-'}
             </td>
             <td className="px-4 py-3.5">
                 <div className="flex items-center justify-end gap-2">

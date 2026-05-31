@@ -1,13 +1,13 @@
-import { getAdminActividadReciente } from '@/lib/query/admin'
+import { fetchAdminRecentActivity } from '@/lib/query/admin'
 import { RecentActivityTable } from '@/components/admin/recent-activity-table'
 
 
 export async function AdminActivitySection() {
-    const actividadData = await getAdminActividadReciente()
+    const actividadData = await fetchAdminRecentActivity()
 
     const actividad = [
-        ...actividadData.pagos.map(p => ({ ...p, tipo: 'pago' as const, fecha: p.fecha })),
-        ...actividadData.disputas.map(d => ({ ...d, tipo: 'disputa' as const, fecha: d.fechaDeInicio })),
+        ...actividadData.payments.map(p => ({ ...p, tipo: 'pago' as const, fecha: p.fecha })),
+        ...actividadData.disputes.map(d => ({ ...d, tipo: 'disputa' as const, fecha: d.fechaDeInicio })),
     ].sort((a, b) => b.fecha.getTime() - a.fecha.getTime())
 
     return (

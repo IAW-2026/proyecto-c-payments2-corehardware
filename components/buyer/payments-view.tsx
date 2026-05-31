@@ -6,7 +6,7 @@ import { Payment } from '@/types/payments'
 import { PaymentRow } from '@/components/buyer/payment-row'
 import { PaymentModal } from '@/components/buyer/payment-modal'
 import { TabButton } from '@/components/ui/tab-button'
-import { getVendedorPublicKey } from '@/lib/query/buyer'
+import { fetchSellerPublicKey } from '@/lib/query/buyer'
 import { PAGINATION_NEXT_LABEL, PAGINATION_PREV_LABEL, PaginationButton } from '@/components/ui/pagination-button'
 
 
@@ -16,7 +16,7 @@ interface PaymentsViewProps {
     offset: number
     limit: number
     tab: 'pendientes' | 'realizados'
-    totalPendientesAbsoluto: number
+    totalPendingGlobal: number
 }
 
 
@@ -26,7 +26,7 @@ export function PaymentsView({
     offset, 
     limit, 
     tab,
-    totalPendientesAbsoluto 
+    totalPendingGlobal 
 }: PaymentsViewProps) {
     const router = useRouter()
     const pathname = usePathname()
@@ -34,13 +34,13 @@ export function PaymentsView({
     const [pagoActivo, setPagoActivo] = useState<{ payment: Payment, publicKey: string } | null>(null);
     
     const handleAbrirPago = async (payment: Payment) => {
-        const publicKey = await getVendedorPublicKey(payment.id);
+        const publicKey = await fetchSellerPublicKey(payment.id);
         if (publicKey) {
             setPagoActivo({ payment, publicKey });
         }
     }
 
-    function cambiarTab(nuevaTab: 'pendientes' | 'realizados') {
+    function switchTab(nuevaTab: 'pendientes' | 'realizados') {
         const sp = new URLSearchParams()
         sp.set('tab', nuevaTab)
         sp.delete('offset') 
@@ -65,15 +65,15 @@ export function PaymentsView({
             </div>
 
             <div className="flex border-b border-neutral-200 dark:border-neutral-800">
-                <TabButton active={tab === 'pendientes'} onClick={() => cambiarTab('pendientes')}>
+                <TabButton active={tab === 'pendientes'} onClick={() => switchTab('pendientes')}>
                     Pendientes
-                    {totalPendientesAbsoluto > 0 && (
+                    {totalPendingGlobal > 0 && (
                         <span className="ml-2 inline-flex items-center justify-center w-4 h-4 rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400 text-xs font-mono">
-                            {totalPendientesAbsoluto}
+                            {totalPendingGlobal}
                         </span>
                     )}
                 </TabButton>
-                <TabButton active={tab === 'realizados'} onClick={() => cambiarTab('realizados')}>
+                <TabButton active={tab === 'realizados'} onClick={() => switchTab('realizados')}>
                     Realizados
                 </TabButton>
             </div>

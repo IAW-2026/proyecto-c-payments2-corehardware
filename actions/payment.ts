@@ -4,7 +4,7 @@ import crypto from 'crypto';
 import { prisma } from '@/lib/prisma';
 
 
-export async function procesarOrdenPagoPro(
+export async function processPaymentOrder(
     pagoId: string,
     submitData: {
         total_amount: string;
@@ -31,17 +31,17 @@ export async function procesarOrdenPagoPro(
 
 
         const idempotencyKey = crypto.randomUUID();
-        const montoFormateado = Number(submitData.total_amount).toFixed(2);
+        const formattedAmount = Number(submitData.total_amount).toFixed(2);
 
         const orderBody = {
             external_reference: pagoId,
             type: "online",
             processing_mode: "automatic",
-            total_amount: montoFormateado,
+            total_amount: formattedAmount,
             payer: { email: submitData.email },
             transactions: {
                 payments: [{
-                    amount: montoFormateado,
+                    amount: formattedAmount,
                     payment_method: {
                         id: submitData.payment_method_id,
                         type: "credit_card",

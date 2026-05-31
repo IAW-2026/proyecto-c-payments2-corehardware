@@ -1,13 +1,13 @@
 import { auth } from '@clerk/nextjs/server'
-import { getPagosPendientes, getDisputasRecientes } from '@/lib/query/buyer'
+import { fetchPendingPayments, fetchRecentDisputes } from '@/lib/query/buyer'
 import { AlertBanner } from '@/components/buyer/alert-banner'
 
 
 export async function AlertsSection() {
     const { userId } = await auth()
     const [pagosPendientes, disputasRecientes] = await Promise.all([
-        getPagosPendientes(userId!),
-        getDisputasRecientes(userId!),
+        fetchPendingPayments(userId!),
+        fetchRecentDisputes(userId!),
     ])
 
     const alertas: { mensaje: string; tipo: string }[] = []

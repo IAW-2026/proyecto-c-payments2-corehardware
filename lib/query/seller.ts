@@ -8,7 +8,7 @@ import { toPayment, toDispute } from '@/lib/mappers';
 import { Prisma } from '@prisma/client';
 
 
-export async function getAcreditacionesSeller(
+export async function fetchSellerAccreditations(
     sellerId: string,
     offset = 0,
     limit = 20,
@@ -22,7 +22,7 @@ export async function getAcreditacionesSeller(
         where.estado = { in: ['acreditado', 'rechazado'] };
     }
 
-    const [pagosRaw, total] = await Promise.all([
+    const [payments, total] = await Promise.all([
         prisma.pago.findMany({
             where,
             orderBy: { fecha: 'desc' },
@@ -32,11 +32,11 @@ export async function getAcreditacionesSeller(
         prisma.pago.count({ where })
     ]);
 
-    return { acreditaciones: pagosRaw.map(toPayment), total };
+    return { acreditaciones: payments.map(toPayment), total };
 }
 
 
-export async function getCountAcreditacionesSellerPendientes(sellerId: string): Promise<number> {
+export async function fetchPendingAccreditationsCount(sellerId: string): Promise<number> {
     return await prisma.pago.count({
         where: {
             sellerClerkUserId: sellerId,
@@ -46,12 +46,12 @@ export async function getCountAcreditacionesSellerPendientes(sellerId: string): 
 }
 
 
-export async function getDisputasSeller(
+export async function fetchSellerDisputes(
     sellerId: string,
     offset = 0,
     limit = 20,
     tab?: 'pendientes' | 'resueltas'
-): Promise<{ disputas: Dispute[], total: number }> {
+): Promise<{ disputes: Dispute[], total: number }> {
     const where: Prisma.DisputaWhereInput = { pago: { sellerClerkUserId: sellerId } };
 
     if (tab === 'pendientes') {
@@ -60,7 +60,7 @@ export async function getDisputasSeller(
         where.estado = { not: 'pendiente' };
     }
 
-    const [disputasRaw, total] = await Promise.all([
+    const [disputes, total] = await Promise.all([
         prisma.disputa.findMany({
             where,
             include: { pago: true },
@@ -71,21 +71,21 @@ export async function getDisputasSeller(
         prisma.disputa.count({ where })
     ]);
 
-    return { disputas: disputasRaw.map(toDispute), total };
+    return { disputes: disputes.map(toDispute), total };
 }
 
 
-export async function getCountDisputasSellerPendientes(sellerId: string): Promise<number> {
+export async function fetchPendingDisputesCount(sellerId: string): Promise<number> {
     return await prisma.disputa.count({
         where: { estado: 'pendiente', pago: { sellerClerkUserId: sellerId } }
     });
 }
 
 
-export const getSellerDashboardSummary = cache(async (sellerId: string) => {
-    const inicioMes = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+export const fetchSellerDashboardSummary = cache(async (sellerId: string) => {
+    const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
 
-    const [pendientes, disputasActivas, acreditadoMes] = await Promise.all([
+    const [pending, activeDisputes, accreditedInMonth] = await Promise.all([
         prisma.pago.aggregate({
             where: { sellerClerkUserId: sellerId, estado: 'pendiente' },
             _count: { id: true },
@@ -98,25 +98,25 @@ export const getSellerDashboardSummary = cache(async (sellerId: string) => {
             where: {
                 sellerClerkUserId: sellerId,
                 estado: 'acreditado',
-                fecha: { gte: inicioMes }
+                fecha: { gte: monthStart }
             },
             _sum: { monto: true }
         })
     ]);
 
     return {
-        acreditacionesPendientes: {
-            cantidad: pendientes._count.id,
-            monto: Number(pendientes._sum.monto ?? 0)
+        pendingAccreditations: {
+            quantity: pending._count.id,
+            amount: Number(pending._sum.monto ?? 0)
         },
-        disputasActivas: disputasActivas,
-        totalAcreditadoMes: Number(acreditadoMes._sum.monto ?? 0)
+        activeDisputes: activeDisputes,
+        totalAccreditedInMonth: Number(accreditedInMonth._sum.monto ?? 0)
     };
 })
 
 
-export async function getSellerActividadReciente(sellerId: string) {
-    const [acreditaciones, disputas] = await Promise.all([
+export async function fetchSellerRecentActivity(sellerId: string) {
+    const [accreditations, disputes] = await Promise.all([
         prisma.pago.findMany({ where: { sellerClerkUserId: sellerId }, orderBy: { fecha: 'desc' }, take: 10 }),
         prisma.disputa.findMany({
             where: { pago: { sellerClerkUserId: sellerId } },
@@ -127,16 +127,16 @@ export async function getSellerActividadReciente(sellerId: string) {
     ]);
 
     return {
-        acreditaciones: acreditaciones.map(toPayment),
-        disputas: disputas.map(toDispute)
+        accreditations: accreditations.map(toPayment),
+        disputes: disputes.map(toDispute)
     };
 }
 
 
-export async function getIsSellerAuthorized(userId: string): Promise<boolean> {
-    const credencial = await prisma.credencialVendedor.findUnique({
+export async function fetchIsSellerAuthorized(userId: string): Promise<boolean> {
+    const authorized = await prisma.credencialVendedor.findUnique({
         where: { clerkUserId: userId },
         select: { id: true }
     });
-    return !!credencial;
+    return !!authorized;
 }

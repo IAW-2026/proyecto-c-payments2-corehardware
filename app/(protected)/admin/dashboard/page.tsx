@@ -1,8 +1,8 @@
 import { DashboardFilters } from '@/components/admin/dashboard-filters'
 import { DashboardKPIs } from '@/components/admin/dashboard-kpis'
 import { DashboardCharts } from '@/components/admin/dashboard-charts'
-import { TransaccionesTable } from '@/components/admin/transacciones-table'
-import { getAdminPagos, getAdminSummary, getDisputasChartData, getPagosChartData } from '@/lib/query/admin'
+import { TransactionsTable } from '@/components/admin/transactions-table'
+import { fetchPaymentsForAdmin, fetchAdminDashboardSummary, fetchDisputesChartData, fetchPaymentsChartData } from '@/lib/query/admin'
 import { ITEMS_PER_PAGE } from '@/lib/constants'
 
 
@@ -27,80 +27,80 @@ export default async function AdminDashboardPage({
     const q = params.q ?? ''
     const offset = Math.max(0, parseInt(params.offset ?? '0', 10))
 
-    const [summary, { pagos, total }, pagosChart, disputasChart] = await Promise.all([
-        getAdminSummary(periodo),
-        getAdminPagos({ offset, limit: ITEMS_PER_PAGE, estado, q, periodo }),
-        getPagosChartData(periodo),
-        getDisputasChartData(periodo)
+    const [summary, { payments, total }, pagosChart, disputasChart] = await Promise.all([
+        fetchAdminDashboardSummary(periodo),
+        fetchPaymentsForAdmin({ offset, limit: ITEMS_PER_PAGE, estado, q, periodo }),
+        fetchPaymentsChartData(periodo),
+        fetchDisputesChartData(periodo)
     ])
 
-    const curMonto = parseFloat(summary.current.pagosMonto)
-    const prevMonto = parseFloat(summary.previous.pagosMonto)
+    const curAmount = parseFloat(summary.current.paymentsAmount)
+    const prevAmount = parseFloat(summary.previous.paymentsAmount)
 
-    const tasaDisputasCur = summary.current.pagosCantidad > 0 ? (summary.current.disputas / summary.current.pagosCantidad) * 100 : 0
-    const tasaDisputasPrev = summary.previous.pagosCantidad > 0 ? (summary.previous.disputas / summary.previous.pagosCantidad) * 100 : 0
+    const disputesRatioCur = summary.current.paymentsQuantity > 0 ? (summary.current.disputes / summary.current.paymentsQuantity) * 100 : 0
+    const disputesRatioPrev = summary.previous.paymentsQuantity > 0 ? (summary.previous.disputes / summary.previous.paymentsQuantity) * 100 : 0
 
-    const tasaRechazoCur = summary.current.pagosCantidad > 0 ? (summary.current.rechazados / summary.current.pagosCantidad) * 100 : 0
-    const tasaRechazoPrev = summary.previous.pagosCantidad > 0 ? (summary.previous.rechazados / summary.previous.pagosCantidad) * 100 : 0
+    const rejectionRatioCur = summary.current.paymentsQuantity > 0 ? (summary.current.rejected / summary.current.paymentsQuantity) * 100 : 0
+    const rejectionRatioPrev = summary.previous.paymentsQuantity > 0 ? (summary.previous.rejected / summary.previous.paymentsQuantity) * 100 : 0
 
-    const resumen = {
-        totalProcesado: curMonto,
-        totalProcesadoDelta: prevMonto !== 0 ? ((curMonto - prevMonto) / prevMonto) * 100 : 0,
-        cantidadPagos: summary.current.pagosCantidad,
-        cantidadPagosDelta: summary.previous.pagosCantidad !== 0
-            ? ((summary.current.pagosCantidad - summary.previous.pagosCantidad) / summary.previous.pagosCantidad) * 100
-            : summary.current.pagosCantidad > 0 ? 100 : 0,
-        tasaDisputas: tasaDisputasCur,
-        tasaDisputasDelta: tasaDisputasCur - tasaDisputasPrev,
-        tasaRechazo: tasaRechazoCur,
-        tasaRechazoDelta: tasaRechazoCur - tasaRechazoPrev,
+    const kpis = {
+        totalProcessed: curAmount,
+        totalProcessedDelta: prevAmount !== 0 ? ((curAmount - prevAmount) / prevAmount) * 100 : 0,
+        paymentsQuantity: summary.current.paymentsQuantity,
+        paymentsQuantityDelta: summary.previous.paymentsQuantity !== 0
+            ? ((summary.current.paymentsQuantity - summary.previous.paymentsQuantity) / summary.previous.paymentsQuantity) * 100
+            : summary.current.paymentsQuantity > 0 ? 100 : 0,
+        disputesRatio: disputesRatioCur,
+        disputesRatioDelta: disputesRatioCur - disputesRatioPrev,
+        rejectionRatio: rejectionRatioCur,
+        rejectionRatioDelta: rejectionRatioCur - rejectionRatioPrev,
     }
 
-    const mapaDias = new Map<string, { fechaObj: Date; monto: number; disputas: number }>()
+    const daysMap = new Map<string, { date: Date; monto: number; disputas: number }>()
 
     pagosChart.forEach((p) => {
-        const fechaObj = new Date(p.fecha)
-        const fechaKey = fechaObj.toDateString()
-        const montoNum = parseFloat(p.monto) || 0
+        const date = new Date(p.fecha)
+        const dateKey = date.toDateString()
+        const amountNumber = parseFloat(p.monto) || 0
 
-        const existente = mapaDias.get(fechaKey)
-        if (existente) {
-            existente.monto += montoNum
+        const existentDate = daysMap.get(dateKey)
+        if (existentDate) {
+            existentDate.monto += amountNumber
         } else {
-            mapaDias.set(fechaKey, { fechaObj, monto: montoNum, disputas: 0 })
+            daysMap.set(dateKey, { date, monto: amountNumber, disputas: 0 })
         }
     })
 
     disputasChart.forEach((d) => {
-        const fechaObj = new Date(d.fechaDeInicio)
-        const fechaKey = fechaObj.toDateString()
+        const date = new Date(d.fechaDeInicio)
+        const dateKey = date.toDateString()
 
-        const existente = mapaDias.get(fechaKey)
-        if (existente) {
-            existente.disputas += 1
+        const existentDate = daysMap.get(dateKey)
+        if (existentDate) {
+            existentDate.disputas += 1
         } else {
-            mapaDias.set(fechaKey, { fechaObj, monto: 0, disputas: 1 })
+            daysMap.set(dateKey, { date, monto: 0, disputas: 1 })
         }
     })
 
-    const grafico = Array.from(mapaDias.values())
-        .sort((a, b) => a.fechaObj.getTime() - b.fechaObj.getTime())
+    const grafico = Array.from(daysMap.values())
+        .sort((a, b) => a.date.getTime() - b.date.getTime())
         .map((dia) => ({
-            label: dia.fechaObj.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' }),
+            label: dia.date.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' }),
             monto: dia.monto,
             disputas: dia.disputas
         })
         )
 
-    const idsVendedores = Array.from(new Set(pagos.map(p => p.sellerClerkUserId)))
+    const sellersIds = Array.from(new Set(payments.map(p => p.sellerClerkUserId)))
     const nombresVendedores = await Promise.all(
-        idsVendedores.map(id =>
+        sellersIds.map(id =>
             fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/mock/sellers/${id}`, { cache: 'no-store' })
                 .then(res => res.json())
                 .then(data => [id, data.razon_social as string])
         )
     )
-    const mapaVendedores = Object.fromEntries(nombresVendedores)
+    const sellersMap = Object.fromEntries(nombresVendedores)
 
     return (
         <div className="max-w-6xl mx-auto space-y-8">
@@ -119,7 +119,7 @@ export default async function AdminDashboardPage({
                 q={q}
             />
 
-            <DashboardKPIs resumen={resumen} />
+            <DashboardKPIs kpis={kpis} />
 
             <DashboardCharts datos={grafico} />
 
@@ -127,13 +127,13 @@ export default async function AdminDashboardPage({
                 <h2 className="text-xs font-mono uppercase tracking-wider text-neutral-500 dark:text-neutral-500">
                     Transacciones · {total} resultado{total !== 1 ? 's' : ''}
                 </h2>
-                <TransaccionesTable
-                    transacciones={pagos}
+                <TransactionsTable
+                    transactions={payments}
                     total={total}
                     offset={offset}
                     limit={ITEMS_PER_PAGE}
                     searchParams={{ periodo, estado, q }}
-                    mapaVendedores={mapaVendedores}
+                    sellersMap={sellersMap}
                 />
             </div>
 

@@ -1,7 +1,7 @@
 import { Prisma } from "@prisma/client"
 
 
-export function formatMonto(n: Prisma.Decimal | number | string) {
+export function formatAmount(n: Prisma.Decimal | number | string) {
     const value = typeof n === 'string' ? parseFloat(n) : 
                   n instanceof Prisma.Decimal ? n.toNumber() : n
                   
@@ -12,7 +12,7 @@ export function formatMonto(n: Prisma.Decimal | number | string) {
     }).format(value)
 }
 
-export function formatFecha(date: Date | string) {
+export function formatDate(date: Date | string) {
     const value = date instanceof Date ? date : new Date(date)
     return value.toLocaleDateString("es-AR", {
         day: "2-digit",
