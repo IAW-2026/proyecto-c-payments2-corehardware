@@ -61,8 +61,9 @@ export function DisputeModal({
 
                     {/* Pedido */}
                     <div className="space-y-1.5">
-                        <label className="text-xs font-medium text-neutral-400">Pedido</label>
+                        <label htmlFor="pagoId" className="text-xs font-medium text-neutral-400">Pedido</label>
                         <select
+                            id="pagoId"
                             value={pagoId}
                             onChange={(e) => setPagoId(e.target.value)}
                             className="w-full px-3 py-2 bg-white dark:bg-neutral-950 border border-neutral-300 dark:border-neutral-800 rounded-lg text-sm text-neutral-800 dark:text-neutral-200 focus:outline-none focus:border-green-600 focus:ring-2 focus:ring-green-600/10 dark:focus:border-green-500 dark:focus:ring-green-500/10 transition-all"
@@ -78,8 +79,9 @@ export function DisputeModal({
 
                     {/* Descripción */}
                     <div className="space-y-1.5">
-                        <label className="text-xs font-medium text-neutral-400">Descripción del problema</label>
+                        <label htmlFor="descripcion" className="text-xs font-medium text-neutral-400">Descripción del problema</label>
                         <textarea
+                            id="descripcion"
                             value={descripcion}
                             onChange={(e) => setDescripcion(e.target.value)}
                             rows={4}

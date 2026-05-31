@@ -83,26 +83,26 @@ export default function DevCheckoutPage() {
                     <h2 className="text-lg font-semibold border-b border-gray-800 pb-2 text-white">Datos del Pedido</h2>
                     
                     <div>
-                        <label className="block text-xs font-medium text-gray-400 mb-1">ID del Pedido</label>
-                        <input type="text" name="id" value={formData.id} onChange={handleChange} className="w-full p-2 bg-gray-800 border border-gray-700 rounded text-white focus:outline-none" />
+                        <label htmlFor="id" className="block text-xs font-medium text-gray-400 mb-1">ID del Pedido</label>
+                        <input id="id" type="text" name="id" value={formData.id} onChange={handleChange} className="w-full p-2 bg-gray-800 border border-gray-700 rounded text-white focus:outline-none" />
                     </div>
 
                     <div>
                         <div className="flex justify-between items-center mb-1">
-                            <label className="block text-xs font-medium text-gray-400">Fecha (ISO String)</label>
-                            <button type="button" onClick={refrescarFecha} className="text-xs text-blue-400 hover:underline">Ahora</button>
+                            <label htmlFor="fecha" className="block text-xs font-medium text-gray-400">Fecha (ISO String)</label>
+                            <button id="fecha" type="button" onClick={refrescarFecha} className="text-xs text-blue-400 hover:underline">Ahora</button>
                         </div>
                         <input type="text" name="fecha" value={formData.fecha} onChange={handleChange} className="w-full p-2 bg-gray-800 border border-gray-700 rounded text-blue-300 font-mono text-sm focus:outline-none" />
                     </div>
 
                     <div>
-                        <label className="block text-xs font-medium text-gray-400 mb-1">Monto</label>
-                        <input type="number" name="monto" value={formData.monto} onChange={handleChange} className="w-full p-2 bg-gray-800 border border-gray-700 rounded text-white focus:outline-none" />
+                        <label htmlFor="monto" className="block text-xs font-medium text-gray-400 mb-1">Monto</label>
+                        <input id="monto" type="number" name="monto" value={formData.monto} onChange={handleChange} className="w-full p-2 bg-gray-800 border border-gray-700 rounded text-white focus:outline-none" />
                     </div>
 
                     <div>
-                        <label className="block text-xs font-medium text-gray-400 mb-1">Productos (Array JSON)</label>
-                        <input type="text" name="productosRaw" value={formData.productosRaw} onChange={handleChange} className="w-full p-2 bg-gray-800 border border-gray-700 rounded text-green-400 font-mono text-sm focus:outline-none" />
+                        <label htmlFor="productosRaw" className="block text-xs font-medium text-gray-400 mb-1">Productos (Array JSON)</label>
+                        <input id="productosRaw" type="text" name="productosRaw" value={formData.productosRaw} onChange={handleChange} className="w-full p-2 bg-gray-800 border border-gray-700 rounded text-green-400 font-mono text-sm focus:outline-none" />
                     </div>
 
                     <button
