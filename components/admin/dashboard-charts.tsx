@@ -37,9 +37,9 @@ export function DashboardCharts({ datos }: { datos: any[] }) {
                 </TabButton>
             </div>
 
-            <div className="h-52 pt-2">
+            <div style={{ width: '100%', height: 208 }}>
                 {tab === 'volumen' ? (
-                    <ResponsiveContainer width="100%" height="100%">
+                    <ResponsiveContainer width="100%" height={200}>
                         <AreaChart data={datos} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
                             <defs>
                                 <linearGradient id="gradPagos" x1="0" y1="0" x2="0" y2="1">
@@ -75,7 +75,7 @@ export function DashboardCharts({ datos }: { datos: any[] }) {
                         </AreaChart>
                     </ResponsiveContainer>
                 ) : (
-                    <ResponsiveContainer width="100%" height="100%">
+                    <ResponsiveContainer width="100%" height={200}>
                         <BarChart data={datos} margin={{ top: 4, right: 4, left: 0, bottom: 0 }} barSize={8}>
                             <CartesianGrid stroke="currentColor" strokeOpacity={0.06} vertical={false} />
                             <XAxis

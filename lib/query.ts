@@ -5,7 +5,8 @@ import { Payment } from '@/types/payments'
 import { Dispute } from '@/types/dispute'
 import { toPayment, toDispute } from '@/lib/mappers';
 import { CredencialVendedor } from "@prisma/client";
-import { AdminDashboardSummary } from "@/types/admin-dashboard-summary";
+import { AdminDashboardSummary, AdminHomeSummary } from "@/types/admin-summaries";
+import { getRange } from "@/lib/date-range-helper";
 
 
 export async function getPagosPendientes(userId: string): Promise<Payment[]> {
@@ -190,7 +191,7 @@ export async function getIsSellerAuthorized(userId: string): Promise<boolean> {
 }
 
 
-export async function getAdminDashboardSummary(): Promise<AdminDashboardSummary> {
+export async function getAdminHomeSummary(): Promise<AdminHomeSummary> {
     const hoy = new Date();
     hoy.setHours(0, 0, 0, 0);
 
@@ -240,4 +241,91 @@ export async function getUltimosVendedores() {
             createdAt: true
         }
     });
+}
+
+
+export async function getAdminSummary(periodo: string): Promise<AdminDashboardSummary> {
+    const { start, end, prevStart, prevEnd } = getRange(periodo);
+
+    const fetchData = async (s: Date, e: Date) => {
+        const [pagos, disputas] = await Promise.all([
+            prisma.pago.aggregate({
+                where: { fecha: { gte: s, lte: e } },
+                _sum: { monto: true },
+                _count: { id: true }
+            }),
+            prisma.disputa.count({ where: { fechaDeInicio: { gte: s, lte: e } } })
+        ]);
+        
+        return { 
+            pagosMonto: pagos._sum.monto?.toString() ?? "0",
+            pagosCantidad: pagos._count.id,
+            disputas
+        };
+    };
+
+    const [current, previous] = await Promise.all([
+        fetchData(start, end),
+        fetchData(prevStart, prevEnd)
+    ]);
+
+    return { current, previous };
+}
+
+
+export async function getPagosChartData(periodo: string): Promise<Payment[]> {
+    const { start, end } = getRange(periodo);
+    const pagos = await prisma.pago.findMany({
+        where: { fecha: { gte: start, lte: end } }
+    });
+    return pagos.map(toPayment);
+}
+
+
+export async function getDisputasChartData(periodo: string): Promise<Dispute[]> {
+    const { start, end } = getRange(periodo);
+    const disputas = await prisma.disputa.findMany({
+        where: { fechaDeInicio: { gte: start, lte: end } }
+    });
+    return disputas.map(toDispute);
+}
+
+
+// 3. getAdminPagos: Implementación real de la tabla
+export async function getAdminPagos(params: { 
+    offset: number, 
+    limit: number, 
+    estado: string, 
+    q: string,
+    periodo: string // ← Nuevo parámetro
+}): Promise<{ pagos: Payment[], total: number }> {
+    const where: any = {};
+    
+    // 2. Traemos las fechas límites usando la función que ya tenés en tu archivo
+    const { start, end } = getRange(params.periodo);
+    where.fecha = { gte: start, lte: end }; // ← Filtramos por el rango de fechas
+
+    if (params.estado && params.estado !== 'todos') {
+        where.estado = params.estado;
+    }
+    
+    if (params.q) {
+        where.OR = [
+            { pedidoId: { contains: params.q, mode: 'insensitive' } },
+            { buyerClerkUserId: { contains: params.q, mode: 'insensitive' } },
+            { sellerClerkUserId: { contains: params.q, mode: 'insensitive' } }
+        ];
+    }
+
+    const [pagos, total] = await Promise.all([
+        prisma.pago.findMany({
+            where,
+            orderBy: { fecha: 'desc' },
+            skip: params.offset,
+            take: params.limit,
+        }),
+        prisma.pago.count({ where })
+    ]);
+
+    return { pagos: pagos.map(toPayment), total };
 }
