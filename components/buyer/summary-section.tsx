@@ -1,15 +1,16 @@
 import { auth } from '@clerk/nextjs/server'
 import { CreditCard, MessageSquareWarning, Package } from 'lucide-react'
-import { getPagosPendientes, getDisputasActivas, getPagosRecientes } from '@/lib/query'
+import { fetchPendingPayments, fetchActiveDisputes, fetchRecentPayments } from '@/lib/query/buyer'
 import { SummaryCard } from '@/components/ui/summary-card'
-import { formatMonto } from '@/lib/formatters'
+import { formatAmount } from '@/lib/formatters'
+
 
 export async function SummarySection() {
     const { userId } = await auth()
     const [pagosPendientes, disputasActivas, pagosRecientes] = await Promise.all([
-        getPagosPendientes(userId!),
-        getDisputasActivas(userId!),
-        getPagosRecientes(userId!),
+        fetchPendingPayments(userId!),
+        fetchActiveDisputes(userId!),
+        fetchRecentPayments(userId!),
     ])
 
     const ultimoPedido = pagosRecientes[0] ?? null
@@ -31,7 +32,7 @@ export async function SummarySection() {
             <SummaryCard
                 icon={Package}
                 label="Último pedido"
-                value={ultimoPedido ? formatMonto(Number(ultimoPedido.monto)) : '-'}
+                value={ultimoPedido ? formatAmount(Number(ultimoPedido.monto)) : '-'}
             />
         </div>
     )

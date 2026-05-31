@@ -1,11 +1,24 @@
-import { formatFecha } from '@/lib/formatters'
+import { formatDate } from '@/lib/formatters'
 
-export function VendedoresTable({ vendedores }: { vendedores: any[] }) {
+
+interface Seller {
+    id: string;
+    cuit: string;
+    razon_social: string;
+    direccion: string;
+    mail: string;
+    celular: string;
+    condicion_iva: string;
+    createdAt: Date;
+}
+
+
+export function SellersTable({ sellers }: { sellers: Seller[] }) {
     return (
         <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl overflow-hidden">
             <table className="w-full">
                 <tbody>
-                    {vendedores.map((v) => (
+                    {sellers.map((v) => (
                         <tr
                             key={v.id}
                             className="border-b border-neutral-100 dark:border-neutral-800/60 last:border-0 hover:bg-neutral-50 dark:hover:bg-neutral-800/20 transition-colors"
@@ -19,7 +32,7 @@ export function VendedoresTable({ vendedores }: { vendedores: any[] }) {
                                 </p>
                             </td>
                             <td className="px-4 py-3.5 text-right text-xs text-neutral-400 font-mono whitespace-nowrap">
-                                {formatFecha(v.createdAt)}
+                                {formatDate(v.createdAt)}
                             </td>
                         </tr>
                     ))}

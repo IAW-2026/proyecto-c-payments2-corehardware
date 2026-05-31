@@ -1,8 +1,9 @@
 import { Suspense } from 'react'
-import { SellerAlertsSection } from '@/components/seller/alerts-section'
-import { SellerSummarySection } from '@/components/seller/summary-section'
-import { SellerActivitySection } from '@/components/seller/activity-section'
+import { AlertsSection } from '@/components/seller/alerts-section'
+import { SummarySection } from '@/components/seller/summary-section'
+import { ActivitySection } from '@/components/seller/activity-section'
 import { AlertsSkeleton, SummarySkeleton, ActivitySkeleton } from '@/components/skeletons'
+
 
 export default function SellerHomePage() {
     return (
@@ -13,15 +14,15 @@ export default function SellerHomePage() {
             </div>
 
             <Suspense fallback={<AlertsSkeleton />}>
-                <SellerAlertsSection />
+                <AlertsSection />
             </Suspense>
 
             <Suspense fallback={<SummarySkeleton />}>
-                <SellerSummarySection />
+                <SummarySection />
             </Suspense>
 
             <Suspense fallback={<ActivitySkeleton />}>
-                <SellerActivitySection />
+                <ActivitySection />
             </Suspense>
         </div>
     )

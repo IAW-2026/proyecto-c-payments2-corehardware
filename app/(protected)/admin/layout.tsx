@@ -1,9 +1,11 @@
 import SideNav from '@/components/ui/side-nav'
 
+
 const tabs = [
     { label: 'Home', href: '/admin' },
     { label: 'Dashboard', href: '/admin/dashboard' },
 ]
+
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
     return (

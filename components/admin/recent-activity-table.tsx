@@ -1,5 +1,8 @@
 import { Badge } from '@/components/ui/badge'
-import { formatFecha, formatMonto } from '@/lib/formatters'
+import { formatDate, formatAmount } from '@/lib/formatters'
+import { Dispute } from '@/types/dispute'
+import { Payment } from '@/types/payments'
+
 
 const badgeVariant: Record<string, React.ComponentProps<typeof Badge>['variant']> = {
     pendiente:   'warning',
@@ -19,7 +22,12 @@ const badgeLabel: Record<string, string> = {
     rechazada:   'Rechazada',
 }
 
-export function RecentActivityTable({ actividad }: { actividad: any[] }) {
+type ActivityItem = 
+    | (Payment & { tipo: 'pago'; fecha: Date }) 
+    | (Dispute & { tipo: 'disputa'; fecha: Date })
+
+
+export function RecentActivityTable({ actividad }: { actividad: ActivityItem[] }) {
     return (
         <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl overflow-hidden">
             <table className="w-full">
@@ -34,7 +42,7 @@ export function RecentActivityTable({ actividad }: { actividad: any[] }) {
                                     {a.descripcion ?? `Pedido ${a.pedidoId}`}
                                 </p>
                                 <p className="text-xs text-neutral-400 mt-0.5 font-mono">
-                                    {formatFecha(a.fecha)}
+                                    {formatDate(a.fecha)}
                                 </p>
                             </td>
                             <td className="px-4 py-3.5">
@@ -43,7 +51,7 @@ export function RecentActivityTable({ actividad }: { actividad: any[] }) {
                                 </Badge>
                             </td>
                             <td className="px-4 py-3.5 font-mono text-sm font-semibold text-neutral-900 dark:text-neutral-100 whitespace-nowrap hidden sm:table-cell">
-                                {formatMonto(Number(a.tipo === 'pago' ? a.monto : a.pago?.monto))}
+                                {formatAmount(Number(a.tipo === 'pago' ? a.monto : a.pago?.monto))}
                             </td>
                             <td className="px-4 py-3.5 text-right">
                                 <Badge variant={badgeVariant[a.estado]}>

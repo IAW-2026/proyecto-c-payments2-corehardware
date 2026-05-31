@@ -1,9 +1,10 @@
 import { auth } from '@clerk/nextjs/server'
-import { getPagos, getCountPendientes } from '@/lib/query'
+import { fetchPaymentsForBuyer, fetchPendingPaymentsCount } from '@/lib/query/buyer'
 import { PaymentsView } from '@/components/buyer/payments-view'
 import { ITEMS_PER_PAGE } from '@/lib/constants'
 
-export default async function PaymentsPage({
+
+export default async function BuyerPaymentsPage({
     searchParams,
 }: {
     searchParams: Promise<{
@@ -17,21 +18,19 @@ export default async function PaymentsPage({
     const tab = params.tab === 'realizados' ? 'realizados' : 'pendientes'
     const offset = Math.max(0, parseInt(params.offset ?? '0', 10))
     
-    // Desestructuramos { pagos, total } directamente de la respuesta
-    const [{ pagos, total }, totalPendientes] = await Promise.all([
-        getPagos(userId!, offset, ITEMS_PER_PAGE, tab),
-        getCountPendientes(userId!)
+    const [{ payments, total }, totalPending] = await Promise.all([
+        fetchPaymentsForBuyer(userId!, offset, ITEMS_PER_PAGE, tab),
+        fetchPendingPaymentsCount(userId!)
     ])
 
-    // Pasamos todas las propiedades necesarias al componente de cliente
     return (
         <PaymentsView 
-            initialPagos={pagos} 
+            initialPagos={payments} 
             total={total}
             offset={offset}
             limit={ITEMS_PER_PAGE}
             tab={tab}
-            totalPendientesAbsoluto={totalPendientes}
+            totalPendingGlobal={totalPending}
         />
     )
 }

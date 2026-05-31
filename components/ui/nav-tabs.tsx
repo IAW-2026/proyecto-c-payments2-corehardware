@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { AnchorHTMLAttributes } from 'react'
 import { LinkProps } from 'next/link'
  
+
 type tabProps = AnchorHTMLAttributes<HTMLAnchorElement> & LinkProps
 
 

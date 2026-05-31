@@ -2,6 +2,7 @@ import { Disputa as PrismaDisputa, Pago as PrismaPago } from '@prisma/client';
 import { Dispute, DisputeStatus } from '@/types/dispute';
 import { Payment, PaymentStatus } from '@/types/payments';
 
+
 export const toPayment = (pago: PrismaPago): Payment => ({
     ...pago,
     estado: pago.estado as PaymentStatus,

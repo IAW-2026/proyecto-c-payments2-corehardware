@@ -1,10 +1,10 @@
 import { auth } from '@clerk/nextjs/server'
-import { getAcreditacionesSeller, getCountAcreditacionesSellerPendientes } from '@/lib/query'
+import { fetchSellerAccreditations, fetchPendingAccreditationsCount } from '@/lib/query/seller'
 import { AccreditationsView } from '@/components/seller/accreditations-view'
 import { ITEMS_PER_PAGE } from '@/lib/constants';
 
 
-async function getNombreComprador(id: string): Promise<string> {
+async function getSellerName(id: string): Promise<string> {
     const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/mock/buyers/${id}`);
     
     if (!res.ok) return "Usuario no encontrado";
@@ -13,7 +13,8 @@ async function getNombreComprador(id: string): Promise<string> {
     return `${data.nombre} ${data.apellido}`;
 }
 
-export default async function SellerAcreditacionesPage({
+
+export default async function SellerAccreditationsPage({
     searchParams,
 }: {
     searchParams: Promise<{ tab?: string; offset?: string }>
@@ -25,12 +26,12 @@ export default async function SellerAcreditacionesPage({
     const offset = Math.max(0, parseInt(params.offset ?? '0', 10))
 
     const [{ acreditaciones, total }, totalPendientes] = await Promise.all([
-        getAcreditacionesSeller(userId!, offset, ITEMS_PER_PAGE, tab),
-        getCountAcreditacionesSellerPendientes(userId!)
+        fetchSellerAccreditations(userId!, offset, ITEMS_PER_PAGE, tab),
+        fetchPendingAccreditationsCount(userId!)
     ])
 
     const ids = Array.from(new Set(acreditaciones.map(a => a.buyerClerkUserId)))
-    const nombres = await Promise.all(ids.map(id => getNombreComprador(id)))
+    const nombres = await Promise.all(ids.map(id => getSellerName(id)))
     const mapaNombres = Object.fromEntries(ids.map((id, index) => [id, nombres[index]]))
 
     return (

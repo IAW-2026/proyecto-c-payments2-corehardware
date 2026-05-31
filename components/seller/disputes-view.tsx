@@ -6,35 +6,36 @@ import { TabButton } from '@/components/ui/tab-button'
 import { DisputeRow } from '@/components/seller/dispute-row'
 import { DisputeResolveModal } from '@/components/seller/dispute-resolve-modal'
 import { Dispute, DisputeStatus } from '@/types/dispute'
-import { resolverDisputa } from '@/actions/disputes'
+import { resolveDispute } from '@/actions/disputes'
 import { PaginationButton, PAGINATION_PREV_LABEL, PAGINATION_NEXT_LABEL } from '@/components/ui/pagination-button'
 
 
-interface SellerDisputasViewProps {
-    initialDisputas: Dispute[]
-    mapaEmails: Record<string, string>
+interface DisputesViewProps {
+    initialDisputes: Dispute[]
+    emailsMap: Record<string, string>
     total: number
     offset: number
     limit: number
     tab: 'pendientes' | 'resueltas'
-    totalPendientesAbsoluto: number
+    totalPendingGlobal: number
 }
 
-export function SellerDisputasView({
-    initialDisputas,
-    mapaEmails,
+
+export function DisputesView({
+    initialDisputes,
+    emailsMap,
     total,
     offset,
     limit,
     tab,
-    totalPendientesAbsoluto
-}: SellerDisputasViewProps) {
+    totalPendingGlobal
+}: DisputesViewProps) {
     const router = useRouter()
     const pathname = usePathname()
     const [, startTransition] = useTransition()
     const [disputaActiva, setDisputaActiva] = useState<Dispute | null>(null)
 
-    function cambiarTab(nuevaTab: 'pendientes' | 'resueltas') {
+    function switchTab(nuevaTab: 'pendientes' | 'resueltas') {
         const sp = new URLSearchParams()
         sp.set('tab', nuevaTab)
         startTransition(() => router.replace(`${pathname}?${sp.toString()}`))
@@ -49,7 +50,7 @@ export function SellerDisputasView({
     const hasNext = offset + limit < total
 
     async function handleResolver(id: string, estado: Exclude<DisputeStatus, 'pendiente'>) {
-        await resolverDisputa(id, estado)
+        await resolveDispute(id, estado)
         setDisputaActiva(null)
     }
 
@@ -63,15 +64,15 @@ export function SellerDisputasView({
             </div>
 
             <div className="flex border-b border-neutral-200 dark:border-neutral-800">
-                <TabButton active={tab === 'pendientes'} onClick={() => cambiarTab('pendientes')}>
+                <TabButton active={tab === 'pendientes'} onClick={() => switchTab('pendientes')}>
                     Pendientes
-                    {totalPendientesAbsoluto > 0 && (
+                    {totalPendingGlobal > 0 && (
                         <span className="ml-2 inline-flex items-center justify-center w-4 h-4 rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400 text-xs font-mono">
-                            {totalPendientesAbsoluto}
+                            {totalPendingGlobal}
                         </span>
                     )}
                 </TabButton>
-                <TabButton active={tab === 'resueltas'} onClick={() => cambiarTab('resueltas')}>
+                <TabButton active={tab === 'resueltas'} onClick={() => switchTab('resueltas')}>
                     Resueltas
                 </TabButton>
             </div>
@@ -88,18 +89,18 @@ export function SellerDisputasView({
                         </tr>
                     </thead>
                     <tbody>
-                        {initialDisputas.length === 0 ? (
+                        {initialDisputes.length === 0 ? (
                             <tr>
                                 <td colSpan={4} className="py-16 text-center text-sm text-neutral-400 dark:text-neutral-600">
                                     No hay disputas {tab}.
                                 </td>
                             </tr>
                         ) : (
-                            initialDisputas.map((d) => (
+                            initialDisputes.map((d) => (
                                 <DisputeRow
                                     key={d.id}
                                     disputa={d}
-                                    emailComprador={mapaEmails[d.pago?.buyerClerkUserId ?? '']}
+                                    emailComprador={emailsMap[d.pago?.buyerClerkUserId ?? '']}
                                     onResolver={setDisputaActiva}
                                 />
                             ))

@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation'
 import { ButtonPrimary, ButtonSecondary } from '@/components/ui/button'
 
+
 export function ErrorView({ reset }: { reset: () => void }) {
     const router = useRouter()
     return (

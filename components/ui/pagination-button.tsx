@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 
+
 export const PAGINATION_PREV_LABEL = (
     <div className="flex items-center gap-1">
         <ChevronLeft className="h-4 w-4 stroke-[1.5]" />
@@ -20,6 +21,7 @@ interface PaginationButtonProps {
     disabled: boolean
     children: React.ReactNode
 }
+
 
 export function PaginationButton({ href, disabled, children }: PaginationButtonProps) {
     const className = `px-3 py-1 text-xs font-medium rounded-lg border transition-colors ${

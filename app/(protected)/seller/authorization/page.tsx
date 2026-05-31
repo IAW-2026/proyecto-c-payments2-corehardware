@@ -1,24 +1,22 @@
 import { auth } from '@clerk/nextjs/server'
 import { ButtonPrimary } from '@/components/ui/button'
 import { redirectToMercadoPago } from '@/actions/seller-auth'
-import { getIsSellerAuthorized } from '@/lib/query'
+import { fetchIsSellerAuthorized } from '@/lib/query/seller'
 import { CheckCircle2 } from 'lucide-react'
 
 
 export default async function SellerAuthorizationPage() {
     const { userId } = await auth()
-    const isAuthorized = await getIsSellerAuthorized(userId!)
+    const isAuthorized = await fetchIsSellerAuthorized(userId!)
     
     return (
         <div className="max-w-6xl mx-auto space-y-8">
  
-            {/* Encabezado */}
             <div>
                 <h1 className="text-xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100">Autorización</h1>
                 <p className="text-sm text-neutral-500 mt-0.5">Conectá tu cuenta de MercadoPago para recibir pagos.</p>
             </div>
  
-            {/* Panel */}
             <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-8 max-w-lg space-y-6">
  
                 <div className="space-y-2">

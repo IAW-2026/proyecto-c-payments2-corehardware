@@ -5,16 +5,16 @@ import { useRouter, usePathname } from 'next/navigation'
 import { TabButton } from '@/components/ui/tab-button'
 import { ButtonPrimary } from '@/components/ui/button'
 import { DisputeRow } from '@/components/buyer/dispute-row'
-import { NewDisputeModal } from '@/components/buyer/dispute-modal'
+import { DisputeModal } from '@/components/buyer/dispute-modal'
 import { Dispute } from '@/types/dispute'
 import { Payment } from '@/types/payments'
 import { PAGINATION_NEXT_LABEL, PAGINATION_PREV_LABEL, PaginationButton } from '@/components/ui/pagination-button'
 
 
 interface DisputesViewProps {
-    disputas: Dispute[]
-    montos: Map<Dispute, string>
-    pagosDisputables: Payment[]
+    disputes: Dispute[]
+    amounts: Map<Dispute, string>
+    disputablePayments: Payment[]
     total: number
     offset: number
     limit: number
@@ -22,10 +22,11 @@ interface DisputesViewProps {
     totalActivas: number
 }
 
+
 export function DisputesView({
-    disputas,
-    montos,
-    pagosDisputables,
+    disputes,
+    amounts,
+    disputablePayments,
     total,
     offset,
     limit,
@@ -38,7 +39,7 @@ export function DisputesView({
     const [modalAbierto, setModalAbierto] = useState(false)
 
 
-    function cambiarTab(nuevaTab: 'activas' | 'resueltas') {
+    function switchTab(nuevaTab: 'activas' | 'resueltas') {
         const sp = new URLSearchParams()
         sp.set('tab', nuevaTab)
         sp.delete('offset')
@@ -60,7 +61,7 @@ export function DisputesView({
             {/* Encabezado */}
             <div className="flex items-start justify-between gap-4">
                 <div>
-                    <h1 className="text-xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100">Disputas</h1>
+                    <h1 className="text-xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100">disputes</h1>
                     <p className="text-sm text-neutral-500 mt-0.5">
                         Gestioná tus quejas sobre pedidos cobrados.
                     </p>
@@ -72,7 +73,7 @@ export function DisputesView({
 
             {/* Tabs */}
             <div className="flex border-b border-neutral-200 dark:border-neutral-800">
-                <TabButton active={tab === 'activas'} onClick={() => cambiarTab('activas')}>
+                <TabButton active={tab === 'activas'} onClick={() => switchTab('activas')}>
                     Activas
                     {totalActivas > 0 && (
                         <span className="ml-2 inline-flex items-center justify-center w-4 h-4 rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400 text-xs font-mono">
@@ -80,7 +81,7 @@ export function DisputesView({
                         </span>
                     )}
                 </TabButton>
-                <TabButton active={tab === 'resueltas'} onClick={() => cambiarTab('resueltas')}>
+                <TabButton active={tab === 'resueltas'} onClick={() => switchTab('resueltas')}>
                     Resueltas
                 </TabButton>
             </div>
@@ -98,15 +99,15 @@ export function DisputesView({
                         </tr>
                     </thead>
                     <tbody>
-                        {disputas.length === 0 ? (
+                        {disputes.length === 0 ? (
                             <tr>
                                 <td colSpan={4} className="py-16 text-center text-sm text-neutral-400 dark:text-neutral-600">
-                                    No hay disputas {tab === 'activas' ? 'activas' : 'resueltas'}.
+                                    No hay disputes {tab === 'activas' ? 'activas' : 'resueltas'}.
                                 </td>
                             </tr>
                         ) : (
-                            disputas.map((d) => (
-                                <DisputeRow key={d.id} disputa={d} monto={montos.get(d) ?? '0'} />
+                            disputes.map((d) => (
+                                <DisputeRow key={d.id} disputa={d} monto={amounts.get(d) ?? '0'} />
                             ))
                         )}
                     </tbody>
@@ -138,9 +139,9 @@ export function DisputesView({
 
             {/* Modal */}
             {modalAbierto && (
-                <NewDisputeModal
+                <DisputeModal
                     onClose={() => setModalAbierto(false)}
-                    pagosDisputables={pagosDisputables}
+                    disputablePayments={disputablePayments}
                 />
             )}
 

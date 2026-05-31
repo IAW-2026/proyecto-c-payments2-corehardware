@@ -7,23 +7,38 @@ import {
     XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from 'recharts'
 import { TabButton } from '@/components/ui/tab-button'
-import { formatMonto } from '@/lib/formatters'
+import { formatAmount } from '@/lib/formatters'
 
-function CustomTooltip({ active, payload, label }: any) {
+
+interface TooltipPayload {
+    dataKey: string;
+    name: string;
+    value: number;
+    color: string;
+}
+
+function CustomTooltip({ active, payload, label }: { active?: boolean, payload?: TooltipPayload[], label?: string }) {
     if (!active || !payload?.length) return null
     return (
         <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg px-3 py-2 text-xs shadow-sm">
             <p className="font-mono text-neutral-500 mb-1">{label}</p>
-            {payload.map((p: any) => (
+            {payload.map((p: TooltipPayload) => (
                 <p key={p.dataKey} style={{ color: p.color }} className="font-mono">
-                    {p.name}: {p.dataKey === 'monto' ? formatMonto(p.value) : p.value}
+                    {p.name}: {p.dataKey === 'monto' ? formatAmount(p.value) : p.value}
                 </p>
             ))}
         </div>
     )
 }
 
-export function DashboardCharts({ datos }: { datos: any[] }) {
+interface ChartData {
+    label: string;
+    monto: number;
+    disputas: number;
+}
+
+
+export function DashboardCharts({ datos }: { datos: ChartData[] }) {
     const [tab, setTab] = useState<'volumen' | 'disputas'>('volumen')
 
     return (
@@ -59,7 +74,7 @@ export function DashboardCharts({ datos }: { datos: any[] }) {
                                 axisLine={false}
                                 tickLine={false}
                                 width={56}
-                                tickFormatter={(v) => formatMonto(v)}
+                                tickFormatter={(v) => formatAmount(v)}
                             />
                             <Tooltip content={<CustomTooltip />} />
                             <Area

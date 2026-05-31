@@ -1,25 +1,25 @@
 export type AdminHomeSummary = {
-    pagosHoy: { 
-        cantidad: number; 
-        monto: number 
+    paymentsToday: { 
+        quantity: number; 
+        amount: number 
     };
-    pendientes: number;
-    disputasActivas: number;
-    vendedoresActivos: number;
+    pending: number;
+    activeDisputes: number;
+    activeSellers: number;
 };
 
 
 export type AdminDashboardSummary = {
     current: {
-        pagosMonto: string;
-        pagosCantidad: number;
-        disputas: number;
-        rechazados: number
+        paymentsAmount: string;
+        paymentsQuantity: number;
+        disputes: number;
+        rejected: number
     };
     previous: {
-        pagosMonto: string;
-        pagosCantidad: number;
-        disputas: number;
-        rechazados: number
+        paymentsAmount: string;
+        paymentsQuantity: number;
+        disputes: number;
+        rejected: number
     };
 };
