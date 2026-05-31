@@ -1,23 +1,36 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useTransition } from 'react'
+import { useRouter, usePathname } from 'next/navigation'
 import { Payment } from '@/types/payments'
 import { PaymentRow } from '@/components/buyer/payment-row'
 import { PaymentModal } from '@/components/buyer/payment-modal'
 import { TabButton } from '@/components/ui/tab-button'
 import { getVendedorPublicKey } from '@/lib/query'
+import { PAGINATION_NEXT_LABEL, PAGINATION_PREV_LABEL, PaginationButton } from '@/components/ui/pagination-button'
 
 interface PaymentsViewProps {
     initialPagos: Payment[]
+    total: number
+    offset: number
+    limit: number
+    tab: 'pendientes' | 'realizados'
+    totalPendientesAbsoluto: number
 }
 
-export function PaymentsView({ initialPagos }: PaymentsViewProps) {
-    const [tab, setTab] = useState<'pendientes' | 'realizados'>('pendientes')
+export function PaymentsView({ 
+    initialPagos, 
+    total, 
+    offset, 
+    limit, 
+    tab,
+    totalPendientesAbsoluto 
+}: PaymentsViewProps) {
+    const router = useRouter()
+    const pathname = usePathname()
+    const [, startTransition] = useTransition()
     const [pagoActivo, setPagoActivo] = useState<{ payment: any, publicKey: string } | null>(null)
     
-    // Los pagos ahora vienen de props, no de un fetch interno
-    const pagos = initialPagos
-
     const handleAbrirPago = async (payment: any) => {
         const publicKey = await getVendedorPublicKey(payment.id);
         if (publicKey) {
@@ -25,15 +38,20 @@ export function PaymentsView({ initialPagos }: PaymentsViewProps) {
         }
     }
 
-    const pagosPendientes = pagos.filter(p =>
-        p.estado?.toString().trim().toLowerCase() === 'pendiente'
-    )
+    function cambiarTab(nuevaTab: 'pendientes' | 'realizados') {
+        const sp = new URLSearchParams()
+        sp.set('tab', nuevaTab)
+        sp.delete('offset') 
+        startTransition(() => router.replace(`${pathname}?${sp.toString()}`))
+    }
 
-    const pagosRealizados = pagos.filter(p =>
-        p.estado?.toString().trim().toLowerCase() !== 'pendiente'
-    )
+    function buildHref(nuevoOffset: number) {
+        const sp = new URLSearchParams({ tab, offset: nuevoOffset.toString() })
+        return `${pathname}?${sp.toString()}`
+    }
 
-    const lista = tab === 'pendientes' ? pagosPendientes : pagosRealizados
+    const hasPrev = offset > 0
+    const hasNext = offset + limit < total
 
     return (
         <div className="max-w-6xl mx-auto space-y-6">
@@ -45,15 +63,15 @@ export function PaymentsView({ initialPagos }: PaymentsViewProps) {
             </div>
 
             <div className="flex border-b border-neutral-200 dark:border-neutral-800">
-                <TabButton active={tab === 'pendientes'} onClick={() => setTab('pendientes')}>
+                <TabButton active={tab === 'pendientes'} onClick={() => cambiarTab('pendientes')}>
                     Pendientes
-                    {pagosPendientes.length > 0 && (
+                    {totalPendientesAbsoluto > 0 && (
                         <span className="ml-2 inline-flex items-center justify-center w-4 h-4 rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400 text-xs font-mono">
-                            {pagosPendientes.length}
+                            {totalPendientesAbsoluto}
                         </span>
                     )}
                 </TabButton>
-                <TabButton active={tab === 'realizados'} onClick={() => setTab('realizados')}>
+                <TabButton active={tab === 'realizados'} onClick={() => cambiarTab('realizados')}>
                     Realizados
                 </TabButton>
             </div>
@@ -70,14 +88,14 @@ export function PaymentsView({ initialPagos }: PaymentsViewProps) {
                         </tr>
                     </thead>
                     <tbody>
-                        {lista.length === 0 ? (
+                        {initialPagos.length === 0 ? (
                             <tr>
                                 <td colSpan={5} className="py-16 text-center text-sm text-neutral-400 dark:text-neutral-600">
                                     No hay pagos {tab === 'pendientes' ? 'pendientes' : 'realizados'}.
                                 </td>
                             </tr>
                         ) : (
-                            lista.map((p) => (
+                            initialPagos.map((p) => (
                                 <PaymentRow
                                     key={p.id}
                                     payment={p}
@@ -88,6 +106,29 @@ export function PaymentsView({ initialPagos }: PaymentsViewProps) {
                     </tbody>
                 </table>
             </div>
+
+            {(hasPrev || hasNext) && (
+                <div className="flex items-center justify-between text-xs text-neutral-500 dark:text-neutral-500">
+                    <span className="font-mono">
+                        {offset + 1}–{Math.min(offset + limit, total)} de {total}
+                    </span>
+                    <div className="flex items-center gap-2">
+                        <PaginationButton 
+                            href={buildHref(Math.max(0, offset - limit))} 
+                            disabled={!hasPrev}
+                        >
+                            {PAGINATION_PREV_LABEL}
+                        </PaginationButton>
+                        
+                        <PaginationButton 
+                            href={buildHref(offset + limit)} 
+                            disabled={!hasNext}
+                        >
+                            {PAGINATION_NEXT_LABEL}
+                        </PaginationButton>
+                    </div>
+                </div>
+            )}
 
             {pagoActivo && (
                 <PaymentModal

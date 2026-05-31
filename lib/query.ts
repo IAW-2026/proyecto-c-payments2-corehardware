@@ -83,13 +83,37 @@ export async function getDisputasBuyer(userId: string): Promise<{
     return { disputas: disputasConPago, montos };
 }
 
-export async function getPagos(userId: string): Promise<Payment[]> {
-    const pagos = await prisma.pago.findMany({
-        where: { buyerClerkUserId: userId },
-        orderBy: { fecha: 'desc' },
-    });
+export async function getPagos(
+    userId: string, 
+    offset = 0, 
+    limit = 20, 
+    tab?: 'pendientes' | 'realizados'
+): Promise<{ pagos: Payment[], total: number }> {
+    const where: any = { buyerClerkUserId: userId };
 
-    return pagos.map(toPayment);
+    if (tab === 'pendientes') {
+        where.estado = 'pendiente';
+    } else if (tab === 'realizados') {
+        where.estado = { not: 'pendiente' };
+    }
+
+    const [pagos, total] = await Promise.all([
+        prisma.pago.findMany({
+            where,
+            orderBy: { fecha: 'desc' },
+            skip: offset,
+            take: limit,
+        }),
+        prisma.pago.count({ where })
+    ]);
+
+    return { pagos: pagos.map(toPayment), total };
+}
+
+export async function getCountPendientes(userId: string): Promise<number> {
+    return await prisma.pago.count({
+        where: { buyerClerkUserId: userId, estado: 'pendiente' }
+    });
 }
 
 export async function getVendedorPublicKey(pagoId: string): Promise<string | null> {
