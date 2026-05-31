@@ -4,7 +4,6 @@ import { prisma } from "./prisma";
 import { Payment } from '@/types/payments'
 import { Dispute } from '@/types/dispute'
 import { toPayment, toDispute } from '@/lib/mappers';
-import { CredencialVendedor } from "@prisma/client";
 import { AdminDashboardSummary, AdminHomeSummary } from "@/types/admin-summaries";
 import { getRange } from "@/lib/date-range-helper";
 
@@ -64,32 +63,81 @@ export async function getPagosDisputables(userId: string): Promise<Payment[]> {
     return pagos.map(toPayment);
 }
 
-export async function getDisputasBuyer(userId: string): Promise<{
+export async function getDisputasBuyer(
+    userId: string,
+    offset = 0,
+    limit = 20,
+    tab?: 'activas' | 'resueltas'
+): Promise<{
     disputas: Dispute[]
+    total: number
     montos: Map<Dispute, string>
 }> {
-    const disputas = await prisma.disputa.findMany({
-        where: { clerkUserId: userId },
-        orderBy: { fechaDeInicio: 'desc' },
-        include: { pago: true } 
-    });
+    const where: any = { clerkUserId: userId };
 
-    const disputasConPago = disputas.map(toDispute);
+    if (tab === 'activas') {
+        where.estado = 'pendiente';
+    } else if (tab === 'resueltas') {
+        where.estado = { not: 'pendiente' };
+    }
+
+    const [disputas, total] = await Promise.all([
+        prisma.disputa.findMany({
+            where,
+            orderBy: { fechaDeInicio: 'desc' },
+            skip: offset,
+            take: limit,
+            include: { pago: true } 
+        }),
+        prisma.disputa.count({ where })
+    ]);
+
+    const disputasMapeadas = disputas.map(toDispute);
 
     const montos = new Map(
-        disputasConPago.map((d) => [d, d.pago?.monto ?? '0'])
+        disputasMapeadas.map((d) => [d, d.pago?.monto ?? '0'])
     );
 
-    return { disputas: disputasConPago, montos };
+    return { disputas: disputasMapeadas, total, montos };
 }
 
-export async function getPagos(userId: string): Promise<Payment[]> {
-    const pagos = await prisma.pago.findMany({
-        where: { buyerClerkUserId: userId },
-        orderBy: { fecha: 'desc' },
+export async function getCountDisputasActivas(userId: string): Promise<number> {
+    return await prisma.disputa.count({
+        where: { clerkUserId: userId, estado: 'pendiente' }
     });
+}
 
-    return pagos.map(toPayment);
+export async function getPagos(
+    userId: string, 
+    offset = 0, 
+    limit = 20, 
+    tab?: 'pendientes' | 'realizados'
+): Promise<{ pagos: Payment[], total: number }> {
+    const where: any = { buyerClerkUserId: userId };
+
+    if (tab === 'pendientes') {
+        where.estado = 'pendiente';
+    } else if (tab === 'realizados') {
+        where.estado = { not: 'pendiente' };
+    }
+
+    const [pagos, total] = await Promise.all([
+        prisma.pago.findMany({
+            where,
+            orderBy: { fecha: 'desc' },
+            skip: offset,
+            take: limit,
+        }),
+        prisma.pago.count({ where })
+    ]);
+
+    return { pagos: pagos.map(toPayment), total };
+}
+
+export async function getCountPendientes(userId: string): Promise<number> {
+    return await prisma.pago.count({
+        where: { buyerClerkUserId: userId, estado: 'pendiente' }
+    });
 }
 
 export async function getVendedorPublicKey(pagoId: string): Promise<string | null> {
@@ -109,26 +157,74 @@ export async function getVendedorPublicKey(pagoId: string): Promise<string | nul
 }
 
 
-export async function getAcreditacionesSeller(sellerId: string): Promise<Payment[]> {
-    const pagos = await prisma.pago.findMany({
-        where: { sellerClerkUserId: sellerId },
-        orderBy: { fecha: 'desc' },
-    });
-    
-    return pagos.map(toPayment);
+export async function getAcreditacionesSeller(
+    sellerId: string,
+    offset = 0,
+    limit = 20,
+    tab?: 'pendientes' | 'acreditados'
+): Promise<{ acreditaciones: Payment[], total: number }> {
+    const where: any = { sellerClerkUserId: sellerId };
+
+    if (tab === 'pendientes') {
+        where.estado = { in: ['pendiente', 'en_proceso'] };
+    } else if (tab === 'acreditados') {
+        where.estado = { in: ['acreditado', 'rechazado'] };
+    }
+
+    const [pagosRaw, total] = await Promise.all([
+        prisma.pago.findMany({
+            where,
+            orderBy: { fecha: 'desc' },
+            skip: offset,
+            take: limit,
+        }),
+        prisma.pago.count({ where })
+    ]);
+
+    return { acreditaciones: pagosRaw.map(toPayment), total };
 }
 
-export async function getDisputasSeller(sellerId: string): Promise<Dispute[]> {
-    const disputas = await prisma.disputa.findMany({
-        where: {
-            pago: {
-                sellerClerkUserId: sellerId
-            }
-        },
-        include: { pago: true },
-        orderBy: { fechaDeInicio: 'desc' },
+export async function getCountAcreditacionesSellerPendientes(sellerId: string): Promise<number> {
+    return await prisma.pago.count({
+        where: { 
+            sellerClerkUserId: sellerId,
+            estado: { in: ['pendiente', 'en_proceso'] }
+        }
     });
-    return disputas.map(toDispute);
+}
+
+export async function getDisputasSeller(
+    sellerId: string,
+    offset = 0,
+    limit = 20,
+    tab?: 'pendientes' | 'resueltas'
+): Promise<{ disputas: Dispute[], total: number }> {
+    const where: any = { pago: { sellerClerkUserId: sellerId } };
+
+    if (tab === 'pendientes') {
+        where.estado = 'pendiente';
+    } else if (tab === 'resueltas') {
+        where.estado = { not: 'pendiente' };
+    }
+
+    const [disputasRaw, total] = await Promise.all([
+        prisma.disputa.findMany({
+            where,
+            include: { pago: true },
+            orderBy: { fechaDeInicio: 'desc' },
+            skip: offset,
+            take: limit,
+        }),
+        prisma.disputa.count({ where })
+    ]);
+
+    return { disputas: disputasRaw.map(toDispute), total };
+}
+
+export async function getCountDisputasSellerPendientes(sellerId: string): Promise<number> {
+    return await prisma.disputa.count({
+        where: { estado: 'pendiente', pago: { sellerClerkUserId: sellerId } }
+    });
 }
 
 

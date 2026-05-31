@@ -1,7 +1,7 @@
-import Link from 'next/link'
 import { Badge } from '@/components/ui/badge'
 import { formatMonto, formatFecha } from '@/lib/formatters'
 import { Payment } from '@/types/payments'
+import { PAGINATION_NEXT_LABEL, PAGINATION_PREV_LABEL, PaginationButton } from '../ui/pagination-button'
 
 const badgeVariant: Record<string, React.ComponentProps<typeof Badge>['variant']> = {
     pendiente:   'warning',
@@ -43,10 +43,6 @@ export function TransaccionesTable({
         const sp = new URLSearchParams({ ...searchParams, offset: newOffset.toString() })
         return `/admin/dashboard?${sp.toString()}`
     }
-
-    const btnBase = 'px-3 py-1 text-xs font-medium rounded-lg transition-colors border border-neutral-200 dark:border-neutral-800 text-neutral-800 dark:text-neutral-200'
-    const btnActive = 'bg-white hover:bg-neutral-100 dark:bg-neutral-900 dark:hover:bg-neutral-800'
-    const btnDisabled = 'bg-neutral-100 text-neutral-400 border-neutral-200 cursor-not-allowed dark:bg-neutral-900 dark:text-neutral-600 dark:border-neutral-900/50'
 
     return (
         <>
@@ -104,14 +100,19 @@ export function TransaccionesTable({
                         {offset + 1}–{Math.min(offset + limit, total)} de {total}
                     </span>
                     <div className="flex items-center gap-2">
-                        {hasPrev
-                            ? <Link href={buildHref(Math.max(0, offset - limit))} className={`${btnBase} ${btnActive}`}>← Anterior</Link>
-                            : <span className={`${btnBase} ${btnDisabled}`}>← Anterior</span>
-                        }
-                        {hasNext
-                            ? <Link href={buildHref(offset + limit)} className={`${btnBase} ${btnActive}`}>Siguiente →</Link>
-                            : <span className={`${btnBase} ${btnDisabled}`}>Siguiente →</span>
-                        }
+                        <PaginationButton 
+                            href={buildHref(Math.max(0, offset - limit))} 
+                            disabled={!hasPrev}
+                        >
+                            {PAGINATION_PREV_LABEL}
+                        </PaginationButton>
+                        
+                        <PaginationButton 
+                            href={buildHref(offset + limit)} 
+                            disabled={!hasNext}
+                        >
+                            {PAGINATION_NEXT_LABEL}
+                        </PaginationButton>
                     </div>
                 </div>
             )}

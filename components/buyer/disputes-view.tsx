@@ -1,30 +1,58 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useTransition } from 'react'
+import { useRouter, usePathname } from 'next/navigation'
 import { TabButton } from '@/components/ui/tab-button'
 import { ButtonPrimary } from '@/components/ui/button'
 import { DisputeRow } from '@/components/buyer/dispute-row'
 import { NewDisputeModal } from '@/components/buyer/dispute-modal'
-import { Dispute, DisputeStatus } from '@/types/dispute'
+import { Dispute } from '@/types/dispute'
 import { Payment } from '@/types/payments'
+import { PAGINATION_NEXT_LABEL, PAGINATION_PREV_LABEL, PaginationButton } from '@/components/ui/pagination-button'
 
-type DisputeTab = 'activas' | 'resueltas'
+
+interface DisputesViewProps {
+    disputas: Dispute[]
+    montos: Map<Dispute, string>
+    pagosDisputables: Payment[]
+    total: number
+    offset: number
+    limit: number
+    tab: 'activas' | 'resueltas'
+    totalActivas: number
+}
 
 export function DisputesView({
     disputas,
     montos,
     pagosDisputables,
-}: {
-    disputas: Dispute[]
-    montos: Map<Dispute, string>
-    pagosDisputables: Payment[]
-}) {
-    const [tab, setTab] = useState<DisputeTab>('activas')
+    total,
+    offset,
+    limit,
+    tab,
+    totalActivas,
+}: DisputesViewProps) {
+    const router = useRouter()
+    const pathname = usePathname()
+    const [, startTransition] = useTransition()
     const [modalAbierto, setModalAbierto] = useState(false)
 
-    const activas   = disputas.filter((d) => d.estado.toLowerCase() === 'pendiente')
-    const resueltas = disputas.filter((d) => d.estado.toLowerCase() !== 'pendiente')
-    const lista = tab === 'activas' ? activas : resueltas
+
+    function cambiarTab(nuevaTab: 'activas' | 'resueltas') {
+        const sp = new URLSearchParams()
+        sp.set('tab', nuevaTab)
+        sp.delete('offset')
+        startTransition(() => router.replace(`${pathname}?${sp.toString()}`))
+    }
+
+    function buildHref(nuevoOffset: number) {
+        const sp = new URLSearchParams({ tab, offset: nuevoOffset.toString() })
+        return `${pathname}?${sp.toString()}`
+    }
+
+    const hasPrev = offset > 0
+    const hasNext = offset + limit < total
+
 
     return (
         <div className="max-w-6xl mx-auto space-y-6">
@@ -44,15 +72,15 @@ export function DisputesView({
 
             {/* Tabs */}
             <div className="flex border-b border-neutral-200 dark:border-neutral-800">
-                <TabButton active={tab === 'activas'} onClick={() => setTab('activas')}>
+                <TabButton active={tab === 'activas'} onClick={() => cambiarTab('activas')}>
                     Activas
-                    {activas.length > 0 && (
+                    {totalActivas > 0 && (
                         <span className="ml-2 inline-flex items-center justify-center w-4 h-4 rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400 text-xs font-mono">
-                            {activas.length}
+                            {totalActivas}
                         </span>
                     )}
                 </TabButton>
-                <TabButton active={tab === 'resueltas'} onClick={() => setTab('resueltas')}>
+                <TabButton active={tab === 'resueltas'} onClick={() => cambiarTab('resueltas')}>
                     Resueltas
                 </TabButton>
             </div>
@@ -70,20 +98,43 @@ export function DisputesView({
                         </tr>
                     </thead>
                     <tbody>
-                        {lista.length === 0 ? (
+                        {disputas.length === 0 ? (
                             <tr>
                                 <td colSpan={4} className="py-16 text-center text-sm text-neutral-400 dark:text-neutral-600">
                                     No hay disputas {tab === 'activas' ? 'activas' : 'resueltas'}.
                                 </td>
                             </tr>
                         ) : (
-                            lista.map((d) => (
+                            disputas.map((d) => (
                                 <DisputeRow key={d.id} disputa={d} monto={montos.get(d) ?? '0'} />
                             ))
                         )}
                     </tbody>
                 </table>
             </div>
+
+            {(hasPrev || hasNext) && (
+                <div className="flex items-center justify-between text-xs text-neutral-500 dark:text-neutral-500">
+                    <span className="font-mono">
+                        {offset + 1}–{Math.min(offset + limit, total)} de {total}
+                    </span>
+                    <div className="flex items-center gap-2">
+                        <PaginationButton 
+                            href={buildHref(Math.max(0, offset - limit))} 
+                            disabled={!hasPrev}
+                        >
+                            {PAGINATION_PREV_LABEL}
+                        </PaginationButton>
+                        
+                        <PaginationButton 
+                            href={buildHref(offset + limit)} 
+                            disabled={!hasNext}
+                        >
+                            {PAGINATION_NEXT_LABEL}
+                        </PaginationButton>
+                    </div>
+                </div>
+            )}
 
             {/* Modal */}
             {modalAbierto && (

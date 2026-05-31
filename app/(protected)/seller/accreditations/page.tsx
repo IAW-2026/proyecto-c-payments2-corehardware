@@ -1,6 +1,7 @@
 import { auth } from '@clerk/nextjs/server'
-import { getAcreditacionesSeller } from '@/lib/query'
+import { getAcreditacionesSeller, getCountAcreditacionesSellerPendientes } from '@/lib/query'
 import { AccreditationsView } from '@/components/seller/accreditations-view'
+import { ITEMS_PER_PAGE } from '@/lib/constants';
 
 
 async function getNombreComprador(id: string): Promise<string> {
@@ -12,18 +13,36 @@ async function getNombreComprador(id: string): Promise<string> {
     return `${data.nombre} ${data.apellido}`;
 }
 
-export default async function SellerAcreditacionesPage() {
+export default async function SellerAcreditacionesPage({
+    searchParams,
+}: {
+    searchParams: Promise<{ tab?: string; offset?: string }>
+}) {
     const { userId } = await auth()
+    const params = await searchParams
     
-    const acreditaciones = await getAcreditacionesSeller(userId!)
+    const tab = params.tab === 'acreditados' ? 'acreditados' : 'pendientes'
+    const offset = Math.max(0, parseInt(params.offset ?? '0', 10))
 
-    // Obtenemos IDs únicos y resolvemos nombres en el servidor
+    const [{ acreditaciones, total }, totalPendientes] = await Promise.all([
+        getAcreditacionesSeller(userId!, offset, ITEMS_PER_PAGE, tab),
+        getCountAcreditacionesSellerPendientes(userId!)
+    ])
+
     const ids = Array.from(new Set(acreditaciones.map(a => a.buyerClerkUserId)))
     const nombres = await Promise.all(ids.map(id => getNombreComprador(id)))
-    const mapaNombres = Object.fromEntries(
-        ids.map((id, index) => [id, nombres[index]])
-    )
+    const mapaNombres = Object.fromEntries(ids.map((id, index) => [id, nombres[index]]))
 
-    return <AccreditationsView acreditaciones={acreditaciones} mapaNombres={mapaNombres} />
+    return (
+        <AccreditationsView 
+            initialAcreditaciones={acreditaciones}
+            mapaNombres={mapaNombres}
+            total={total}
+            offset={offset}
+            limit={ITEMS_PER_PAGE}
+            tab={tab}
+            totalPendientesAbsoluto={totalPendientes}
+        />
+    )
 }
 

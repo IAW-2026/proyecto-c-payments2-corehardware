@@ -1,12 +1,10 @@
-import { Download } from 'lucide-react'
 import { DashboardFilters } from '@/components/admin/dashboard-filters'
 import { DashboardKPIs } from '@/components/admin/dashboard-kpis'
 import { DashboardCharts } from '@/components/admin/dashboard-charts'
 import { TransaccionesTable } from '@/components/admin/transacciones-table'
-import { ButtonSecondary } from '@/components/ui/button'
 import { getAdminPagos, getAdminSummary, getDisputasChartData, getPagosChartData } from '@/lib/query'
+import { ITEMS_PER_PAGE } from '@/lib/constants'
 
-const LIMIT = 20
 
 const PERIODOS = ['Últimos 7 días', 'Últimos 30 días', 'Este mes', 'Mes anterior'] as const
 type Periodo = typeof PERIODOS[number]
@@ -30,7 +28,7 @@ export default async function AdminDashboardPage({
 
     const [summary, { pagos, total }, pagosChart, disputasChart] = await Promise.all([
         getAdminSummary(periodo),
-        getAdminPagos({ offset, limit: LIMIT, estado, q, periodo }),
+        getAdminPagos({ offset, limit: ITEMS_PER_PAGE, estado, q, periodo }),
         getPagosChartData(periodo),
         getDisputasChartData(periodo)
     ])
@@ -118,7 +116,7 @@ export default async function AdminDashboardPage({
                     transacciones={pagos}
                     total={total}
                     offset={offset}
-                    limit={LIMIT}
+                    limit={ITEMS_PER_PAGE}
                     searchParams={{ periodo, estado, q }}
                 />
             </div>
