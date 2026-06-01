@@ -2,6 +2,7 @@
 
 import crypto from 'crypto';
 import { prisma } from '@/lib/prisma';
+import { revalidatePath } from 'next/cache';
 
 
 export async function processPaymentOrder(
@@ -67,7 +68,8 @@ export async function processPaymentOrder(
         if (!response.ok) {
             return { success: false, orderId: '', error: data.message || 'Error en MP' };
         }
-
+        
+        revalidatePath('/buyer/payments')
         return { success: true, orderId: data.id, error: '' };
     } catch {
         return { success: false, orderId: '', error: 'Error interno' };
