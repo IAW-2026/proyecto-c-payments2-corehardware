@@ -100,6 +100,16 @@ async function seed() {
                 descripcion: 'Pedido order_008',
                 monto: 830.00,
             },
+            {
+                buyerClerkUserId: BUYERS.buyer2,
+                sellerClerkUserId: SELLERS.seller1,
+                formaDePago: 'tarjeta_credito',
+                estado: 'acreditado',
+                pedidoId: 'order_009',
+                fecha: new Date('2026-06-01'),
+                descripcion: 'Pedido order_009',
+                monto: 270.00,
+            },
         ],
     })
 
