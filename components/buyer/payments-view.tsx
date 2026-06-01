@@ -8,6 +8,7 @@ import { PaymentModal } from '@/components/buyer/payment-modal'
 import { TabButton } from '@/components/ui/tab-button'
 import { fetchSellerPublicKey } from '@/lib/query/buyer'
 import { PAGINATION_NEXT_LABEL, PAGINATION_PREV_LABEL, PaginationButton } from '@/components/ui/pagination-button'
+import { ButtonSecondary } from '../ui/button'
 
 
 interface PaymentsViewProps {
@@ -20,30 +21,33 @@ interface PaymentsViewProps {
 }
 
 
-export function PaymentsView({ 
-    initialPagos, 
-    total, 
-    offset, 
-    limit, 
+export function PaymentsView({
+    initialPagos,
+    total,
+    offset,
+    limit,
     tab,
-    totalPendingGlobal 
+    totalPendingGlobal
 }: PaymentsViewProps) {
     const router = useRouter()
     const pathname = usePathname()
     const [, startTransition] = useTransition()
     const [pagoActivo, setPagoActivo] = useState<{ payment: Payment, publicKey: string } | null>(null);
-    
+    const [vendedorNoAutenticado, setVendedorNoAutenticado] = useState(false);
+
     const handleAbrirPago = async (payment: Payment) => {
         const publicKey = await fetchSellerPublicKey(payment.id);
         if (publicKey) {
             setPagoActivo({ payment, publicKey });
+        } else {
+            setVendedorNoAutenticado(true);
         }
     }
 
     function switchTab(nuevaTab: 'pendientes' | 'realizados') {
         const sp = new URLSearchParams()
         sp.set('tab', nuevaTab)
-        sp.delete('offset') 
+        sp.delete('offset')
         startTransition(() => router.replace(`${pathname}?${sp.toString()}`))
     }
 
@@ -115,15 +119,15 @@ export function PaymentsView({
                         {offset + 1}–{Math.min(offset + limit, total)} de {total}
                     </span>
                     <div className="flex items-center gap-2">
-                        <PaginationButton 
-                            href={buildHref(Math.max(0, offset - limit))} 
+                        <PaginationButton
+                            href={buildHref(Math.max(0, offset - limit))}
                             disabled={!hasPrev}
                         >
                             {PAGINATION_PREV_LABEL}
                         </PaginationButton>
-                        
-                        <PaginationButton 
-                            href={buildHref(offset + limit)} 
+
+                        <PaginationButton
+                            href={buildHref(offset + limit)}
                             disabled={!hasNext}
                         >
                             {PAGINATION_NEXT_LABEL}
@@ -139,6 +143,32 @@ export function PaymentsView({
                     onClose={() => setPagoActivo(null)}
                 />
             )}
+
+            {vendedorNoAutenticado && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+                    <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl shadow-xl p-6 max-w-sm w-full mx-4 space-y-4">
+                        <div className="flex items-start gap-3">
+                            <div className="mt-0.5 flex-shrink-0 w-8 h-8 rounded-full bg-amber-500/15 flex items-center justify-center">
+                                <span className="text-amber-500 text-base">⚠</span>
+                            </div>
+                            <div>
+                                <h2 className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">
+                                    Vendedor no autenticado
+                                </h2>
+                                <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
+                                    El vendedor aún no completó su configuración de cobros. Por favor, reintentá en otro momento.
+                                </p>
+                            </div>
+                        </div>
+                        <div className="flex justify-end">
+                            <ButtonSecondary onClick={() => setVendedorNoAutenticado(false)}>
+                                Aceptar
+                            </ButtonSecondary>
+                        </div>
+                    </div>
+                </div>
+            )}
+
         </div>
     )
 }
