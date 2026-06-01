@@ -20,13 +20,13 @@ Enunciado completo: <https://iaw-2026.github.io/proyecto/>
 
 ### Users de clerk
 
-- Admin: admin1+clerk_test@example.com
-- Comprador1: buyer1+clerk_test@example.com
-- Comprador2: buyer2+clerk_test@example.com
-- Vendedor1: seller1+clerk_test@example.com
-- Vendedor2: seller2+clerk_test@example.com
+- Admin: admin1+clerk_test@iaw.com
+- Comprador1: buyer1+clerk_test@iaw.com
+- Comprador2: buyer2+clerk_test@iaw.com
+- Vendedor1: seller1+clerk_test@iaw.com
+- Vendedor2: seller2+clerk_test@iaw.com
 
-Para loguearse ingresar el mail y cuando pida contraseña seleccionar ingresar de otro modo. Seleccionar por codigo de confirmacion enviado al mail, e ingresar **424242**
+Contraseña: **iawuser#**
 
 ### Cuentas de mercadopago
 
@@ -59,3 +59,7 @@ Para loguearse ingresar el mail y cuando pida contraseña seleccionar ingresar d
 - **SECU**: Rechazado por código de seguridad inválido.
 - **EXPI**: Rechazado debido a un problema de fecha de vencimiento.
 - **FORM**: Rechazado debido a un error de formulario.
+
+## Comentarios adicionales
+
+La app implementa integracion de mercadopago mediante flujo marketplace y pagos con tarjetas. Para ello los vendedores se autorizan con antes de poder recibir pagos.
