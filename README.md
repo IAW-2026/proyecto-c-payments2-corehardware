@@ -13,36 +13,20 @@ Enunciado completo: <https://iaw-2026.github.io/proyecto/>
 
 ## Deploy
 
-- Deploy de branch develop: https://proyecto-c-payments2-corehardware-git-develop-agusf22s-projects.vercel.app/
+- Deploy en Vercel: https://proyecto-c-payments2-corehardware.vercel.app/
 
-## Variables de entorno
-
-Para que el proyecto funcione correctamente se requiere configurar las siguientes variables.
-
-### Base de datos
-- **DATABASE_URL**: URL de base de datos PostgreSQL.
-### Clerk
-- **NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY**: Clave publica de Clerk.
-- **CLERK_SECRET_KEY**: Clave privada de Clerk.
-### Mercadopago
-- **MERCADOPAGO_ACCESS_TOKEN**: Access token de la cuenta de mercadopago dueña de la app.
-- **MERCADOPAGO_SECRET_KEY**: Clave secreta para autenticacion de POST al webhook de la app proveniente de mercadopago luego de un evento.
-- **MERCADOPAGO_CLIENT_ID**: Client ID de la app creada en mercadopago.
-- **MERCADOPAGO_CLIENT_SECRET**: Client secret de la app creada en mercadopago.
-- **NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY**: Clave publica para cifrado de tarjetas de mercado pago, no necesaria en versiones del proyecto que implementan flujo marketplace.
-- **MERCADOPAGO_REDIRECT_URI**: URL de redireccion luego de autenticacion de vendedores.
-### Otras
-- **NEXT_PUBLIC_TEST_SELLER_CLERK_ID** (Opcional): Si se usan las pantallas de testing, user id de Clerk de una cuenta con rol seller.
 
 ## Credenciales de prueba
 
 ### Users de clerk
 
 - Admin: admin1+clerk_test@example.com
-- Comprador: buyer1+clerk_test@example.com
-- Vendedor: seller1+clerk_test@example.com
+- Comprador1: buyer1+clerk_test@example.com
+- Comprador2: buyer2+clerk_test@example.com
+- Vendedor1: seller1+clerk_test@example.com
+- Vendedor2: seller2+clerk_test@example.com
 
-Para loguearse ingresar el mail y cuando pida contraseña seleccionar ingresar de otro modo, por codigo de confirmacion enviado al mail, e ingresar **424242**
+Para loguearse ingresar el mail y cuando pida contraseña seleccionar ingresar de otro modo. Seleccionar por codigo de confirmacion enviado al mail, e ingresar **424242**
 
 ### Cuentas de mercadopago
 

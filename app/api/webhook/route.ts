@@ -9,6 +9,7 @@ const MP_STATUS_MAP: Record<string, string> = {
     approved:     "acreditado",
     processed:    "acreditado",
     rejected:     "rechazado",
+    closed:       "rechazado",
     cancelled:    "cancelado",
     refunded:     "reembolsado",
     charged_back: "contracargo",

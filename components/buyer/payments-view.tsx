@@ -140,7 +140,10 @@ export function PaymentsView({
                 <PaymentModal
                     payment={pagoActivo.payment}
                     publicKey={pagoActivo.publicKey}
-                    onClose={() => setPagoActivo(null)}
+                    onClose={() => {
+                        setPagoActivo(null)
+                        router.refresh()
+                    }}
                 />
             )}
 
