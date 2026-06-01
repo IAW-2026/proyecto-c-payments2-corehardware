@@ -61,7 +61,7 @@ export function DisputesView({
             {/* Encabezado */}
             <div className="flex items-start justify-between gap-4">
                 <div>
-                    <h1 className="text-xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100">disputes</h1>
+                    <h1 className="text-xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100">Disputas</h1>
                     <p className="text-sm text-neutral-500 mt-0.5">
                         Gestioná tus quejas sobre pedidos cobrados.
                     </p>
