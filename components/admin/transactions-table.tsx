@@ -75,7 +75,7 @@ export function TransactionsTable({
                             >
                                 <td className="px-4 py-3.5">
                                     <p className="text-sm font-mono font-medium text-neutral-800 dark:text-neutral-200">
-                                        #{t.pedidoId}
+                                        {t.pedidoId}
                                     </p>
                                 </td>
                                 <td className="px-4 py-3.5 hidden md:table-cell">
