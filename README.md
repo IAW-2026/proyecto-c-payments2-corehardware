@@ -30,11 +30,17 @@ Contraseña: **iawuser#**
 
 ### Cuentas de mercadopago
 
-#### Marketplace dueño de la app
+#### Marketplace dueño de la app en produccion
 - User ID: **3432030204**
 - Usuario: **TESTUSER625096611424863304**
 - Contraseña: **xO08JXUGxm**
 - Código de verificación: **030204**
+
+#### Marketplace dueño de la app en development
+- User ID: **3479211124**
+- Usuario: **TESTUSER295157237426927998**
+- Contraseña: **4VGbnCTVVE**
+- Código de verificación: **211124**
 
 #### Vendedor
 - User ID: **3432219260**
@@ -62,4 +68,4 @@ Contraseña: **iawuser#**
 
 ## Comentarios adicionales
 
-La app implementa integracion de mercadopago mediante flujo marketplace y pagos con tarjetas. Para ello los vendedores se autorizan con antes de poder recibir pagos.
+La app implementa integracion de mercadopago mediante flujo marketplace y pagos con tarjetas. Para ello los vendedores se autorizan antes de poder recibir pagos.
