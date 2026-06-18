@@ -2,36 +2,53 @@ import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
+import * as jose from 'jose';
+
+
+const JWKS = jose.createRemoteJWKSet(
+    new URL(`${process.env.CLERK_FRONTEND_API_URL}/.well-known/jwks.json`)
+);
+
+
+export async function verifyToken(token: string) {
+    const { payload } = await jose.jwtVerify(token, JWKS, {
+        issuer: process.env.CLERK_FRONTEND_API_URL,
+    });
+    return payload;
+}
 
 
 const checkoutOrderSchema = z.object({
-    id: z.union([z.string(), z.number()]), 
+    id: z.string(),
     fecha: z.iso.datetime(),
     comprador_id: z.string(),
     vendedor_id: z.string(),
     monto: z.number().positive("El monto debe ser mayor a 0"),
-    productos: z.array(z.any()).min(1, "Debe incluir al menos un producto"),
+    productos: z.array(z.string()).min(1, "Debe incluir al menos un producto"),
 });
 
 
 export async function POST(req: NextRequest) {
     try {
-        // ***************************************************************************************************************************************************
-        // En la etapa 3 se usar al token de Clerk para esto
+        const bearer = req.headers.get('Authorization') ?? '';
+        const token = bearer.replace('Bearer ', '');
 
-        const { userId } = await auth();
-        if (!userId) {
+        if (!token) {
             return NextResponse.json({ message: "No autorizado" }, { status: 401 });
         }
 
-        // ***************************************************************************************************************************************************
+        const { sub: userId } = await verifyToken(token);
+
+        if (!userId) {
+            return NextResponse.json({ message: "No autorizado" }, { status: 401 });
+        }
 
         const json = await req.json();
         const result = checkoutOrderSchema.safeParse(json);
 
         if (!result.success) {
             return NextResponse.json(
-                { message: "Datos inválidos", errors: result.error.format() },
+                { message: "Datos inválidos", errors: result.error.issues },
                 { status: 400 }
             );
         }
@@ -41,7 +58,7 @@ export async function POST(req: NextRequest) {
         const pago = await prisma.pago.create({
             data: {
                 sellerClerkUserId: body.vendedor_id,
-                buyerClerkUserId: userId,
+                buyerClerkUserId: body.comprador_id,
                 formaDePago: "",
                 estado: "pendiente",
                 pedidoId: String(body.id),
