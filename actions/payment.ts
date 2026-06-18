@@ -18,7 +18,6 @@ export async function processPaymentOrder(
     try {
         const pago = await prisma.pago.findUnique({
             where: { id: pagoId },
-            select: { sellerClerkUserId: true }
         });
 
         if (!pago) return { success: false, orderId: '', error: "Pago no encontrado" };
@@ -66,9 +65,14 @@ export async function processPaymentOrder(
         const data = await response.json();
 
         if (!response.ok) {
+            await prisma.pago.update({
+                where: { id: pagoId },
+                data: { estado: "rechazado" },
+            });
+            await onPaymentRejected(pago.pedidoId);
             return { success: false, orderId: '', error: data.message || 'Error en MP' };
         }
-        
+
         revalidatePath('/buyer/payments')
         return { success: true, orderId: data.id, error: '' };
     } catch {
@@ -76,3 +80,61 @@ export async function processPaymentOrder(
     }
 }
 
+
+export async function onPaymentRejected(pedidoId: string) {
+    await fetch(`${process.env.BUYER_API_URL}/api/orders/${pedidoId}/status`, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${process.env.BUYER_API_KEY}`,
+        },
+        body: JSON.stringify({ estado: "PAGO_RECHAZADO" }),
+    });
+}
+
+
+export async function onPaymentApproved(pagoId: string) {
+    const pago = await prisma.pago.findUnique({
+        where: { id: pagoId },
+        select: { pedidoId: true, buyerId: true, sellerId: true, fecha: true, monto: true },
+    });
+
+    if (!pago) throw new Error(`Pago no encontrado: ${pagoId}`);
+
+    const orderRes = await fetch(`${process.env.BUYER_API_URL}/api/orders/${pago.pedidoId}`, {
+        headers: { Authorization: `Bearer ${process.env.BUYER_API_KEY}` },
+    });
+
+    if (!orderRes.ok) throw new Error(`Error al obtener orden: ${orderRes.status}`);
+
+    const order = await orderRes.json();
+
+    const saleRes = await fetch(`${process.env.SELLER_API_URL}/api/sale`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${process.env.SELLER_API_KEY}`,
+        },
+        body: JSON.stringify({
+            id: pagoId,
+            fecha: pago.fecha,
+            comprador_id: pago.buyerId,
+            vendedor_id: pago.sellerId,
+            productos: order.productos,
+            monto: Number(pago.monto),
+        }),
+    });
+
+    if (!saleRes.ok) throw new Error(`Error al crear venta: ${saleRes.status}`);
+
+    const statusRes = await fetch(`${process.env.BUYER_API_URL}/api/orders/${pago.pedidoId}/status`, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${process.env.BUYER_API_KEY}`,
+        },
+        body: JSON.stringify({ estado: "PAGO_APROBADO" }),
+    });
+
+    if (!statusRes.ok) throw new Error(`Error al actualizar estado: ${statusRes.status}`);
+}

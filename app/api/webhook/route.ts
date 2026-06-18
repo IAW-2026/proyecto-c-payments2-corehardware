@@ -1,17 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import crypto from "crypto";
+import { onPaymentApproved, onPaymentRejected } from "@/actions/payment";
 
 
 const MP_STATUS_MAP: Record<string, string> = {
-    pending:      "pendiente",
-    in_process:   "en_proceso",
-    approved:     "acreditado",
-    processed:    "acreditado",
-    rejected:     "rechazado",
-    closed:       "rechazado",
-    cancelled:    "cancelado",
-    refunded:     "reembolsado",
+    pending: "pendiente",
+    in_process: "en_proceso",
+    approved: "acreditado",
+    processed: "acreditado",
+    rejected: "rechazado",
+    closed: "rechazado",
+    cancelled: "cancelado",
+    refunded: "reembolsado",
     charged_back: "contracargo",
 };
 
@@ -66,7 +67,7 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ message: "Credencial no encontrada" }, { status: 404 });
         }
 
-        const endpoint = topic === 'order' 
+        const endpoint = topic === 'order'
             ? `https://api.mercadopago.com/v1/orders/${resourceId}`
             : `https://api.mercadopago.com/v1/payments/${resourceId}`;
 
@@ -80,11 +81,8 @@ export async function POST(req: NextRequest) {
         const externalReference = mpData.external_reference;
 
         if (externalReference) {
-            // Extraer forma de pago de forma segura
             const formaDePago = mpData.payment_method_id || mpData.payments?.[0]?.payment_method_id;
 
-            // Definir datos de actualización dinámicos
-            
             const dataToUpdate: { estado: string; formaDePago?: string } = {
                 estado: MP_STATUS_MAP[mpData.status] ?? "desconocido",
             };
@@ -93,10 +91,17 @@ export async function POST(req: NextRequest) {
                 dataToUpdate.formaDePago = formaDePago;
             }
 
-            await prisma.pago.update({
+            const pago = await prisma.pago.update({
                 where: { id: externalReference },
                 data: dataToUpdate,
             });
+
+            if (dataToUpdate.estado === "acreditado") {
+                await onPaymentApproved(externalReference);
+            }
+            if (dataToUpdate.estado === "rechazado") {
+                await onPaymentRejected(pago.pedidoId);
+            }
         }
 
         return NextResponse.json({ received: true }, { status: 200 });

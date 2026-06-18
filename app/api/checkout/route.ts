@@ -1,4 +1,3 @@
-import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
@@ -55,10 +54,20 @@ export async function POST(req: NextRequest) {
 
         const body = result.data;
 
+        const sellerRes = await fetch(`${process.env.SELLER_API_URL}/api/sellers/${body.vendedor_id}`, {
+            headers: { Authorization: `Bearer ${process.env.SELLER_API_KEY}` },
+        });
+
+        if (!sellerRes.ok) return NextResponse.json({ message: "Vendedor no encontrado" }, { status: 404 });
+
+        const seller = await sellerRes.json();
+
         const pago = await prisma.pago.create({
             data: {
-                sellerClerkUserId: body.vendedor_id,
-                buyerClerkUserId: body.comprador_id,
+                buyerId: body.comprador_id,
+                sellerId: body.vendedor_id,
+                sellerClerkUserId: seller.clerkId,
+                buyerClerkUserId: userId,
                 formaDePago: "",
                 estado: "pendiente",
                 pedidoId: String(body.id),
