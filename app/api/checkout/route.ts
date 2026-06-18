@@ -55,7 +55,7 @@ export async function POST(req: NextRequest) {
         const body = result.data;
 
         const sellerRes = await fetch(`${process.env.SELLER_API_URL}/api/sellers/${body.vendedor_id}`, {
-            headers: { Authorization: `Bearer ${process.env.SELLER_API_KEY}` },
+            headers: { 'x-api-key': process.env.SELLER_API_KEY! },
         });
 
         if (!sellerRes.ok) return NextResponse.json({ message: "Vendedor no encontrado" }, { status: 404 });
@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
             data: {
                 buyerId: body.comprador_id,
                 sellerId: body.vendedor_id,
-                sellerClerkUserId: seller.clerkId,
+                sellerClerkUserId: seller.id_clerk,
                 buyerClerkUserId: userId,
                 formaDePago: "",
                 estado: "pendiente",

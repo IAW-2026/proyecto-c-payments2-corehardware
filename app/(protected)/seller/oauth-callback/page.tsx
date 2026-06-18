@@ -8,7 +8,7 @@ export default async function MercadoPagoCallbackPage({
 }: {
     searchParams: Promise<{ code?: string }>
 }) {
-    const { userId } = await auth();
+    const { userId, getToken } = await auth();
     const { code } = await searchParams;
 
     if (!userId) redirect("/sign-in");
@@ -34,6 +34,14 @@ export default async function MercadoPagoCallbackPage({
             redirect("/error?message=error_mercado_pago");
         }
 
+        const token = await getToken();
+        const vendedorRes = await fetch(`${process.env.SELLER_API_URL}/api/seller`, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
+        });
+        const vendedor = await vendedorRes.json();
+
         await prisma.credencialVendedor.upsert({
             where: { mercadoPagoUserId: BigInt(data.user_id) },
             update: {
@@ -45,7 +53,7 @@ export default async function MercadoPagoCallbackPage({
             },
             create: {
                 clerkUserId: userId,
-                vendedorId: userId,
+                vendedorId: vendedor.id,
                 mercadoPagoUserId: BigInt(data.user_id),
                 accessToken: data.access_token,
                 refreshToken: data.refresh_token,

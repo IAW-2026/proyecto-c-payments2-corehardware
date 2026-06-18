@@ -5,10 +5,14 @@ import { ITEMS_PER_PAGE } from '@/lib/constants';
 
 
 async function getSellerName(id: string): Promise<string> {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/mock/buyers/${id}`);
-    
+    const res = await fetch(`${process.env.BUYER_API_URL}/api/buyers/${id}`, {
+        headers: {
+            'X-API-Key': process.env.BUYER_API_KEY!,
+        },
+    });
+
     if (!res.ok) return "Usuario no encontrado";
-    
+
     const data = await res.json();
     return `${data.nombre} ${data.apellido}`;
 }
@@ -21,7 +25,7 @@ export default async function SellerAccreditationsPage({
 }) {
     const { userId } = await auth()
     const params = await searchParams
-    
+
     const tab = params.tab === 'acreditados' ? 'acreditados' : 'pendientes'
     const offset = Math.max(0, parseInt(params.offset ?? '0', 10))
 
@@ -30,12 +34,12 @@ export default async function SellerAccreditationsPage({
         fetchPendingAccreditationsCount(userId!)
     ])
 
-    const ids = Array.from(new Set(acreditaciones.map(a => a.buyerClerkUserId)))
+    const ids = Array.from(new Set(acreditaciones.map(a => a.buyerId)))
     const nombres = await Promise.all(ids.map(id => getSellerName(id)))
     const mapaNombres = Object.fromEntries(ids.map((id, index) => [id, nombres[index]]))
 
     return (
-        <AccreditationsView 
+        <AccreditationsView
             initialAcreditaciones={acreditaciones}
             mapaNombres={mapaNombres}
             total={total}

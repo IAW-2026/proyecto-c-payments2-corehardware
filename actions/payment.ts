@@ -86,7 +86,7 @@ export async function onPaymentRejected(pedidoId: string) {
         method: "PUT",
         headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${process.env.BUYER_API_KEY}`,
+            'x-api-key': process.env.BUYER_API_KEY!,
         },
         body: JSON.stringify({ estado: "PAGO_RECHAZADO" }),
     });
@@ -102,7 +102,7 @@ export async function onPaymentApproved(pagoId: string) {
     if (!pago) throw new Error(`Pago no encontrado: ${pagoId}`);
 
     const orderRes = await fetch(`${process.env.BUYER_API_URL}/api/orders/${pago.pedidoId}`, {
-        headers: { Authorization: `Bearer ${process.env.BUYER_API_KEY}` },
+        headers: { 'x-api-key': process.env.BUYER_API_KEY! },
     });
 
     if (!orderRes.ok) throw new Error(`Error al obtener orden: ${orderRes.status}`);
@@ -113,7 +113,7 @@ export async function onPaymentApproved(pagoId: string) {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${process.env.SELLER_API_KEY}`,
+            'x-api-key': process.env.SELLER_API_KEY!,
         },
         body: JSON.stringify({
             id: pagoId,
@@ -131,7 +131,7 @@ export async function onPaymentApproved(pagoId: string) {
         method: "PUT",
         headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${process.env.BUYER_API_KEY}`,
+            'x-api-key': process.env.BUYER_API_KEY!,
         },
         body: JSON.stringify({ estado: "PAGO_APROBADO" }),
     });

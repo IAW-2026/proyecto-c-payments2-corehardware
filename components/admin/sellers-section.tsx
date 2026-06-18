@@ -7,7 +7,12 @@ export async function SellersSection() {
 
     const sellers = (await Promise.all(
         ultimosVendedores.map(v =>
-            fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/mock/sellers/${v.clerkUserId}`, { cache: 'no-store' })
+            fetch(`${process.env.SELLER_API_URL}/api/sellers/${v.vendedorId}`, {
+                cache: 'no-store',
+                headers: {
+                    'x-api-key': process.env.SELLER_API_KEY!,
+                },
+            })
                 .then(res => res.ok ? res.json().then(data => ({ ...data, createdAt: v.createdAt })) : null)
         )
     )).filter(Boolean)
