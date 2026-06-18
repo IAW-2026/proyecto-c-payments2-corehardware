@@ -5,7 +5,11 @@ import { ITEMS_PER_PAGE } from '@/lib/constants'
 
 
 async function getBuyerMail(id: string): Promise<string> {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/mock/buyers/${id}`)
+    const res = await fetch(`${process.env.BUYER_API_URL}/api/buyers/${id}`, {
+        headers: {
+            'X-API-Key': process.env.BUYER_API_KEY!,
+        },
+    });
     if (!res.ok) return "No disponible"
     const data = await res.json()
     return data.mail
@@ -19,7 +23,7 @@ export default async function SellerDisputesPage({
 }) {
     const { userId } = await auth()
     const params = await searchParams
-    
+
     const tab = params.tab === 'resueltas' ? 'resueltas' : 'pendientes'
     const offset = Math.max(0, parseInt(params.offset ?? '0', 10))
 
@@ -28,13 +32,13 @@ export default async function SellerDisputesPage({
         fetchPendingDisputesCount(userId!)
     ])
 
-    const ids = Array.from(new Set(disputes.map(d => d.pago?.buyerClerkUserId).filter(Boolean) as string[]))
+    const ids = Array.from(new Set(disputes.map(d => d.pago?.buyerId).filter(Boolean) as string[]))
     const emails = await Promise.all(ids.map(id => getBuyerMail(id)))
     const mapaEmails = Object.fromEntries(ids.map((id, index) => [id, emails[index]]))
 
     return (
-        <DisputesView 
-            initialDisputes={disputes} 
+        <DisputesView
+            initialDisputes={disputes}
             emailsMap={mapaEmails}
             total={total}
             offset={offset}

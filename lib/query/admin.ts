@@ -57,7 +57,7 @@ export async function fetchLatestSellers() {
         orderBy: { createdAt: 'desc' },
         take: 10,
         select: {
-            clerkUserId: true,
+            vendedorId: true,
             createdAt: true
         }
     });
