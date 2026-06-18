@@ -138,7 +138,7 @@ export default function LandingPage() {
                         </div>
                         <div className="grid sm:grid-cols-2 gap-4 max-w-2xl mx-auto">
                             <Link
-                                href="#"
+                                href={process.env.BUYER_APP_URL!}
                                 className="group flex flex-col gap-3 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 hover:border-green-600/40 dark:hover:border-green-500/30 rounded-xl p-6 transition-colors"
                             >
                                 <div className="w-8 h-8 rounded-lg bg-green-600/10 dark:bg-green-500/10 flex items-center justify-center">
@@ -154,7 +154,7 @@ export default function LandingPage() {
                             </Link>
 
                             <Link
-                                href="#"
+                                href={process.env.SELLER_APP_URL!}
                                 className="group flex flex-col gap-3 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 hover:border-green-600/40 dark:hover:border-green-500/30 rounded-xl p-6 transition-colors"
                             >
                                 <div className="w-8 h-8 rounded-lg bg-green-600/10 dark:bg-green-500/10 flex items-center justify-center">
