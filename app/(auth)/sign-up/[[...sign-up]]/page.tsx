@@ -15,7 +15,7 @@ const roles = [
         icon: Store,
         title: 'Vendedor',
         description: 'Publicá productos y gestioná tu historial de cobros.',
-        href: process.env.SELLER_APP_URL! + '/sign-up',
+        href: process.env.SELLER_APP_URL!,
         Button: ButtonPrimary,
     },
 ]
