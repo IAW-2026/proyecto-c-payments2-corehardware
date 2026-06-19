@@ -42,6 +42,8 @@ export default async function MercadoPagoCallbackPage({
         });
         const vendedor = await vendedorRes.json();
 
+        console.log("vendedor recibido de /api/seller, la que usa JWT:", vendedor);
+
         await prisma.credencialVendedor.upsert({
             where: { mercadoPagoUserId: BigInt(data.user_id) },
             update: {
