@@ -94,44 +94,20 @@ export async function onPaymentRejected(pedidoId: string) {
 
 
 export async function onPaymentApproved(pagoId: string) {
-    console.log(`[onPaymentApproved] Iniciando para pagoId: ${pagoId}`);
-
     const pago = await prisma.pago.findUnique({
         where: { id: pagoId },
         select: { pedidoId: true, buyerId: true, sellerId: true, fecha: true, monto: true },
     });
 
-    if (!pago) {
-        console.error(`[onPaymentApproved] Pago no encontrado: ${pagoId}`);
-        throw new Error(`Pago no encontrado: ${pagoId}`);
-    }
-
-    console.log(`[onPaymentApproved] Pago encontrado:`, JSON.stringify(pago));
+    if (!pago) throw new Error(`Pago no encontrado: ${pagoId}`);
 
     const orderRes = await fetch(`${process.env.BUYER_API_URL}/api/orders/${pago.pedidoId}`, {
         headers: { 'x-api-key': process.env.BUYER_API_KEY! },
     });
 
-    console.log(`[onPaymentApproved] GET order ${pago.pedidoId} → status ${orderRes.status}`);
-
-    if (!orderRes.ok) {
-        const body = await orderRes.text();
-        console.error(`[onPaymentApproved] Error al obtener orden. Status: ${orderRes.status}, Body: ${body}`);
-        throw new Error(`Error al obtener orden: ${orderRes.status}`);
-    }
+    if (!orderRes.ok) throw new Error(`Error al obtener orden: ${orderRes.status}`);
 
     const order = await orderRes.json();
-    console.log(`[onPaymentApproved] Orden obtenida:`, JSON.stringify(order));
-
-    const salePayload = {
-        id: pagoId,
-        fecha: pago.fecha,
-        comprador_id: pago.buyerId,
-        vendedor_id: pago.sellerId,
-        productos: order.productos,
-        monto: Number(pago.monto),
-    };
-    console.log(`[onPaymentApproved] POST sale payload:`, JSON.stringify(salePayload));
 
     const saleRes = await fetch(`${process.env.SELLER_API_URL}/api/sale`, {
         method: "POST",
@@ -139,18 +115,17 @@ export async function onPaymentApproved(pagoId: string) {
             "Content-Type": "application/json",
             'x-api-key': process.env.SELLER_API_KEY!,
         },
-        body: JSON.stringify(salePayload),
+        body: JSON.stringify({
+            id: pagoId,
+            fecha: pago.fecha,
+            comprador_id: pago.buyerId,
+            vendedor_id: pago.sellerId,
+            productos: order.productos,
+            monto: Number(pago.monto),
+        }),
     });
 
-    console.log(`[onPaymentApproved] POST sale → status ${saleRes.status}`);
-
-    if (!saleRes.ok) {
-        const body = await saleRes.text();
-        console.error(`[onPaymentApproved] Error al crear venta. Status: ${saleRes.status}, Body: ${body}`);
-        throw new Error(`Error al crear venta: ${saleRes.status}`);
-    }
-
-    console.log(`[onPaymentApproved] Venta creada OK. Actualizando estado del pedido...`);
+    if (!saleRes.ok) throw new Error(`Error al crear venta: ${saleRes.status}`);
 
     const statusRes = await fetch(`${process.env.BUYER_API_URL}/api/orders/${pago.pedidoId}/status`, {
         method: "PUT",
@@ -161,13 +136,5 @@ export async function onPaymentApproved(pagoId: string) {
         body: JSON.stringify({ estado: "PAGO_APROBADO" }),
     });
 
-    console.log(`[onPaymentApproved] PUT status → status ${statusRes.status}`);
-
-    if (!statusRes.ok) {
-        const body = await statusRes.text();
-        console.error(`[onPaymentApproved] Error al actualizar estado. Status: ${statusRes.status}, Body: ${body}`);
-        throw new Error(`Error al actualizar estado: ${statusRes.status}`);
-    }
-
-    console.log(`[onPaymentApproved] Flujo completado OK para pagoId: ${pagoId}`);
+    if (!statusRes.ok) throw new Error(`Error al actualizar estado: ${statusRes.status}`);
 }
