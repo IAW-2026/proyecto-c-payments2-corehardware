@@ -130,6 +130,17 @@ export async function onPaymentApproved(pagoId: string) {
         throw err;
     }
 
+    const statusRes = await fetch(`${process.env.BUYER_API_URL}/api/orders/${pago.pedidoId}/status`, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+            'x-api-key': process.env.BUYER_API_KEY!,
+        },
+        body: JSON.stringify({ estado: "PAGO_APROBADO" }),
+    });
+
+    if (!statusRes.ok) throw new Error(`Error al actualizar estado: ${statusRes.status}`);
+
     const saleRes = await fetch(`${process.env.SELLER_API_URL}/api/sale`, {
         method: "POST",
         headers: {
@@ -147,15 +158,4 @@ export async function onPaymentApproved(pagoId: string) {
     });
 
     if (!saleRes.ok) throw new Error(`Error al crear venta: ${saleRes.status}`);
-
-    const statusRes = await fetch(`${process.env.BUYER_API_URL}/api/orders/${pago.pedidoId}/status`, {
-        method: "PUT",
-        headers: {
-            "Content-Type": "application/json",
-            'x-api-key': process.env.BUYER_API_KEY!,
-        },
-        body: JSON.stringify({ estado: "PAGO_APROBADO" }),
-    });
-
-    if (!statusRes.ok) throw new Error(`Error al actualizar estado: ${statusRes.status}`);
 }
