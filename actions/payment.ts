@@ -116,7 +116,7 @@ export async function onPaymentApproved(pagoId: string) {
             'x-api-key': process.env.SELLER_API_KEY!,
         },
         body: JSON.stringify({
-            id: pagoId,
+            id: pago.pedidoId,
             fecha: pago.fecha,
             comprador_id: pago.buyerId,
             vendedor_id: pago.sellerId,
