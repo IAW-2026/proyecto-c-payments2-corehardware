@@ -109,17 +109,26 @@ export async function onPaymentApproved(pagoId: string) {
 
     const orderRes = await fetch(url, {
         headers: { 'x-api-key': process.env.BUYER_API_KEY! },
-    }).catch(err => {
-        console.error(`[4] Error capturado en fetch:`, err);
-        throw err;
     });
 
     console.log(`[5] Fetch completado. Status: ${orderRes.status}`);
 
-    if (!orderRes.ok) throw new Error(`Error al obtener orden: ${orderRes.status}`);
+    if (!orderRes.ok) {
+        throw new Error(`Error al obtener orden: ${orderRes.status}`);
+    }
 
-    const order = await orderRes.json();
-    console.log(`[6] JSON parseado`);
+    let order;
+
+    try {
+        const text = await orderRes.text();
+        console.log(`[6] RAW RESPONSE:`, text);
+
+        order = JSON.parse(text);
+        console.log(`[7] JSON parseado`);
+    } catch (err) {
+        console.error(`[ERROR parsing order response]`, err);
+        throw err;
+    }
 
     const saleRes = await fetch(`${process.env.SELLER_API_URL}/api/sale`, {
         method: "POST",
