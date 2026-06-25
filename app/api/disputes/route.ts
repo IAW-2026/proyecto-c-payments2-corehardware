@@ -2,9 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
 const STATUS_MAP: Record<string, string> = {
-    open: "ABIERTA",
-    resolved: "RESUELTA",
-    under_review: "EN_REVISION",
+    pending: "pendiente",
+    refunded: "reembolsada",
+    replaced: "repuesta",
+    rejected: "rechazada",
 };
 
 export async function GET(request: NextRequest) {

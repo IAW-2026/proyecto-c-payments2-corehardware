@@ -3,12 +3,11 @@ import { revalidatePath } from 'next/cache'
 
 
 const BUYERS = {
-    buyer1: { clerkId: 'user_3FKfOSysGCxZhOAaOY4FhmKeTE4', id: 'cjld2cjxh0000qzrmn831i7rn' },
+    buyer1: { clerkId: 'user_3FKfOSysGCxZhOAaOY4FhmKeTE4', id: 'cmqkcwvhu0000h0tvzxrv201u' },
 }
 
 const SELLERS = {
-    seller1: { clerkId: 'user_3FKejpiVCZOvNA8H8yODqd2Dge2', id: 'cjld2czug0000wslmgigu8hqc' },
-    seller2: { clerkId: 'user_3FKf1K6dzkCdDCeNsvBZGsO9hqI', id: 'cjld2d0uh0000ewlmc0gkl4uo' },
+    seller1: { clerkId: 'user_3FKejpiVCZOvNA8H8yODqd2Dge2', id: 'cmqkc8b1r000084wvh0lvibw3' },
 }
 
 async function seed() {
@@ -45,9 +44,9 @@ async function seed() {
             },
             {
                 buyerId: BUYERS.buyer1.id,
-                sellerId: SELLERS.seller2.id,
+                sellerId: SELLERS.seller1.id,
                 buyerClerkUserId: BUYERS.buyer1.clerkId,
-                sellerClerkUserId: SELLERS.seller2.clerkId,
+                sellerClerkUserId: SELLERS.seller1.clerkId,
                 formaDePago: 'tarjeta_debito',
                 estado: 'rechazado',
                 pedidoId: 'order_003',
@@ -69,9 +68,9 @@ async function seed() {
             },
             {
                 buyerId: BUYERS.buyer1.id,
-                sellerId: SELLERS.seller2.id,
+                sellerId: SELLERS.seller1.id,
                 buyerClerkUserId: BUYERS.buyer1.clerkId,
-                sellerClerkUserId: SELLERS.seller2.clerkId,
+                sellerClerkUserId: SELLERS.seller1.clerkId,
                 formaDePago: 'transferencia',
                 estado: 'acreditado',
                 pedidoId: 'order_005',
@@ -81,9 +80,9 @@ async function seed() {
             },
             {
                 buyerId: BUYERS.buyer1.id,
-                sellerId: SELLERS.seller2.id,
+                sellerId: SELLERS.seller1.id,
                 buyerClerkUserId: BUYERS.buyer1.clerkId,
-                sellerClerkUserId: SELLERS.seller2.clerkId,
+                sellerClerkUserId: SELLERS.seller1.clerkId,
                 formaDePago: 'tarjeta_credito',
                 estado: 'acreditado',
                 pedidoId: 'order_006',
