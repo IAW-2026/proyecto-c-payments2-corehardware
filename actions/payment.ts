@@ -94,62 +94,51 @@ export async function onPaymentRejected(pedidoId: string) {
 
 
 export async function onPaymentApproved(pagoId: string) {
-    console.log(`[onPaymentApproved] Iniciando proceso para pagoId: ${pagoId}`);
+    console.log(`[1] Iniciando: ${pagoId}`);
 
     const pago = await prisma.pago.findUnique({
         where: { id: pagoId },
         select: { pedidoId: true, buyerId: true, sellerId: true, fecha: true, monto: true },
     });
 
-    if (!pago) {
-        console.error(`[onPaymentApproved] ERROR: Pago no encontrado en DB para ID: ${pagoId}`);
-        throw new Error(`Pago no encontrado: ${pagoId}`);
-    }
-    console.log(`[onPaymentApproved] Pago encontrado:`, { pedidoId: pago.pedidoId, buyerId: pago.buyerId });
+    if (!pago) throw new Error(`Pago no encontrado: ${pagoId}`);
 
-    // 1. Obtener orden
-    console.log(`[onPaymentApproved] Consultando orden: ${pago.pedidoId} en BUYER_API`);
-    const orderRes = await fetch(`${process.env.BUYER_API_URL}/api/orders/${pago.pedidoId}`, {
+    const url = `${process.env.BUYER_API_URL}/api/orders/${pago.pedidoId}`;
+    console.log(`[2] URL construida: ${url}`);
+    console.log(`[3] Intentando fetch...`);
+
+    const orderRes = await fetch(url, {
         headers: { 'x-api-key': process.env.BUYER_API_KEY! },
+    }).catch(err => {
+        console.error(`[4] Error capturado en fetch:`, err);
+        throw err;
     });
 
-    if (!orderRes.ok) {
-        console.error(`[onPaymentApproved] ERROR API BUYER (GET orden): ${orderRes.status} - ${orderRes.statusText}`);
-        throw new Error(`Error al obtener orden: ${orderRes.status}`);
-    }
+    console.log(`[5] Fetch completado. Status: ${orderRes.status}`);
+
+    if (!orderRes.ok) throw new Error(`Error al obtener orden: ${orderRes.status}`);
 
     const order = await orderRes.json();
-    console.log(`[onPaymentApproved] Orden obtenida correctamente.`);
+    console.log(`[6] JSON parseado`);
 
-    // 2. Crear venta
-    const payloadVenta = {
-        id: pago.pedidoId,
-        fecha: pago.fecha,
-        comprador_id: pago.buyerId,
-        vendedor_id: pago.sellerId,
-        productos: order.productos,
-        monto: Number(pago.monto),
-    };
-    
-    console.log(`[onPaymentApproved] Enviando POST a SELLER_API...`);
     const saleRes = await fetch(`${process.env.SELLER_API_URL}/api/sale`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
             'x-api-key': process.env.SELLER_API_KEY!,
         },
-        body: JSON.stringify(payloadVenta),
+        body: JSON.stringify({
+            id: pago.pedidoId,
+            fecha: pago.fecha,
+            comprador_id: pago.buyerId,
+            vendedor_id: pago.sellerId,
+            productos: order.productos,
+            monto: Number(pago.monto),
+        }),
     });
 
-    if (!saleRes.ok) {
-        const errorText = await saleRes.text();
-        console.error(`[onPaymentApproved] ERROR API SELLER (POST venta): ${saleRes.status} - ${errorText}`);
-        throw new Error(`Error al crear venta: ${saleRes.status}`);
-    }
-    console.log(`[onPaymentApproved] Venta creada exitosamente en SELLER_API`);
+    if (!saleRes.ok) throw new Error(`Error al crear venta: ${saleRes.status}`);
 
-    // 3. Actualizar estado
-    console.log(`[onPaymentApproved] Actualizando estado de orden: ${pago.pedidoId} a PAGO_APROBADO`);
     const statusRes = await fetch(`${process.env.BUYER_API_URL}/api/orders/${pago.pedidoId}/status`, {
         method: "PUT",
         headers: {
@@ -159,11 +148,5 @@ export async function onPaymentApproved(pagoId: string) {
         body: JSON.stringify({ estado: "PAGO_APROBADO" }),
     });
 
-    if (!statusRes.ok) {
-        const errorText = await statusRes.text();
-        console.error(`[onPaymentApproved] ERROR API BUYER (PUT status): ${statusRes.status} - ${errorText}`);
-        throw new Error(`Error al actualizar estado: ${statusRes.status}`);
-    }
-
-    console.log(`[onPaymentApproved] Proceso completado con éxito para pagoId: ${pagoId}`);
+    if (!statusRes.ok) throw new Error(`Error al actualizar estado: ${statusRes.status}`);
 }
