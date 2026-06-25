@@ -52,6 +52,8 @@ export async function POST(req: NextRequest) {
         // 4. Leer el cuerpo tras validar la firma
         const body = await req.json();
 
+        console.log(`Webhook MP | Tipo: ${body.type} | Acción: ${body.action} | ID: ${body.data?.id}`);
+
         // 5. Determinar el endpoint de consulta según el tipo
         const topic = body.type; // 'payment' o 'order'
         const resourceId = body.data?.id;
