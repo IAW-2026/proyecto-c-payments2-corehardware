@@ -92,10 +92,15 @@ export default async function AdminDashboardPage({
         })
         )
 
-    const sellersIds = Array.from(new Set(payments.map(p => p.sellerClerkUserId)))
+    const sellersIds = Array.from(new Set(payments.map(p => p.sellerId)))
     const nombresVendedores = await Promise.all(
         sellersIds.map(id =>
-            fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/mock/sellers/${id}`, { cache: 'no-store' })
+            fetch(`${process.env.SELLER_API_URL}/api/sellers/${id}`, {
+                cache: 'no-store',
+                headers: {
+                    'x-api-key': process.env.SELLER_API_KEY!,
+                },
+            })
                 .then(res => res.json())
                 .then(data => [id, data.razon_social as string])
         )

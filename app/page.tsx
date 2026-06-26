@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { ArrowRight, ShieldCheck, Clock, MessageSquareWarning } from 'lucide-react'
 import { ButtonPrimary, ButtonSecondary } from '@/components/ui/button'
+import { ContactSection } from '@/components/landing-page/contact-section'
 
 
 const pillars = [
@@ -138,7 +139,7 @@ export default function LandingPage() {
                         </div>
                         <div className="grid sm:grid-cols-2 gap-4 max-w-2xl mx-auto">
                             <Link
-                                href="#"
+                                href={process.env.BUYER_APP_URL!}
                                 className="group flex flex-col gap-3 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 hover:border-green-600/40 dark:hover:border-green-500/30 rounded-xl p-6 transition-colors"
                             >
                                 <div className="w-8 h-8 rounded-lg bg-green-600/10 dark:bg-green-500/10 flex items-center justify-center">
@@ -154,7 +155,7 @@ export default function LandingPage() {
                             </Link>
 
                             <Link
-                                href="#"
+                                href={process.env.SELLER_APP_URL!}
                                 className="group flex flex-col gap-3 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 hover:border-green-600/40 dark:hover:border-green-500/30 rounded-xl p-6 transition-colors"
                             >
                                 <div className="w-8 h-8 rounded-lg bg-green-600/10 dark:bg-green-500/10 flex items-center justify-center">
@@ -173,51 +174,7 @@ export default function LandingPage() {
                 </section>
 
                 {/* ── Contacto ── */}
-                <section className="py-20 px-6 border-t border-neutral-200 dark:border-neutral-900">
-                    <div className="mx-auto max-w-5xl grid md:grid-cols-2 gap-12 items-center">
-                        <div>
-                            <p className="text-xs font-mono text-green-600 dark:text-green-500 uppercase tracking-widest mb-3">Contacto</p>
-                            <h2 className="text-2xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100 mb-3">
-                                ¿Trabajás con nosotros?
-                            </h2>
-                            <p className="text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed">
-                                Si sos parte del equipo de logística o necesitás acceso como shipper, contactanos directamente. El acceso a esa plataforma se gestiona de forma interna.
-                            </p>
-                        </div>
-                        <div className="bg-neutral-100/60 dark:bg-neutral-900/60 border border-neutral-200 dark:border-neutral-800 rounded-xl p-6 space-y-4">
-                            <div className="space-y-1.5">
-                                <label htmlFor="nombre" className="text-xs font-medium text-neutral-400">Nombre</label>
-                                <input
-                                    type="text"
-                                    id="nombre"
-                                    placeholder="Tu nombre"
-                                    className="w-full px-3 py-2 bg-white dark:bg-neutral-950 border border-neutral-300 dark:border-neutral-800 rounded-lg text-sm text-neutral-800 dark:text-neutral-200 placeholder:text-neutral-400 dark:placeholder:text-neutral-700 focus:outline-none focus:border-green-600 focus:ring-2 focus:ring-green-600/10 dark:focus:border-green-500 dark:focus:ring-green-500/10 transition-all"
-                                />
-                            </div>
-                            <div className="space-y-1.5">
-                                <label htmlFor="email" className="text-xs font-medium text-neutral-400">Email</label>
-                                <input
-                                    type="email"
-                                    id="email"
-                                    placeholder="tu@email.com"
-                                    className="w-full px-3 py-2 bg-white dark:bg-neutral-950 border border-neutral-300 dark:border-neutral-800 rounded-lg text-sm text-neutral-800 dark:text-neutral-200 placeholder:text-neutral-400 dark:placeholder:text-neutral-700 focus:outline-none focus:border-green-600 focus:ring-2 focus:ring-green-600/10 dark:focus:border-green-500 dark:focus:ring-green-500/10 transition-all"
-                                />
-                            </div>
-                            <div className="space-y-1.5">
-                                <label htmlFor="mensaje" className="text-xs font-medium text-neutral-400">Mensaje</label>
-                                <textarea
-                                    id="mensaje"
-                                    rows={3}
-                                    placeholder="Contanos en qué podemos ayudarte..."
-                                    className="w-full px-3 py-2 bg-white dark:bg-neutral-950 border border-neutral-300 dark:border-neutral-800 rounded-lg text-sm text-neutral-800 dark:text-neutral-200 placeholder:text-neutral-400 dark:placeholder:text-neutral-700 focus:outline-none focus:border-green-600 focus:ring-2 focus:ring-green-600/10 dark:focus:border-green-500 dark:focus:ring-green-500/10 transition-all resize-none"
-                                />
-                            </div>
-                            <button className="w-full px-4 py-2.5 bg-green-600 hover:bg-green-500 dark:bg-green-500 dark:hover:bg-green-400 text-white dark:text-neutral-950 font-medium text-sm rounded-lg transition-colors active:scale-[0.98]">
-                                Enviar mensaje
-                            </button>
-                        </div>
-                    </div>
-                </section>
+                <ContactSection />
 
                 {/* ── Footer ── */}
                 <footer className="mt-auto border-t border-neutral-200 dark:border-neutral-900 py-6 px-6">

@@ -8,14 +8,14 @@ const roles = [
         icon: ShoppingCart,
         title: 'Comprador',
         description: 'Accedé al portal de pedidos y seguimiento de pagos.',
-        href: 'https://github.com/IAW-2026/proyecto-c-buyer2-corehardware',
+        href: process.env.BUYER_APP_URL! + '/sign-up',
         Button: ButtonPrimary,
     },
     {
         icon: Store,
         title: 'Vendedor',
         description: 'Publicá productos y gestioná tu historial de cobros.',
-        href: 'https://github.com/IAW-2026/proyecto-c-seller2-corehardware',
+        href: process.env.SELLER_APP_URL!,
         Button: ButtonPrimary,
     },
 ]

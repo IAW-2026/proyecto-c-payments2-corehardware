@@ -18,7 +18,6 @@ export async function processPaymentOrder(
     try {
         const pago = await prisma.pago.findUnique({
             where: { id: pagoId },
-            select: { sellerClerkUserId: true }
         });
 
         if (!pago) return { success: false, orderId: '', error: "Pago no encontrado" };
@@ -66,9 +65,14 @@ export async function processPaymentOrder(
         const data = await response.json();
 
         if (!response.ok) {
+            await prisma.pago.update({
+                where: { id: pagoId },
+                data: { estado: "rechazado" },
+            });
+            await onPaymentRejected(pago.pedidoId);
             return { success: false, orderId: '', error: data.message || 'Error en MP' };
         }
-        
+
         revalidatePath('/buyer/payments')
         return { success: true, orderId: data.id, error: '' };
     } catch {
@@ -76,3 +80,82 @@ export async function processPaymentOrder(
     }
 }
 
+
+export async function onPaymentRejected(pedidoId: string) {
+    await fetch(`${process.env.BUYER_API_URL}/api/orders/${pedidoId}/status`, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+            'x-api-key': process.env.BUYER_API_KEY!,
+        },
+        body: JSON.stringify({ estado: "PAGO_RECHAZADO" }),
+    });
+}
+
+
+export async function onPaymentApproved(pagoId: string) {
+    console.log(`[1] Iniciando: ${pagoId}`);
+
+    const pago = await prisma.pago.findUnique({
+        where: { id: pagoId },
+        select: { pedidoId: true, buyerId: true, sellerId: true, fecha: true, monto: true },
+    });
+
+    if (!pago) throw new Error(`Pago no encontrado: ${pagoId}`);
+
+    const url = `${process.env.BUYER_API_URL}/api/orders/${pago.pedidoId}`;
+    console.log(`[2] URL construida: ${url}`);
+    console.log(`[3] Intentando fetch...`);
+
+    const orderRes = await fetch(url, {
+        headers: { 'x-api-key': process.env.BUYER_API_KEY! },
+    });
+
+    console.log(`[5] Fetch completado. Status: ${orderRes.status}`);
+
+    if (!orderRes.ok) {
+        throw new Error(`Error al obtener orden: ${orderRes.status}`);
+    }
+
+    let order;
+
+    try {
+        const text = await orderRes.text();
+        console.log(`[6] RAW RESPONSE:`, text);
+
+        order = JSON.parse(text);
+        console.log(`[7] JSON parseado`);
+    } catch (err) {
+        console.error(`[ERROR parsing order response]`, err);
+        throw err;
+    }
+
+    const statusRes = await fetch(`${process.env.BUYER_API_URL}/api/orders/${pago.pedidoId}/status`, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+            'x-api-key': process.env.BUYER_API_KEY!,
+        },
+        body: JSON.stringify({ estado: "PAGO_APROBADO" }),
+    });
+
+    if (!statusRes.ok) throw new Error(`Error al actualizar estado: ${statusRes.status}`);
+
+    const saleRes = await fetch(`${process.env.SELLER_API_URL}/api/sale`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            'x-api-key': process.env.SELLER_API_KEY!,
+        },
+        body: JSON.stringify({
+            id: pago.pedidoId,
+            fecha: pago.fecha,
+            comprador_id: pago.buyerId,
+            vendedor_id: pago.sellerId,
+            productos: order.productos,
+            monto: Number(pago.monto),
+        }),
+    });
+
+    if (!saleRes.ok) throw new Error(`Error al crear venta: ${saleRes.status}`);
+}

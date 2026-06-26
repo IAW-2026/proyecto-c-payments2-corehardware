@@ -55,6 +55,7 @@ Contraseña: **iawuser#**
 - Código de seguridad: **123**
 - Fecha de caducidad: **11/30**
 - Documento de identidad: **(DNI) 12345678**
+- Mail: comprador@testuser.com
 
 #### Codigos para probar diferentes resultados (van en el campo nombre)
 - **APRO**: Pago aprobado.

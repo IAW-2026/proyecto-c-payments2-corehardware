@@ -3,13 +3,11 @@ import { revalidatePath } from 'next/cache'
 
 
 const BUYERS = {
-    buyer1: 'user_3EAcu0oi7IdFgIhhIqNFO7bxmM2',
-    buyer2: 'user_3EPiqm1dQiYgSxU3wI5SspkHOpy',
+    buyer1: { clerkId: 'user_3FKfOSysGCxZhOAaOY4FhmKeTE4', id: 'cmqkcwvhu0000h0tvzxrv201u' },
 }
 
 const SELLERS = {
-    seller1: 'user_3EAcoW6AOEJ5BIIlOLh3aQYty3u',
-    seller2: 'user_3EPivAYys776DSPXS1hM2lT3zw5',
+    seller1: { clerkId: 'user_3FKejpiVCZOvNA8H8yODqd2Dge2', id: 'cmqkc8b1r000084wvh0lvibw3' },
 }
 
 async function seed() {
@@ -21,8 +19,10 @@ async function seed() {
     const pagos = await prisma.pago.createManyAndReturn({
         data: [
             {
-                buyerClerkUserId: BUYERS.buyer1,
-                sellerClerkUserId: SELLERS.seller1,
+                buyerId: BUYERS.buyer1.id,
+                sellerId: SELLERS.seller1.id,
+                buyerClerkUserId: BUYERS.buyer1.clerkId,
+                sellerClerkUserId: SELLERS.seller1.clerkId,
                 formaDePago: 'tarjeta_credito',
                 estado: 'pendiente',
                 pedidoId: 'order_001',
@@ -31,8 +31,10 @@ async function seed() {
                 monto: 350.00,
             },
             {
-                buyerClerkUserId: BUYERS.buyer1,
-                sellerClerkUserId: SELLERS.seller1,
+                buyerId: BUYERS.buyer1.id,
+                sellerId: SELLERS.seller1.id,
+                buyerClerkUserId: BUYERS.buyer1.clerkId,
+                sellerClerkUserId: SELLERS.seller1.clerkId,
                 formaDePago: 'transferencia',
                 estado: 'acreditado',
                 pedidoId: 'order_002',
@@ -41,8 +43,10 @@ async function seed() {
                 monto: 780.50,
             },
             {
-                buyerClerkUserId: BUYERS.buyer1,
-                sellerClerkUserId: SELLERS.seller2,
+                buyerId: BUYERS.buyer1.id,
+                sellerId: SELLERS.seller1.id,
+                buyerClerkUserId: BUYERS.buyer1.clerkId,
+                sellerClerkUserId: SELLERS.seller1.clerkId,
                 formaDePago: 'tarjeta_debito',
                 estado: 'rechazado',
                 pedidoId: 'order_003',
@@ -51,8 +55,10 @@ async function seed() {
                 monto: 210.00,
             },
             {
-                buyerClerkUserId: BUYERS.buyer2,
-                sellerClerkUserId: SELLERS.seller1,
+                buyerId: BUYERS.buyer1.id,
+                sellerId: SELLERS.seller1.id,
+                buyerClerkUserId: BUYERS.buyer1.clerkId,
+                sellerClerkUserId: SELLERS.seller1.clerkId,
                 formaDePago: 'tarjeta_credito',
                 estado: 'pendiente',
                 pedidoId: 'order_004',
@@ -61,8 +67,10 @@ async function seed() {
                 monto: 640.75,
             },
             {
-                buyerClerkUserId: BUYERS.buyer2,
-                sellerClerkUserId: SELLERS.seller2,
+                buyerId: BUYERS.buyer1.id,
+                sellerId: SELLERS.seller1.id,
+                buyerClerkUserId: BUYERS.buyer1.clerkId,
+                sellerClerkUserId: SELLERS.seller1.clerkId,
                 formaDePago: 'transferencia',
                 estado: 'acreditado',
                 pedidoId: 'order_005',
@@ -71,8 +79,10 @@ async function seed() {
                 monto: 480.00,
             },
             {
-                buyerClerkUserId: BUYERS.buyer2,
-                sellerClerkUserId: SELLERS.seller2,
+                buyerId: BUYERS.buyer1.id,
+                sellerId: SELLERS.seller1.id,
+                buyerClerkUserId: BUYERS.buyer1.clerkId,
+                sellerClerkUserId: SELLERS.seller1.clerkId,
                 formaDePago: 'tarjeta_credito',
                 estado: 'acreditado',
                 pedidoId: 'order_006',
@@ -81,8 +91,10 @@ async function seed() {
                 monto: 920.25,
             },
             {
-                buyerClerkUserId: BUYERS.buyer1,
-                sellerClerkUserId: SELLERS.seller1,
+                buyerId: BUYERS.buyer1.id,
+                sellerId: SELLERS.seller1.id,
+                buyerClerkUserId: BUYERS.buyer1.clerkId,
+                sellerClerkUserId: SELLERS.seller1.clerkId,
                 formaDePago: 'transferencia',
                 estado: 'pendiente',
                 pedidoId: 'order_007',
@@ -91,8 +103,10 @@ async function seed() {
                 monto: 175.00,
             },
             {
-                buyerClerkUserId: BUYERS.buyer2,
-                sellerClerkUserId: SELLERS.seller1,
+                buyerId: BUYERS.buyer1.id,
+                sellerId: SELLERS.seller1.id,
+                buyerClerkUserId: BUYERS.buyer1.clerkId,
+                sellerClerkUserId: SELLERS.seller1.clerkId,
                 formaDePago: 'tarjeta_credito',
                 estado: 'acreditado',
                 pedidoId: 'order_008',
@@ -101,8 +115,10 @@ async function seed() {
                 monto: 830.00,
             },
             {
-                buyerClerkUserId: BUYERS.buyer2,
-                sellerClerkUserId: SELLERS.seller1,
+                buyerId: BUYERS.buyer1.id,
+                sellerId: SELLERS.seller1.id,
+                buyerClerkUserId: BUYERS.buyer1.clerkId,
+                sellerClerkUserId: SELLERS.seller1.clerkId,
                 formaDePago: 'tarjeta_credito',
                 estado: 'acreditado',
                 pedidoId: 'order_009',
@@ -120,7 +136,7 @@ async function seed() {
     await prisma.disputa.createMany({
         data: [
             {
-                clerkUserId: BUYERS.buyer1,
+                clerkUserId: BUYERS.buyer1.clerkId,
                 pedidoId: 'order_002',
                 pagoId: pagoOrder002.id,
                 fechaDeInicio: new Date('2026-04-23'),
@@ -129,7 +145,7 @@ async function seed() {
                 descripcion: 'Producto no recibido',
             },
             {
-                clerkUserId: BUYERS.buyer2,
+                clerkUserId: BUYERS.buyer1.clerkId,
                 pedidoId: 'order_005',
                 pagoId: pagoOrder005.id,
                 fechaDeInicio: new Date('2026-05-05'),
@@ -137,7 +153,7 @@ async function seed() {
                 descripcion: 'Monto incorrecto cobrado',
             },
             {
-                clerkUserId: BUYERS.buyer2,
+                clerkUserId: BUYERS.buyer1.clerkId,
                 pedidoId: 'order_004',
                 pagoId: pagoOrder004.id,
                 fechaDeInicio: new Date('2026-05-01'),
