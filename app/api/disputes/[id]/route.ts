@@ -1,12 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+
 const STATUS_MAP: Record<string, string> = {
     pending: "pendiente",
     refunded: "reembolsada",
     replaced: "repuesta",
     rejected: "rechazada",
 };
+
 
 export async function PATCH(
     request: NextRequest,
@@ -41,7 +43,12 @@ export async function PATCH(
 
         const disputes = await prisma.disputa.update({
             where: { id },
-            data: { estado: newStatus },
+            data: {
+                estado: newStatus,
+                ...(newStatus !== "pendiente" && !dispute.fechaDeFinalizacion
+                    ? { fechaDeFinalizacion: new Date() }
+                    : {}),
+            },
             select: {
                 id: true,
                 clerkUserId: true,
