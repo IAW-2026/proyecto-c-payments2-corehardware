@@ -1,0 +1,42 @@
+import { formatDate, formatAmount } from "@/lib/formatters";
+import { Badge } from "../ui/badge";
+import { Dispute, DisputeStatus } from "@/types/dispute";
+
+
+const estadoVariant: Record<DisputeStatus, React.ComponentProps<typeof Badge>['variant']> = {
+    pendiente:   'warning',
+    reembolsada: 'accent',
+    rechazada:   'danger',
+    repuesta: 'accent',  
+}
+
+const estadoLabel: Record<DisputeStatus, string> = {
+    pendiente:   'Pendiente',
+    reembolsada: 'Reembolsada',
+    rechazada:   'Rechazada',
+    repuesta: 'Repuesta',
+}
+
+
+export function DisputeRow({ disputa, monto }: { disputa: Dispute, monto: string }) {
+    return (
+        <tr className="border-b border-neutral-100 dark:border-neutral-800/60 last:border-0 hover:bg-neutral-50 dark:hover:bg-neutral-800/20 transition-colors">
+            <td className="hidden md:table-cell px-4 py-3.5 font-mono text-xs text-neutral-400 whitespace-nowrap">
+                {formatDate(disputa.fechaDeInicio)}
+            </td>
+            <td className="px-4 py-3.5">
+                <p className="text-sm font-medium text-neutral-800 dark:text-neutral-200">{disputa.descripcion}</p>
+                <p className="text-xs text-neutral-400 mt-0.5 md:hidden">{formatDate(disputa.fechaDeInicio)}</p>
+                <p className="text-xs text-neutral-400 mt-0.5 line-clamp-1">ID de pago: {disputa.pagoId}</p>
+            </td>
+            <td className="hidden md:table-cell px-4 py-3.5 font-mono text-sm font-semibold text-neutral-900 dark:text-neutral-100 whitespace-nowrap">
+                {formatAmount(Number(monto))}
+            </td>
+            <td className="px-4 py-3.5 text-right">
+                <Badge variant={estadoVariant[disputa.estado]}>
+                    {estadoLabel[disputa.estado]}
+                </Badge>
+            </td>
+        </tr>
+    )
+}
